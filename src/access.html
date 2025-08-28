@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Supabase (not used here but included if needed later) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- PWA Manifest & Theme -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#000000" />
+
+    <!-- For iOS PWA -->
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+
+    <style>
+        /* Loader & background */
+        body {
+            background: radial-gradient(circle at center, #001a00, #000);
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            font-family: 'Orbitron', sans-serif;
+            color: #00ff88;
+        }
+
+        .loader {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 4px solid rgba(0, 255, 136, 0.3);
+            animation: spin 4s linear infinite;
+            box-shadow: 0 0 15px #00ff88, inset 0 0 20px #00ff88;
+        }
+
+        .loader::before,
+        .loader::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            border: 3px solid #00ff88;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .loader::after {
+            border-color: rgba(0, 255, 136, 0.5);
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            animation-delay: 1s;
+        }
+
+        .text {
+            position: absolute;
+            text-align: center;
+            font-size: 1.5em;
+            text-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88;
+            animation: flicker 2s infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.5;
+            }
+        }
+
+        @keyframes flicker {
+
+            0%,
+            19%,
+            21%,
+            23%,
+            25%,
+            54%,
+            56%,
+            100% {
+                opacity: 1;
+            }
+
+            20%,
+            24%,
+            55% {
+                opacity: 0.3;
+            }
+        }
+
+        /* SweetAlert custom styles */
+        .swal2Style {
+            color: white;
+        }
+
+        .swal2-confirm {
+            background-color: green;
+        }
+
+        .swal2-confirm:hover {
+            background-color: #001a00;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="loader"></div>
+    <div class="text">OnTransat</div>
+
+    <script>
+        // Device detection helpers
+        function isMobile() {
+            return /android|iphone|ipad|ipod/i.test(navigator.userAgent);
+        }
+        function isIos() {
+            return /iphone|ipad|ipod/i.test(navigator.userAgent);
+        }
+
+        async function init() {
+            // Step 1: Service Worker support
+            if (!("serviceWorker" in navigator)) {
+                window.location.href = "https://on-flex.web.app/login/index.html?status=none";
+                return;
+            }
+
+            // Step 2: Detect PC vs Mobile
+            if (!isMobile()) {
+                // Desktop → allow login, // this index from server is just to allow notification only since it support SW
+                window.location.href = "/index.html";
+                return;
+            }
+
+            // Step 3: Mobile → block & show install instructions
+            if (isIos()) {
+                await Swal.fire({
+                    title: "📲 Install OnTransat",
+                    html: `
+            To continue, please:<br><br>
+            👉 Tap <b>Share</b> and choose <b>Add to Home Screen</b>.<br><br>
+            <b>This popup will not close until you install.</b>
+          `,
+                    icon: "info",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    allowEnterKey: false,
+                    showConfirmButton: false,
+                    background: '#0C290F',
+                    customClass: { popup: 'swal2Style' }
+                });
+            } else {
+                // Android → wait for install prompt
+                window.addEventListener("beforeinstallprompt", (event) => {
+                    event.preventDefault();
+                    Swal.fire({
+                        title: "📲 Install OnTransat",
+                        html: `
+              👉 On Android, tap <b>Install App</b> from your browser menu.<br><br>
+              <b>This popup will not close until you install.</b>
+            `,
+                        icon: "info",
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        allowEnterKey: false,
+                        showConfirmButton: false,
+                        background: '#0C290F',
+                        customClass: { popup: 'swal2Style' }
+                    });
+                });
+            }
+        }
+
+        window.addEventListener("load", init);
+    </script>
+</body>
+
+</html>

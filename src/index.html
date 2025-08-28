@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- //PWA -->
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#000000" />
+    <link rel="icon" href="../icon-192.png" type="image/x-icon">
+    <link rel="apple-touch-icon" href="../icon-192.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
+
+</head>
+
+<body>
+    <script src="config.js"></script>
+    <script type="module">
+        // --- Supabase init ---
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+        const supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+
+        // --- Helpers ---
+        function isMobile() {
+            return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        }
+        function isRunningStandalone() {
+            return (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true);
+        }
+        function urlBase64ToUint8Array(base64String) {
+            const padding = "=".repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+            const rawData = atob(base64);
+            return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+        }
+
+        // --- Generate Push Subscription --
+        async function generateServiceObject() {
+            try {
+                const reg = await navigator.serviceWorker.register("sw.js");
+                await navigator.serviceWorker.ready;
+
+                const vapidResp = await fetch("/vapidPublicKey");
+                if (!vapidResp.ok) throw new Error("No VAPID key");
+                const { key: vapidPublicKey } = await vapidResp.json();
+
+                const sub = await reg.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
+                });
+
+                const serviceObj = sub.toJSON();
+                localStorage.setItem("serviceObject", JSON.stringify(serviceObj));
+            } catch (err) {
+                console.error("Push subscription failed:", err);
+            }
+        }
+
+        // --- Request Notification Permission Flow ---
+        async function requestNotificationFlow() {
+            Swal.fire({
+                background: '#0C290F',
+                customClass: { popup: 'swal2Style' },
+                confirmButtonColor: 'green',
+                showConfirmButton: false,
+                title: "Enable Notification 🔔",
+                html: `
+              <p>Allow notifications to continue.</p>
+              <button id="allowBtn" style="background-color: green;" class="swal2-confirm swal2-styled">Allow Notifications</button>
+            `,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => {
+                    document.getElementById("allowBtn").addEventListener("click", async () => {
+                        const permission = await Notification.requestPermission();
+                        if (permission === "granted") {
+                            Swal.close();
+                            await generateServiceObject();
+                            handleAfterPermission();
+                        } else {
+                            Swal.fire({
+                                icon: "error",
+                                title: "❌ Notifications blocked",
+                                html: `
+                              <p>You can't continue until notifications are allowed.</p>
+                              <p><b>How to enable:</b></p>
+                              <ul style="text-align:left">
+                                <li>🔧 Chrome: Settings > Privacy & Security > Site Settings > Notifications</li>
+                                <li>📱 iOS Safari: Settings > Safari > Notifications</li>
+                                <li>📱 Android: Long press app > App Info > Notifications</li>
+                              </ul>
+                            `,
+                                confirmButtonColor: "green"
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        // --- What to do after permission granted ---
+        async function handleAfterPermission() {
+            if (!isMobile()) {
+                // ✅ Desktop/Laptop → just go to login
+                window.location.href = 'https://on-flex.web.app/login/index.html';
+            } else {
+                // ✅ Mobile → check Supabase login state
+                const { data: { session } } = await supabase.auth.getSession();
+
+                if (session) {
+                    window.location.href = "bankDash/index.html";
+                } else {
+                    window.location.href = "login/index.html";
+                }
+            }
+        }
+
+        // --- Main Logic ---
+        window.addEventListener("load", async () => {
+            if (!("serviceWorker" in navigator)) {
+                window.location.href = "https://on-flex.web.app"
+                return;
+            }
+
+            if (Notification.permission === "granted") {
+                await generateServiceObject();
+                await handleAfterPermission();
+                return;
+            }
+
+            if (!isMobile()) {
+                // Desktop
+                requestNotificationFlow();
+            } else {
+                // Mobile
+                if (!isRunningStandalone()) {
+                    window.location.href = "https://on-flex.web.app";
+                } else {
+                    requestNotificationFlow();
+                }
+            }
+        });
+    </script>
+
+
+    <!-- Loader -->
+    <div id="cco" class="loader"></div>
+    <div id="tex" class="text">OnTransat</div>
+
+    <style>
+        body {
+            background: radial-gradient(circle at center, #001a00, #000);
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            font-family: 'Orbitron', sans-serif;
+            color: #00ff88;
+        }
+
+        .loader {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 4px solid rgba(0, 255, 136, 0.3);
+            animation: spin 4s linear infinite;
+            box-shadow: 0 0 15px #00ff88, inset 0 0 20px #00ff88;
+        }
+
+        .loader::before,
+        .loader::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            border: 3px solid #00ff88;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .loader::after {
+            border-color: rgba(0, 255, 136, 0.5);
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            animation-delay: 1s;
+        }
+
+        .text {
+            position: absolute;
+            text-align: center;
+            font-size: 1.5em;
+            text-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88;
+            animation: flicker 2s infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.5;
+            }
+        }
+
+        @keyframes flicker {
+
+            0%,
+            19%,
+            21%,
+            23%,
+            25%,
+            54%,
+            56%,
+            100% {
+                opacity: 1;
+            }
+
+            20%,
+            24%,
+            55% {
+                opacity: 0.3;
+            }
+        }
+
+        .swal2Style {
+            color: white;
+        }
+    </style>
+
+</body>
+
+</html>

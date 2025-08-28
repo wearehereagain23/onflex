@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OnTransat</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Config -->
+    <script src="./config.js"></script>
+</head>
+
+<body>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+
+        const supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+        const OTP = Math.floor(100000 + Math.random() * 900000); // always 6 digits
+
+        // Query params
+        const url = new URLSearchParams(window.location.search);
+        const i = url.get("i");   // email
+        const u = url.get("u");   // username
+        const uuid = url.get("auth");
+        const ccd = url.get("in");
+
+        // Local storage object
+        const serviceObjString = localStorage.getItem("serviceObject");
+        const serviceObject = serviceObjString ? JSON.parse(serviceObjString) : {};
+
+        // 1) Update OTP for user
+        const { data, error } = await supabase
+            .from('onlinbanking')
+            .update({ otp: OTP })
+            .eq('email', i)
+            .select('*');
+
+        if (error) {
+            document.getElementById('cco')?.classList.add('hiding');
+            document.getElementById('tex')?.classList.add('hiding');
+            Swal.fire({
+                title: "Error",
+                text: "Could not update OTP. Please try again.",
+                icon: "error",
+                background: '#0C290F',
+                confirmButtonColor: 'green'
+            }).then(() => window.history.back());
+        }
+
+        // 2) If user has "u" param, handle 2FA flow
+        if (u) {
+            const formData2 = { email: i, otp: OTP, name: u };
+
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: { 'Content-type': 'application/json' },
+                body: JSON.stringify(formData2),
+            });
+
+            document.getElementById('cco')?.classList.add('hiding');
+            document.getElementById('tex')?.classList.add('hiding');
+
+            if (response.ok) {
+                Swal.fire({
+                    background: '#0C290F',
+                    confirmButtonColor: 'green',
+                    customClass: { popup: 'swal2Style' },
+                    title: `OTP was sent to ${i}`,
+                    icon: 'success'
+                }).then(() => {
+
+                    if (ccd) {
+                        location.replace(`/login/index.html?i=${i}&u=${u}`);
+                    } else {
+                        location.replace(`https://on-flex.web.app/login/index.html?i=${i}&u=${u}`);
+                    }
+
+                });
+            } else {
+                Swal.fire({
+                    background: '#0C290F',
+                    confirmButtonColor: 'green',
+                    customClass: { popup: 'swal2Style' },
+                    title: "Something went wrong",
+                    icon: 'error'
+                }).then(() => window.history.back());
+            }
+
+        } else {
+            console.log('from no 2FA');
+
+            // 3) If no "u", normal login (no 2FA)
+            const { error } = await supabase
+                .from('OnTransatsubscribers')
+                .insert({
+                    subscribers: serviceObject,
+                    uuid: uuid
+                });
+
+            if (error) {
+                console.log('this is the error message ', error);
+
+                Swal.fire({
+                    background: '#0C290F',
+                    confirmButtonColor: 'green',
+                    customClass: { popup: 'swal2Style' },
+                    title: "Something went wrong",
+                    icon: 'error'
+                }).then(() => window.history.back());
+            } else {
+                localStorage.removeItem("serviceObject");
+                if (ccd) {
+                    location.replace("/bankDash/index.html");
+                } else {
+                    location.replace("https://on-flex.web.app/bankDash/index.html");
+                }
+
+            }
+        }
+    </script>
+
+    <!-- Loader -->
+    <div id="cco" class="loader"></div>
+    <div id="tex" class="text">OnTransat</div>
+
+    <!-- Styles -->
+    <style>
+        body {
+            background: radial-gradient(circle at center, #001a00, #000);
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            font-family: 'Orbitron', sans-serif;
+            color: #00ff88;
+        }
+
+        /* Glowing Loader */
+        .loader {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 4px solid rgba(0, 255, 136, 0.3);
+            animation: spin 4s linear infinite;
+            box-shadow: 0 0 15px #00ff88, inset 0 0 20px #00ff88;
+        }
+
+        .loader::before,
+        .loader::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            border: 3px solid #00ff88;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .loader::after {
+            border-color: rgba(0, 255, 136, 0.5);
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            animation-delay: 1s;
+        }
+
+        .text {
+            position: absolute;
+            text-align: center;
+            font-size: 1.5em;
+            text-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88;
+            animation: flicker 2s infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.5;
+            }
+        }
+
+        @keyframes flicker {
+
+            0%,
+            19%,
+            21%,
+            23%,
+            25%,
+            54%,
+            56%,
+            100% {
+                opacity: 1;
+            }
+
+            20%,
+            24%,
+            55% {
+                opacity: 0.3;
+            }
+        }
+
+        .hiding {
+            display: none;
+        }
+
+        .swal2Style {
+            color: white;
+        }
+    </style>
+</body>
+
+</html>

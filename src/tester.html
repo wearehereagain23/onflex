@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PWA Login</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+    <h1 style="text-align:center;">🔔 Notification Login</h1>
+    <button id="enableBtn">Enable Notifications</button>
+
+    <script>
+        // --- Supabase init ---
+        const supabase = window.supabase.createClient(
+            "https://YOUR_PROJECT.supabase.co",   // 🔹 replace with your project URL
+            "YOUR_ANON_KEY"                       // 🔹 replace with your anon key
+        );
+
+        // --- Request permission on load ---
+        async function checkNotificationPermission() {
+            if (!("Notification" in window)) {
+                await Swal.fire("❌ Notifications not supported", "Redirecting...", "error");
+                return;
+            }
+
+            if (Notification.permission !== "granted") {
+                // Keep Swal open until user allows
+                Swal.fire({
+                    title: "⚠️ Enable Notifications",
+                    html: `
+            <p>You must allow notifications to continue.</p>
+            <button id="allowBtn" class="swal2-confirm swal2-styled">Allow Notifications</button>
+          `,
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => {
+                        document.getElementById("allowBtn").addEventListener("click", async () => {
+                            const permission = await Notification.requestPermission();
+                            if (permission === "granted") {
+                                Swal.close();
+                                Swal.fire("✅ Notifications enabled!", "", "success");
+                            }
+                        });
+                    }
+                });
+            }
+        }
+        checkNotificationPermission();
+
+        // --- Convert VAPID Key ---
+        function urlBase64ToUint8Array(base64String) {
+            const padding = "=".repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+            const rawData = atob(base64);
+            return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+        }
+
+        // --- Handle subscription ---
+        document.getElementById("enableBtn").addEventListener("click", async () => {
+            try {
+                // 1. Register service worker
+                const reg = await navigator.serviceWorker.register("/sw.js");
+                console.log("✅ Service Worker registered:", reg);
+
+                // 2. Get VAPID public key from backend
+                const vapidResp = await fetch("/vapidPublicKey");
+                const { key: vapidPublicKey } = await vapidResp.json();
+
+                // 3. Subscribe to push
+                const subscription = await reg.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+                });
+
+                // 4. Save subscription to Supabase
+                const { error } = await supabase.from("subscriptions").insert([
+                    {
+                        endpoint: subscription.endpoint,
+                        p256dh: subscription.keys.p256dh,
+                        auth: subscription.keys.auth,
+                    }
+                ]);
+
+                if (error) throw error;
+
+                Swal.fire("🎉 Subscribed!", "Your device is now ready for notifications", "success");
+            } catch (err) {
+                console.error("❌ Subscription failed", err);
+                Swal.fire("❌ Subscription failed", err.message, "error");
+            }
+        });
+    </script>
+</body>
+
+</html>

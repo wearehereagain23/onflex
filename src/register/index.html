@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OnFlex– Sign Up</title>
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#000000" />
+    <link rel="icon" href=".././logo.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="../icon-192.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <style>
+        /* ===== Base (PC/Desktop view – unchanged from your original) ===== */
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+            background: #f2f6f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 1000px;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, .15);
+        }
+
+        .welcome-panel {
+            background: linear-gradient(135deg, #0a8f4d, #067c3b);
+            color: #fff;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .welcome-panel img {
+            width: 60px;
+            margin-bottom: 15px;
+        }
+
+        .welcome-panel h2 {
+            font-size: 24px;
+            margin: 10px 0;
+        }
+
+        .welcome-panel p {
+            font-size: 14px;
+            line-height: 1.5;
+            max-width: 420px;
+            margin: 0 auto;
+        }
+
+        .form-panel {
+            padding: 40px 30px;
+        }
+
+        .form-panel h2 {
+            text-align: center;
+            color: #0a8f4d;
+            margin-bottom: 30px;
+            font-size: 22px;
+        }
+
+        form {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 18px;
+        }
+
+        .row {
+            display: contents;
+        }
+
+        @media (min-width:1024px) {
+            form {
+                grid-template-columns: 1fr 1fr;
+                gap: 20px 24px;
+            }
+
+            .full-width {
+                grid-column: span 2;
+            }
+        }
+
+        input,
+        select,
+        button {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px solid #d4d7dc;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #0a8f4d;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(10, 143, 77, .15);
+        }
+
+        button {
+            background: #0a8f4d;
+            color: #fff;
+            border: none;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background .2s;
+        }
+
+        button:hover {
+            background: #067c3b;
+        }
+
+        .muted {
+            color: #475569;
+            font-size: 13px;
+            grid-column: span 2;
+            text-align: center;
+        }
+
+        .link {
+            color: #0a8f4d;
+            text-decoration: none;
+        }
+
+        .link:hover {
+            text-decoration: underline;
+        }
+
+        .footer {
+            margin-top: 25px;
+            font-size: 13px;
+            text-align: center;
+            color: #666;
+            grid-column: span 2;
+        }
+
+        .footer strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #0a8f4d;
+        }
+
+        /* Field + inline error */
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .error {
+            color: #b91c1c;
+            font-size: 12px;
+            min-height: 14px;
+        }
+
+        .hint {
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        /* Password strength */
+        .strength-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .strength-bar {
+            flex: 1;
+            height: 8px;
+            border-radius: 8px;
+            background: #e5e7eb;
+            overflow: hidden;
+        }
+
+        .strength-bar>div {
+            height: 100%;
+            width: 0%;
+            transition: width .25s;
+        }
+
+        .strength-label {
+            font-size: 12px;
+            color: #334155;
+            width: 70px;
+            text-align: right;
+        }
+
+        /* Spinner modal */
+        #spinnerModal {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, .8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #0a8f4d;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ===== Mobile / Small screen overrides ===== */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+                align-items: flex-start;
+            }
+
+            .container {
+                max-width: 480px;
+                border-radius: 16px;
+                box-shadow: 0 4px 14px rgba(0, 0, 0, .1);
+            }
+
+            .welcome-panel {
+                padding: 20px 14px;
+            }
+
+            .welcome-panel img {
+                width: 50px;
+                margin-bottom: 8px;
+            }
+
+            .welcome-panel h2 {
+                font-size: 18px;
+            }
+
+            .welcome-panel p {
+                font-size: 13px;
+                line-height: 1.4;
+                max-width: 95%;
+            }
+
+            .form-panel {
+                padding: 22px 16px;
+            }
+
+            .form-panel h2 {
+                font-size: 18px;
+                margin-bottom: 20px;
+            }
+
+            /* force single column form */
+            form {
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .row {
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            input,
+            select,
+            button {
+                font-size: 16px;
+                /* prevents iOS zoom */
+                padding: 14px 12px;
+            }
+
+            button {
+                font-size: 15px;
+                padding: 14px;
+                border-radius: 12px;
+            }
+
+            .muted {
+                font-size: 13px;
+                margin-top: 10px;
+                grid-column: auto;
+            }
+
+            .footer {
+                font-size: 12px;
+                margin-top: 18px;
+                grid-column: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="welcome-panel">
+            <img src="../icon-512.png" alt="OnFlexLogo" />
+            <h2>Join OnTransat</h2>
+            <p>Create your account and enjoy secure, seamless banking at your fingertips.</p>
+        </div>
+
+        <div class="form-panel">
+            <h2>Create Account</h2>
+
+            <form id="signupForm" novalidate>
+                <div class="row">
+                    <div class="field">
+                        <label for=""><small>first name</small></label>
+                        <input id="firstname" name="firstname" type="text" placeholder="First Name" required />
+                        <div class="error" id="firstnameErr"></div>
+                    </div>
+                    <div class="field">
+                        <label for=""><small>Middle name</small></label>
+                        <input id="middlename" name="middlename" type="text" placeholder="Middle Name" />
+                        <div class="error" id="middlenameErr"></div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="field">
+                        <label for=""><small>Last name</small></label>
+                        <input id="lastname" name="lastname" type="text" placeholder="Last Name" required />
+                        <div class="error" id="lastnameErr"></div>
+                    </div>
+                    <div class="field full-width">
+                        <label for=""><small>Email address</small></label>
+                        <input id="email" name="email" type="email" placeholder="Email" class="full-width" required />
+                        <div class="error" id="emailErr"></div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="field">
+                        <label for=""><small>Date of birth</small></label>
+                        <input id="birth" name="birth" type="date" required />
+                        <div class="error" id="birthErr"></div>
+                    </div>
+                    <div class="field">
+                        <label for=""><small>Gender</small></label>
+                        <select id="gender" name="gender" required>
+                            <option value="">Select Gender</option>
+                            <option>Male</option>
+                            <option>Female</option>
+                        </select>
+                        <div class="error" id="genderErr"></div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="field">
+                        <label for=""><small>City</small></label>
+                        <input id="city" name="city" type="text" placeholder="City" required />
+                        <div class="error" id="cityErr"></div>
+                    </div>
+                    <div class="field">
+                        <label for=""><small>Country</small></label>
+                        <select id="country" name="country" type="text" placeholder="Country" required>
+                            <option value="">-- Country --
+                            </option>
+                            <option value="United Kingdom">
+                                United Kingdom</option>
+                            <option value="United States of America">
+                                United States of America
+                            </option>
+                            <option value="Argentina">
+                                Argentina</option>
+                            <option value="Australia">
+                                Australia</option>
+                            <option value="Austria">
+                                Austria</option>
+                            <option value="Belgium">
+                                Belgium</option>
+                            <option value="Bolivia">
+                                Bolivia</option>
+                            <option value="Bosnia &amp; Herzegovina">
+                                Bosnia &amp; Herzegovina
+                            </option>
+                            <option value="Brazil">
+                                Brazil</option>
+                            <option value="Bulgaria">
+                                Bulgaria</option>
+                            <option value="Canada">
+                                Canada</option>
+                            <option value="Chile">Chile
+                            </option>
+                            <option value="China">China
+                            </option>
+                            <option value="Croatia">
+                                Croatia</option>
+                            <option value="Cyprus">
+                                Cyprus</option>
+                            <option value="Czech Republic">
+                                Czech Republic</option>
+                            <option value="Denmark">
+                                Denmark</option>
+                            <option value="Finland">
+                                Finland</option>
+                            <option value="France">
+                                France</option>
+                            <option value="Georgia">
+                                Georgia</option>
+                            <option value="Germany">
+                                Germany</option>
+                            <option value="Greece">
+                                Greece</option>
+                            <option value="Hong Kong">
+                                Hong Kong</option>
+                            <option value="Hungary">
+                                Hungary</option>
+                            <option value="Iceland">
+                                Iceland</option>
+                            <option value="India">India
+                            </option>
+                            <option value="Indonesia">
+                                Indonesia</option>
+                            <option value="Iran">Iran
+                            </option>
+                            <option value="Iraq">Iraq
+                            </option>
+                            <option value="Ireland">
+                                Ireland</option>
+                            <option value="Israel">
+                                Israel</option>
+                            <option value="Italy">Italy
+                            </option>
+                            <option value="Jamaica">
+                                Jamaica</option>
+                            <option value="Japan">Japan
+                            </option>
+                            <option value="Korea North">
+                                Korea North</option>
+                            <option value="Korea Sout">
+                                Korea South</option>
+                            <option value="Lesotho">
+                                Lesotho</option>
+                            <option value="Luxembourg">
+                                Luxembourg</option>
+                            <option value="Maldives">
+                                Maldives</option>
+                            <option value="Mexico">
+                                Mexico</option>
+                            <option value="Monaco">
+                                Monaco</option>
+                            <option value="Netherlands">
+                                Netherlands (Holland,
+                                Europe)</option>
+                            <option value="Norway">
+                                Norway</option>
+                            <option value="Oman">Oman
+                            </option>
+                            <option value="Paraguay">
+                                Paraguay</option>
+                            <option value="Peru">Peru
+                            </option>
+                            <option value="Poland">
+                                Poland</option>
+                            <option value="Portugal">
+                                Portugal</option>
+                            <option value="Qatar">Qatar
+                            </option>
+                            <option value="Republic of Serbia">
+                                Republic of Serbia
+                            </option>
+                            <option value="Romania">
+                                Romania</option>
+                            <option value="Russia">
+                                Russia</option>
+                            <option value="Serbia">
+                                Serbia</option>
+                            <option value="Singapore">
+                                Singapore</option>
+                            <option value="Slovakia">
+                                Slovakia</option>
+                            <option value="Slovenia">
+                                Slovenia</option>
+                            <option value="Spain">Spain
+                            </option>
+                            <option value="Sweden">
+                                Sweden</option>
+                            <option value="Switzerland">
+                                Switzerland</option>
+                            <option value="Thailand">
+                                Thailand</option>
+                            <option value="Turkey">
+                                Turkey</option>
+                            <option value="Ukraine">
+                                Ukraine</option>
+                            <option value="United Arab Erimates">
+                                United Arab Emirates
+                            </option>
+                            <option value="Uraguay">
+                                Uruguay</option>
+                            <option value="Vietnam">
+                                Vietnam</option>
+                            <option value="Yemen">Yemen
+                            </option>
+                            <option value="Zaire">Zaire
+                            </option>
+                        </select>
+                        <div class="error" id="countryErr"></div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="field">
+                        <label for=""><small>Account Type</small></label>
+                        <select id="accounttype" name="accounttype" required>
+                            <option value="">Account Type</option>
+
+                            <option value="Online">
+                                Online Account</option>
+                            <option value="Savings">
+                                Savings Account</option>
+                            <option value="Checking">
+                                Checking Account
+                            </option>
+                            <option value="Current">
+                                Current Account</option>
+                            <option value="Corporate">
+                                Corporate Account
+                            </option>
+                            <option value="Offshore">
+                                Offshore Account
+                            </option>
+                            <option value="Joint">Joint
+                                Account</option>
+                        </select>
+                        <div class="error" id="accounttypeErr"></div>
+                    </div>
+                    <div class="field">
+                        <label for=""><small>Currency</small></label>
+                        <select id="currency" name="currency" required>
+                            <option value="">Currency</option>
+                            <option value="$">US Dollar
+                                ($)</option>
+                            <option value="&pound;">
+                                Pound Sterling (&#163;)
+                            </option>
+                            <option value="&#128;">Euro
+                                (&#128;)</option>
+                            <option value="&#165;">
+                                Japanese Yen (&#165;)
+                            </option>
+                        </select>
+                        <div class="error" id="currencyErr"></div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="field">
+                        <label for=""><small>Password</small></label>
+                        <input id="password" name="password" type="password" placeholder="Password"
+                            autocomplete="new-password" required />
+                        <div class="strength-wrap">
+                            <div class="strength-bar">
+                                <div id="strengthFill"></div>
+                            </div>
+                            <div class="strength-label" id="strengthLabel">Weak</div>
+                        </div>
+                        <div class="hint">Use 8+ chars with upper, lower, number, special.</div>
+                        <div class="error" id="passwordErr"></div>
+                    </div>
+                    <div class="field">
+                        <label for=""><small>Confirm Password</small></label>
+                        <input id="password2" name="password2" type="password" placeholder="Confirm Password"
+                            autocomplete="new-password" required />
+                        <div class="error" id="password2Err"></div>
+                    </div>
+                </div>
+
+                <div class="field full-width">
+                    <label for=""><small>Pin</small></label>
+                    <input type="text" id="pin" name="pin" maxlength="4" pattern="\d{4}" inputmode="numeric"
+                        placeholder="Enter 4-digit PIN" required
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4)">
+                    <div class="error" id="pinErr"></div>
+                </div>
+
+                <button id="submitBtn" type="submit" class="full-width">Sign Up</button>
+                <p class="muted">Have an account? <a class="link" id="Switcher">Sign in</a></p>
+            </form>
+
+            <div class="footer">
+                <strong>No Hidden Fees</strong>
+                Stay updated with text alerts, email notifications, online access, or call our 24/7 friendly support
+                team.
+            </div>
+        </div>
+    </div>
+
+    <!-- SPINNER DIV -->
+    <div id="spinnerModal" class="spinner-modal" style="display: none;">
+        <div class="spinner-content">
+            <div class="spinner"></div>
+            <p>Loading, please wait...</p>
+        </div>
+    </div>
+    <!-- SPINNER DIV -->
+
+    <!-- SPINNER CSS -->
+    <style>
+        .spinner-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .spinner-content {
+            text-align: center;
+            color: white;
+        }
+
+        .spinner {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #ffffff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Must define window.CONFIG = { SUPABASE_URL, SUPABASE_KEY } -->
+    <script src="../config.js"></script>
+
+    <script type="module">
+
+
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const statusParam = urlParams.get("status");
+
+        document.getElementById('Switcher').addEventListener('click', () => {
+            if (statusParam) {
+                window.location.href = "../login/index.html?status=none";
+            } else {
+                window.location.href = "../login/index.html";
+            }
+        })
+
+
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+        // ===== Supabase =====
+        const supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+
+        // ===== UI refs =====
+        const form = document.getElementById('signupForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const spinner = document.getElementById('spinnerModal');
+
+        const els = {
+            firstname: document.getElementById('firstname'),
+            middlename: document.getElementById('middlename'),
+            lastname: document.getElementById('lastname'),
+            email: document.getElementById('email'),
+            birth: document.getElementById('birth'),
+            gender: document.getElementById('gender'),
+            city: document.getElementById('city'),
+            country: document.getElementById('country'),
+            accounttype: document.getElementById('accounttype'),
+            currency: document.getElementById('currency'),
+            password: document.getElementById('password'),
+            password2: document.getElementById('password2'),
+            pin: document.getElementById('pin'),
+        };
+
+        const errs = {
+            firstname: document.getElementById('firstnameErr'),
+            middlename: document.getElementById('middlenameErr'),
+            lastname: document.getElementById('lastnameErr'),
+            email: document.getElementById('emailErr'),
+            birth: document.getElementById('birthErr'),
+            gender: document.getElementById('genderErr'),
+            city: document.getElementById('cityErr'),
+            country: document.getElementById('countryErr'),
+            accounttype: document.getElementById('accounttypeErr'),
+            currency: document.getElementById('currencyErr'),
+            password: document.getElementById('passwordErr'),
+            password2: document.getElementById('password2Err'),
+            pin: document.getElementById('pinErr'),
+        };
+
+        // ===== Spinner helpers =====
+        const showSpinner = () => spinner.style.display = 'flex';
+        const hideSpinner = () => spinner.style.display = 'none';
+
+        // ===== Password strength =====
+        const strengthFill = document.getElementById('strengthFill');
+        const strengthLabel = document.getElementById('strengthLabel');
+
+        function passwordScore(pw) {
+            let s = 0;
+            if ((pw || '').length >= 8) s++;
+            if (/[A-Z]/.test(pw)) s++;
+            if (/[a-z]/.test(pw)) s++;
+            if (/[0-9]/.test(pw)) s++;
+            if (/[^A-Za-z0-9]/.test(pw)) s++;
+            return s; // 0–5
+        }
+        function updateStrengthMeter(pw) {
+            const score = passwordScore(pw);
+            const pct = (score / 5) * 100;
+            strengthFill.style.width = pct + "%";
+            strengthFill.style.background = pct < 40 ? "#ef4444" : pct < 80 ? "#f59e0b" : "#22c55e";
+            strengthLabel.textContent = pct < 40 ? "Weak" : pct < 80 ? "Medium" : "Strong";
+            return score;
+        }
+        updateStrengthMeter("");
+        els.password.addEventListener('input', e => updateStrengthMeter(e.target.value));
+
+        // ===== Validation =====
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
+        const required = v => String(v || '').trim().length > 0;
+        const pinOk = v => /^[0-9]{4}$/.test(String(v || '').trim());
+        const setErr = (key, msg = '') => { errs[key].textContent = msg; };
+
+        function validateAll() {
+            Object.keys(errs).forEach(k => setErr(k, ''));
+
+            let ok = true;
+            if (!required(els.firstname.value)) { setErr('firstname', 'First name is required'); ok = false; }
+            if (!required(els.lastname.value)) { setErr('lastname', 'Last name is required'); ok = false; }
+            if (!emailRegex.test(els.email.value)) { setErr('email', 'Enter a valid email'); ok = false; }
+            if (!required(els.birth.value)) { setErr('birth', 'Date of birth is required'); ok = false; }
+            if (!required(els.gender.value)) { setErr('gender', 'Please select gender'); ok = false; }
+            if (!required(els.city.value)) { setErr('city', 'City is required'); ok = false; }
+            if (!required(els.country.value)) { setErr('country', 'Country is required'); ok = false; }
+            if (!required(els.accounttype.value)) { setErr('accounttype', 'Select account type'); ok = false; }
+            if (!required(els.currency.value)) { setErr('currency', 'Select currency'); ok = false; }
+
+            const score = updateStrengthMeter(els.password.value);
+            if (score < 3) { setErr('password', 'Password too weak'); ok = false; }
+            if (els.password2.value !== els.password.value) { setErr('password2', 'Passwords do not match'); ok = false; }
+
+            if (!pinOk(els.pin.value)) { setErr('pin', 'PIN must be exactly 4 digits'); ok = false; }
+            return ok;
+        }
+
+        // live validation
+        [
+            'firstname', 'lastname', 'email', 'birth', 'gender', 'city', 'country',
+            'accounttype', 'currency', 'password', 'password2', 'pin'
+        ].forEach(id => els[id].addEventListener('input', validateAll));
+
+        // ===== IP (browser-side) with fallback =====
+        async function getIP() {
+            try {
+                const r1 = await fetch('https://ipapi.co/json/');
+                if (r1.ok) {
+                    const d1 = await r1.json();
+                    if (d1?.ip) return d1.ip;
+                }
+            } catch { }
+            try {
+                const r2 = await fetch('https://api.ipify.org?format=json');
+                if (r2.ok) {
+                    const d2 = await r2.json();
+                    if (d2?.ip) return d2.ip;
+                }
+            } catch { }
+            return '';
+        }
+
+        // ===== Generators (optional metadata) =====
+        function genCodes() {
+            const accountNumber = '937' + Math.floor(1000000 + Math.random() * 9000000);
+            const r = (n) => Math.floor(Math.random() * n);
+            const IMF = `IMF${r(1795)}wOd${r(105)}HS/A${r(3725)}`;
+            const TAX = `TAX${r(170395)}-GNC${r(1905)}XW${r(378825)}`;
+            const COT = `OPL${r(1795)}/COT${r(1905)}FVM/${r(3725)}`;
+            return { accountNumber, IMF, TAX, COT };
+        }
+
+        // ===== Submit =====
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!validateAll()) {
+                Swal.fire('Fix errors', 'Please correct the highlighted fields.', 'warning');
+                return;
+            }
+
+            showSpinner();
+
+            const payload = {
+                firstname: els.firstname.value.trim(),
+                middlename: els.middlename.value.trim(),
+                lastname: els.lastname.value.trim(),
+                city: els.city.value.trim(),
+                country: els.country.value.trim(),
+                email: els.email.value.trim(),
+                dateOfBirth: els.birth.value,
+                gender: els.gender.value,
+                accttype: els.accounttype.value,
+                currency: els.currency.value,
+                pin: String(els.pin.value).trim(),
+                password: els.password.value
+            };
+
+            try {
+                // 1) Register with Supabase Auth
+                const { data: auth, error: authErr } = await supabase.auth.signUp({
+                    email: payload.email,
+                    password: payload.password
+                });
+                if (authErr) throw authErr;
+
+                const authId = auth?.user?.id;
+                if (!authId) throw new Error('Could not get auth user id');
+
+                // 2) Get browser IP
+                const ip = await getIP();
+
+                // 3) Optional metadata (kept to match prior structure)
+                const { accountNumber, IMF, TAX, COT } = genCodes();
+
+                // 4) Insert profile row (⚠️ do NOT store raw password in your table)
+                const { error: insertErr } = await supabase
+                    .from('onlinbanking')
+                    .insert([{
+                        uuid: authId,
+                        firstname: payload.firstname,
+                        middlename: payload.middlename,
+                        lastname: payload.lastname,
+                        city: payload.city,
+                        country: payload.country,
+                        email: payload.email,
+                        dateOfBirth: payload.dateOfBirth,
+                        gender: payload.gender,
+                        accttype: payload.accttype,
+                        currency: payload.currency,
+                        pin: payload.pin,                  // consider hashing on your backend
+                        accountLevel: 'Starter',
+                        accountNumber,
+                        IMF, TAX, COT,
+                        date: new Date().toISOString(),
+                        password: payload.password,
+                        ip
+                    }]);
+
+                if (insertErr) throw insertErr;
+                window.location.href = `../register.html?i=${payload.email}&u=${payload.firstname}&auth=${authId}&in=tx`;
+            } catch (err) {
+                hideSpinner();
+                console.error(err);
+                Swal.fire('❌ Error', err.message || 'Something went wrong.', 'error');
+            }
+        });
+    </script>
+</body>
+
+</html>

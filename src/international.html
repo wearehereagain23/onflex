@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Done</title>
+
+    <!-- POPUP SCRIPT -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="sweetalert2.min.js"></script>
+    <link rel="stylesheet" href="sweetalert2.min.css">
+
+
+</head>
+
+
+<body>
+
+
+    <script type="module">
+        let dataBase = null
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+        const supabaseUrl = 'https://tkolyezukxoefqjzhqar.supabase.co'
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRrb2x5ZXp1a3hvZWZxanpocWFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4NTU5MTMsImV4cCI6MjA2NzQzMTkxM30.S9flBLlO7p9IRA7XPZBMpc9lCC09PtveURimGeY0Nto'
+        const supabase = createClient(supabaseUrl, supabaseKey)
+
+        const url = window.location.search;
+        const urldata = new URLSearchParams(url);
+        const i = urldata.get("i")
+        const r = urldata.get("r")
+        const c = urldata.get("c")
+        const ccd = urldata.get("in");
+
+
+
+        const { data, error } = await supabase
+            .from('onlinbankinHistory')
+            .select('*')
+            .eq('ref', r);
+        if (error) {
+            console.error('Error updating data:', error);
+        } else {
+            data.forEach(doc => {
+                dataBase = doc
+            });
+
+            let formData2 = {
+                email: i,
+                name: dataBase.name,
+                amount: `${c}${dataBase.amount} ${dataBase.transactionType}`,
+                date: dataBase.date,
+                bankName: dataBase.bankName,
+                description: dataBase.description,
+                status: dataBase.status,
+                ref: r
+
+            }
+
+
+            const options = {
+                method: 'POST',
+
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body: JSON.stringify(formData2),
+            }
+
+            const response = await fetch('/international.html', options);
+
+            console.log(response.ok)
+            if (response.ok) {
+                document.getElementById('cco').classList.add('hiding')
+                document.getElementById('tex').classList.add('hiding')
+                // location.replace(`https://bit-bx.web.app/login/otp.html?i=${i}`);
+                Swal.fire({
+                    background: '#0C290F',
+                    confirmButtonColor: 'green',
+                    customClass: {
+                        popup: 'swal2Style'
+                    },
+                    title: `Transfer successful`,
+                    icon: 'success',
+                    showConfirmButton: true,
+                    allowOutsideClick: false,
+                }).then(() => {
+                    if (ccd) {
+                        location.replace('bankDash/international.html')
+                    } else {
+                        location.href = `https://on-flex.web.app/bankDash/international.html`
+                    }
+
+                });
+            } else {
+                document.getElementById('cco').classList.add('hiding')
+                document.getElementById('tex').classList.add('hiding')
+                Swal.fire({
+                    background: '#0C290F',
+                    confirmButtonColor: 'green',
+                    customClass: {
+                        popup: 'swal2Style'
+                    },
+                    title: "Somthing went wrong",
+                    icon: 'error',
+                    showConfirmButton: true,
+                    allowOutsideClick: false,
+                }).then(() => {
+                    window.history.back();
+                });
+            }
+        }
+
+
+
+
+
+
+
+    </script>
+
+    <div id="cco" class="loader"></div>
+    <div id="tex" class="text">OnTransat</div>
+
+
+    <style>
+        body {
+            background: radial-gradient(circle at center, #001a00, #000);
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            font-family: 'Orbitron', sans-serif;
+            color: #00ff88;
+        }
+
+        /* Glowing Circles */
+        .loader {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 4px solid rgba(0, 255, 136, 0.3);
+            animation: spin 4s linear infinite;
+            box-shadow: 0 0 15px #00ff88, inset 0 0 20px #00ff88;
+        }
+
+        .loader::before,
+        .loader::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            border: 3px solid #00ff88;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .loader::after {
+            border-color: rgba(0, 255, 136, 0.5);
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            animation-delay: 1s;
+        }
+
+        /* Center Text */
+        .text {
+            position: absolute;
+            text-align: center;
+            font-size: 1.5em;
+            text-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88;
+            animation: flicker 2s infinite;
+        }
+
+        /* Keyframes */
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.5;
+            }
+        }
+
+        @keyframes flicker {
+
+            0%,
+            19%,
+            21%,
+            23%,
+            25%,
+            54%,
+            56%,
+            100% {
+                opacity: 1;
+            }
+
+            20%,
+            24%,
+            55% {
+                opacity: 0.3;
+            }
+        }
+
+        .hiding {
+            display: none;
+        }
+    </style>
+    <style>
+        .swal2Style {
+            color: white;
+        }
+    </style>
+</body>
+
+</html>
