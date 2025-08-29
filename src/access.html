@@ -136,7 +136,7 @@
 
 <body>
     <div class="loader"></div>
-    <div class="text">OnTransat</div>
+    <div class="text">OnFlex</div>
 
     <script>
         // Device detection helpers
@@ -164,7 +164,7 @@
             // Step 3: Mobile → block & show install instructions
             if (isIos()) {
                 await Swal.fire({
-                    title: "📲 Install OnTransat",
+                    title: "📲 Install OnFlex",
                     html: `
             To continue, please:<br><br>
             👉 Tap <b>Share</b> and choose <b>Add to Home Screen</b>.<br><br>
@@ -183,7 +183,7 @@
                 window.addEventListener("beforeinstallprompt", (event) => {
                     event.preventDefault();
                     Swal.fire({
-                        title: "📲 Install OnTransat",
+                        title: "📲 Install OnFlex",
                         html: `
               👉 On Android, tap <b>Install App</b> from your browser menu.<br><br>
               <b>This popup will not close until you install.</b>

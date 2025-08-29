@@ -36,7 +36,7 @@ document.getElementById("notifyBtn").addEventListener("click", async () => {
         console.log("✅ Custom notification request sent!");
         //////// Notification to database
         const { data, error } = await window.supabase
-            .from('OnTransatNotification')
+            .from('OnFlexNotification')
             .insert({
                 title: title,
                 message: message,

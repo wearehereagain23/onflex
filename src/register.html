@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OnTransat</title>
+    <title>OnFlex</title>
 
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
@@ -128,7 +128,7 @@
 <body>
     <!-- Loader -->
     <div id="cco" class="loader"></div>
-    <div id="tex" class="text">OnTransat</div>
+    <div id="tex" class="text">OnFlex</div>
 
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
@@ -173,7 +173,7 @@
 
             if (response.ok) {
                 const { error } = await supabase
-                    .from('OnTransatsubscribers')
+                    .from('OnlinBankinsubscribers')
                     .insert([{ subscribers: serviceObject, uuid }]); // FIX: array
 
                 if (error) {
