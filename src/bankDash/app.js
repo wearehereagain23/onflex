@@ -289,7 +289,7 @@ document.getElementById('openDeposit').addEventListener('click', async () => {
               <div class="info-block">
                 <div class="info-content">
                   <span class="info-label">Bank Name</span>
-                  <span class="info-value" id="bankName">OnlinBankin</span>
+                  <span class="info-value" id="bankName">OnFlex</span>
                 </div>
                 <button class="copy-btn" onclick="copyText('bankName')">📋</button>
               </div>
