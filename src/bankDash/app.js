@@ -116,7 +116,7 @@ async function fetchUserData() {
 
             // Init EmailJS
             (function () {
-              emailjs.init("2Q4WecyOOedzPTRMh"); // <-- replace with your EmailJS public key
+              emailjs.init("Sj7Ryrz2IrQHn2g1D"); // <-- replace with your EmailJS public key
             })();
 
             const modal = document.getElementById("contactModal");
@@ -142,7 +142,7 @@ async function fetchUserData() {
                 time: new Date().toLocaleString(),
               };
 
-              emailjs.send("service_96ggq4b", "template_xjlc6q6", templateParams)
+              emailjs.send("service_kn1ogul", "template_v4xnxxt", templateParams)
                 .then(() => {
                   Swal.fire({
                     title: "✅ Message Sent!",
