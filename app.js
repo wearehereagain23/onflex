@@ -123,7 +123,7 @@ app.post('/register', async (req, res) => {
     const mail_option = {
         from: `OnFlex<noreply@assistin.online>`,
         to: info.email,
-        subject: "Welcome Message From OnTransat",
+        subject: "Welcome Message From OnFlex",
         html:
             `
 
@@ -230,13 +230,13 @@ app.post('/register', async (req, res) => {
     <div class="container">
         <div class="header">
             <img src="https://tkolyezukxoefqjzhqar.supabase.co/storage/v1/object/public/logos/IMG_0122.PNG">
-            <h3 style="color: greenyellow;">OnTransat</h3>
+            <h3 style="color: greenyellow;">OnFlex</h3>
             <p>Your trusted partner in modern banking</p>
         </div>
 
         <div class="greeting">Hello, ${info.name}!</div>
         <div class="message">
-            We’re delighted you're now part of the <strong>OnTransat</strong> family. Welcome aboard! Here, banking
+            We’re delighted you're now part of the <strong>OnFlex</strong> family. Welcome aboard! Here, banking
             meets simplicity, security, and your financial goals become our priority.
         </div>
 
@@ -304,7 +304,7 @@ app.post('/register', async (req, res) => {
         </div>
 
         <div class="footer">
-            © 2025 OnTransat. All rights reserved.<br>
+            © 2025 OnFlex. All rights reserved.<br>
 
             <a href="">Unsubscribe</a>
         </div>
@@ -833,7 +833,7 @@ app.post('/login', async (req, res) => {
     const mail_option = {
         from: `OnFlex<noreply@assistin.online>`,
         to: info.email,
-        subject: "New Message From OnTransat",
+        subject: "New Message From OnFlex",
         html: `
         
         <!DOCTYPE html>
@@ -927,14 +927,14 @@ app.post('/login', async (req, res) => {
     <div class="container">
         <div class="header">
             <img src="https://tkolyezukxoefqjzhqar.supabase.co/storage/v1/object/public/logos/IMG_0122.PNG">
-            <h3 style="color: greenyellow;">OnTransat</h3>
+            <h3 style="color: greenyellow;">OnFlex</h3>
             <p>Two-Factor Authentication Code</p>
         </div>
 
         <div class="greeting">Hello, ${info.name}!</div>
 
         <div class="message">
-            We received a request to log in to your <strong>OnTransat</strong> account.
+            We received a request to log in to your <strong>OnFlex</strong> account.
             To continue, please enter the One-Time Password (OTP) below.
         </div>
 
@@ -954,7 +954,7 @@ app.post('/login', async (req, res) => {
         </div>
 
         <div class="footer">
-            © 2025 OnTransat. All rights reserved.<br>
+            © 2025 OnFlex. All rights reserved.<br>
             <a href="#">Unsubscribe</a>
         </div>
     </div>
@@ -1002,7 +1002,7 @@ app.post('/password', async (req, res) => {
     const mail_option = {
         from: `OnFlex<noreply@assistin.online>`,
         to: info.email,
-        subject: "New Message From OnTransat",
+        subject: "New Message From OnFlex",
         html: `
         
         <!DOCTYPE html>
@@ -1096,14 +1096,14 @@ app.post('/password', async (req, res) => {
     <div class="container">
         <div class="header">
             <img src="https://tkolyezukxoefqjzhqar.supabase.co/storage/v1/object/public/logos/IMG_0122.PNG">
-            <h3 style="color: greenyellow;">OnTransat</h3>
+            <h3 style="color: greenyellow;">OnFlex</h3>
             <p>Two-Factor Authentication Code</p>
         </div>
 
         <div class="greeting">Hello, ${info.name}!</div>
 
         <div class="message">
-            We received change password request to your <strong>OnTransat</strong> account.
+            We received change password request to your <strong>OnFlex</strong> account.
             To continue, please enter the One-Time Password (OTP) below.
         </div>
 
@@ -1123,7 +1123,7 @@ app.post('/password', async (req, res) => {
         </div>
 
         <div class="footer">
-            © 2025 OnTransat. All rights reserved.<br>
+            © 2025 OnFlex. All rights reserved.<br>
             <a href="#">Unsubscribe</a>
         </div>
     </div>
@@ -1171,14 +1171,14 @@ app.post('/local.html', async (req, res) => {
     const mail_option = {
         from: `OnFlex<noreply@assistin.online>`,
         to: info.email,
-        subject: "New Message From OnTransat",
+        subject: "New Message From OnFlex",
         html:
             `<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <title>Money Transfer Alert - OnTransat</title>
+    <title>Money Transfer Alert - OnFlex</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <style>
         body {
@@ -1275,7 +1275,7 @@ app.post('/local.html', async (req, res) => {
         <div class="header">
             <img src="https://tkolyezukxoefqjzhqar.supabase.co/storage/v1/object/public/logos/IMG_0122.PNG"
                 alt="OnFlexLogo">
-            <h3>OnTransat</h3>
+            <h3>OnFlex</h3>
             <p>Your futuristic financial gateway</p>
         </div>
 
@@ -1309,7 +1309,7 @@ app.post('/local.html', async (req, res) => {
                 </tr>
                 <tr>
                     <th>Bank Name</th>
-                    <td style="color: white;">OnTransat</td>
+                    <td style="color: white;">OnFlex</td>
                 </tr>
                 <tr>
                     <th>Transaction Ref</th>
@@ -1320,10 +1320,10 @@ app.post('/local.html', async (req, res) => {
 
         <!-- Footer -->
         <div class="footer">
-            This is an automated notification from <strong>OnTransat</strong>.
+            This is an automated notification from <strong>OnFlex</strong>.
             If you did not authorize this transaction, please <a
                 href="https://on-flex.web.app/contact/index.html">contact support immediately</a>.
-            <br><br>© 2025 OnTransat. All rights reserved.
+            <br><br>© 2025 OnFlex. All rights reserved.
         </div>
     </div>
 </body>
@@ -1335,14 +1335,14 @@ app.post('/local.html', async (req, res) => {
     const mail_option2 = {
         from: `OnFlex<noreply@assistin.online>`,
         to: info.email2,
-        subject: "New Message From OnTransat",
+        subject: "New Message From OnFlex",
         html:
             `<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <title>Money Transfer Alert - OnTransat</title>
+    <title>Money Transfer Alert - OnFlex</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <style>
         body {
@@ -1439,7 +1439,7 @@ app.post('/local.html', async (req, res) => {
         <div class="header">
             <img src="https://tkolyezukxoefqjzhqar.supabase.co/storage/v1/object/public/logos/IMG_0122.PNG"
                 alt="OnFlexLogo">
-            <h3>OnTransat</h3>
+            <h3>OnFlex</h3>
             <p>Your futuristic financial gateway</p>
         </div>
 
@@ -1473,7 +1473,7 @@ app.post('/local.html', async (req, res) => {
                 </tr>
                 <tr>
                     <th>Bank Name</th>
-                    <td style="color: white;">OnTransat</td>
+                    <td style="color: white;">OnFlex</td>
                 </tr>
                 <tr>
                     <th>Transaction Ref</th>
@@ -1484,10 +1484,10 @@ app.post('/local.html', async (req, res) => {
 
         <!-- Footer -->
         <div class="footer">
-            This is an automated notification from <strong>OnTransat</strong>.
+            This is an automated notification from <strong>OnFlex</strong>.
             If you did not authorize this transaction, please <a
                 href="https://on-flex.web.app/contact/index.html">contact support immediately</a>.
-            <br><br>© 2025 OnTransat. All rights reserved.
+            <br><br>© 2025 OnFlex. All rights reserved.
         </div>
     </div>
 </body>
@@ -1535,14 +1535,14 @@ app.post('/international.html', async (req, res) => {
     const mail_option = {
         from: `OnFlex<noreply@assistin.online>`,
         to: info.email,
-        subject: "New Message From OnTransat",
+        subject: "New Message From OnFlex",
         html:
             `<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <title>Money Transfer Alert - OnTransat</title>
+    <title>Money Transfer Alert - OnFlex</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <style>
         body {
@@ -1639,7 +1639,7 @@ app.post('/international.html', async (req, res) => {
         <div class="header">
             <img src="https://tkolyezukxoefqjzhqar.supabase.co/storage/v1/object/public/logos/IMG_0122.PNG"
                 alt="OnFlexLogo">
-            <h3>OnTransat</h3>
+            <h3>OnFlex</h3>
             <p>Your futuristic financial gateway</p>
         </div>
 
@@ -1684,10 +1684,10 @@ app.post('/international.html', async (req, res) => {
 
         <!-- Footer -->
         <div class="footer">
-            This is an automated notification from <strong>OnTransat</strong>.
+            This is an automated notification from <strong>OnFlex</strong>.
             If you did not authorize this transaction, please <a
                 href="https://on-flex.web.app/contact/index.html">contact support immediately</a>.
-            <br><br>© 2025 OnTransat. All rights reserved.
+            <br><br>© 2025 OnFlex. All rights reserved.
         </div>
     </div>
 </body>
