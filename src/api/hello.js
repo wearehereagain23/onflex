@@ -1,7 +1,7 @@
 export default function handler(req, res) {
     // Always set CORS headers first
     res.setHeader("Access-Control-Allow-Credentials", true);
-    res.setHeader("Access-Control-Allow-Origin", "http://127.0.0.1:5500"); // 🔒 Replace * with your Firebase domain later
+    res.setHeader("Access-Control-Allow-Origin", "https://on-flex.web.app"); // 🔒 Replace * with your Firebase domain later
     res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS,POST");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
