@@ -9,9 +9,6 @@
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="config.js"></script>
     <!-- PWA Manifest & Icons -->
     <link rel="manifest" href="manifest.json" />
@@ -31,137 +28,34 @@
     <div class="text">OnFlex</div>
 
     <script>
-        // ====== CONFIG ======
-        firebase.initializeApp(CONFIG.FIREBASE);
-        const auth = firebase.auth();
+        (function authGuard() {
+            // 1. Attempt to retrieve the local session
+            const sessionRaw = localStorage.getItem('user_session');
 
-        const VAPID_PUBLIC_KEY = CONFIG.VAPID_PUBLIC_KEY;
+            if (sessionRaw) {
+                try {
+                    const sessionData = JSON.parse(sessionRaw);
 
-        // ====== HELPERS ======
-        function urlBase64ToUint8Array(base64String) {
-            const padding = "=".repeat((4 - base64String.length % 4) % 4);
-            const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
-            const rawData = atob(base64);
-            return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
-        }
+                    // 2. Validate session structure (ensuring it's not empty or corrupted)
+                    if (sessionData && sessionData.uuid) {
+                        console.log("Active session found for:", sessionData.fullName);
 
-        async function generateServiceObject() {
-            try {
-                const reg = await navigator.serviceWorker.register("sw.js");
-                await navigator.serviceWorker.ready;
-
-                const sub = await reg.pushManager.subscribe({
-                    userVisibleOnly: true,
-                    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
-                });
-
-                localStorage.setItem("serviceObject", JSON.stringify(sub.toJSON()));
-                console.log("Service object saved:", sub.toJSON());
-            } catch (err) {
-                console.error("Push subscription failed:", err);
-            }
-        }
-
-        async function requestNotificationFlow() {
-            return new Promise((resolve) => {
-                Swal.fire({
-                    background: "#0C290F",
-                    customClass: { popup: "swal2Style" },
-                    title: "Enable Notifications 🔔",
-                    html: `
-            <p>We need notifications enabled to continue.</p>
-            <button id="allowBtn" class="swal2-confirm swal2-styled" style="background:green">Allow Notifications</button>
-          `,
-                    showConfirmButton: false,
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    didOpen: () => {
-                        function getDeviceInstructions() {
-                            if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-                                return `
-            📱 <b>iOS Safari</b>:<br>
-            1. Open <b>Settings</b> → <b>Safari</b> → <b>Notifications</b><br>
-            2. Allow notifications for this site<br>
-            3. Refresh this page
-        `;
-                            } else if (/Android/i.test(navigator.userAgent)) {
-                                return `
-            🤖 <b>Android (Chrome)</b>:<br>
-            1. Open <b>Chrome</b> → <b>⋮ Menu</b> → <b>Settings</b><br>
-            2. Site settings → Notifications → find this site → Allow<br>
-            3. Refresh this page
-        `;
-                            } else {
-                                return `
-            💻 <b>Desktop (Chrome/Edge)</b>:<br>
-            1. Click the <b>🔒 lock icon</b> in the address bar<br>
-            2. Open <b>Site settings</b><br>
-            3. Set <b>Notifications</b> to Allow<br>
-            4. Refresh this page
-        `;
-                            }
-                        }
-
-                        document.getElementById("allowBtn").addEventListener("click", async () => {
-                            const permission = await Notification.requestPermission();
-                            if (permission === "granted") {
-                                Swal.close();
-                                resolve(true);
-                            } else {
-                                Swal.fire({
-                                    icon: "error",
-                                    title: "❌ Notifications Blocked",
-                                    html: `
-                <p>You must enable notifications in your browser settings.</p>
-                <p><b>How to enable:</b></p>
-                <div style="text-align:left">${getDeviceInstructions()}</div>
-            `,
-                                    background: '#0C290F',
-                                    allowOutsideClick: false,
-                                    showConfirmButton: false,
-                                    allowEscapeKey: false,
-                                    allowEnterKey: false,
-                                    customClass: { popup: 'swal2Style' }
-                                });
-                                resolve(false);
-                            }
-                        });
-
+                        // Redirect to dashboard immediately
+                        window.location.replace("./dashboard/index.html");
+                        return;
                     }
-                });
-            });
-        }
-
-        async function handleAfterPermission() {
-            // Check Firebase login state
-            auth.onAuthStateChanged(user => {
-                if (user) {
-                    window.location.href = "dashboard/index.html";
-                } else {
-                    window.location.href = "login/index.html";
-                }
-            });
-        }
-
-        // ====== MAIN LOGIC ======
-        window.addEventListener("load", async () => {
-            if (!("serviceWorker" in navigator)) {
-                alert("Service workers not supported on this device.");
-                window.location.href = "login/index.html?status=unsupported";
-                return;
-            }
-
-            if (Notification.permission === "granted") {
-                await generateServiceObject();
-                await handleAfterPermission();
-            } else {
-                const allowed = await requestNotificationFlow();
-                if (allowed) {
-                    await generateServiceObject();
-                    await handleAfterPermission();
+                } catch (e) {
+                    console.error("Session corrupted, clearing storage.");
+                    localStorage.removeItem('user_session');
                 }
             }
-        });
+
+            // 3. No session or invalid session: Redirect to login after a tiny splash delay
+            // You can adjust the 1500ms to match your splash animation length
+            setTimeout(() => {
+                window.location.replace("./login/index.html");
+            }, 1500);
+        })();
     </script>
 
     <style>
