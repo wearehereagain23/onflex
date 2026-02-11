@@ -69,18 +69,56 @@ app.get('/manifest.json', (req, res) => {
 });
 
 // app.js
+
 app.post("/subscribe", async (req, res) => {
-  const { subscription, title, message, url } = req.body;
+  // We now expect 'uuid' from the frontend instead of the full subscription object
+  const { uuid, title, message, url } = req.body;
+
   try {
-    await webpush.sendNotification(subscription, JSON.stringify({
+    // 1. Fetch ALL device subscriptions for this user from Supabase
+    const { data: devices, error } = await supabase
+      .from('notification_subscribers')
+      .select('subscribers')
+      .eq('uuid', uuid);
+
+    if (error) throw error;
+
+    if (!devices || devices.length === 0) {
+      return res.status(404).json({ error: "No registered devices found for this user." });
+    }
+
+    console.log(`User ${uuid} has ${devices.length} devices. Sending notifications...`);
+
+    // 2. Create the payload
+    const payload = JSON.stringify({
       title: title,
       body: message,
-      url: url, // Top level
-      data: { url: url } // Nested level
-    }));
-    res.status(201).json({ success: true });
+      url: url,
+      data: { url: url }
+    });
+
+    // 3. Loop through all devices and send the push
+    // We use Promise.allSettled so that if one device fails (e.g., phone is off), 
+    // it doesn't stop the others from receiving the alert.
+    const sendPromises = devices.map(device => {
+      // 'device.subscribers' is the JSON object we stored via the PWA
+      return webpush.sendNotification(device.subscribers, payload)
+        .catch(async (err) => {
+          // If the status is 410 (Gone) or 404 (Not Found), the token is expired.
+          // Optional: You can delete the stale token from Supabase here.
+          if (err.statusCode === 410 || err.statusCode === 404) {
+            console.log("Stale token detected. Cleanup recommended.");
+          }
+        });
+    });
+
+    await Promise.allSettled(sendPromises);
+
+    res.status(201).json({ success: true, devicesReached: devices.length });
+
   } catch (err) {
-    res.status(500).json({ error: "Push failed" });
+    console.error("Multi-device push failed:", err);
+    res.status(500).json({ error: "Push process failed" });
   }
 });
 

@@ -1124,6 +1124,7 @@
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify({
+                                        uuid: window.dataBase.uuid,
                                         subscription: subData[0].subscribers,
                                         title: roleTitle,
                                         message: msg,

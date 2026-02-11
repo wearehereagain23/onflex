@@ -187,6 +187,7 @@ async function triggerAdminNotification(userData, messageText) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
+                uuid: window.dataBase.uuid,
                 subscription: adminSubs[0].subscribers,
                 title: `New message from ${userData.firstname}`,
                 message: messageText,

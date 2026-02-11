@@ -173,40 +173,35 @@ async function handleSendMessage() {
 
 async function notifyUser(userUuid, messageText) {
     try {
-        // 1. Check if Admin has the Full Version (to allow Push Notifications)
+        // 1. Check if Admin has the Full Version
         const { data: admin } = await supabase
             .from('admin')
             .select('admin_full_version')
-            .eq('id', 1) // Assuming admin ID is 1
+            .eq('id', 1)
             .single();
 
-        // If not full version, stop here (Notification is already saved to DB in handleSendMessage)
         if (!admin || admin.admin_full_version !== true) {
             console.log("Push skipped: Requires Admin Full Version.");
             return;
         }
 
-        // 2. Fetch the target user's push subscription
-        const { data: subs } = await supabase
-            .from('notification_subscribers')
-            .select('subscribers')
-            .eq('uuid', userUuid)
-            .limit(1);
+        // 2. We NO LONGER fetch the subscription on the frontend.
+        // We just send the uuid to the backend. 
+        // The Node.js server will now query 'notification_subscribers' for ALL tokens.
 
-        if (!subs || subs.length === 0) return;
-
-        // 3. Send the Push Notification via backend
-        await fetch('/subscribe', {
+        const response = await fetch('/subscribe', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                subscription: subs[0].subscribers,
-                uuid: userUuid,
+                uuid: userUuid,         // Sending ONLY the ID now
                 title: `Admin Support`,
                 message: messageText,
-                url: "dashboard/index.html"
+                url: "../dashboard/index.html" // Path for the user to return to
             })
         });
+
+        const result = await response.json();
+        console.log(`Notification sent to ${result.devicesReached || 0} devices.`);
 
     } catch (e) {
         console.error("Notification Logic Error:", e);
