@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <link rel="icon" href="images/favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>LightAble | Next js & Admin Dashboard</title>
+
+    <!-- Fonts & Styles -->
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="css/69de85e1c8b0bbe0.css" as="style">
+    <link rel="stylesheet" href="css/69de85e1c8b0bbe0.css">
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+    <!-- Firebase Config -->
+    <script src="../../config.js"></script>
+
+    <script>
+        // ===== Init Firebase =====
+        if (!firebase.apps.length) {
+            firebase.initializeApp(CONFIG.FIREBASE);
+        }
+        const auth = firebase.auth();
+
+        // ===== Spinner Handling =====
+        function showSpinnerModal() {
+            const spinner = document.getElementById('spinnerModal');
+            if (spinner) spinner.style.display = 'flex';
+        }
+
+        function hideSpinnerModal() {
+            const spinner = document.getElementById('spinnerModal');
+            if (spinner) spinner.style.display = 'none';
+        }
+
+        // ===== Login Function =====
+        async function loginUser(email, password) {
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                if (user) {
+                    console.log("✅ Login successful:", user.uid);
+                    hideSpinnerModal();
+                    window.location.href = "../users/dashboard/users.html";
+                }
+            } catch (error) {
+                console.error("❌ Login failed:", error.message);
+                hideSpinnerModal();
+                Swal.fire({
+                    title: "Login Failed",
+                    text: error.message,
+                    icon: "error",
+                    confirmButtonColor: "red"
+                });
+            }
+        }
+
+        // ===== Form Handling =====
+        window.addEventListener("DOMContentLoaded", () => {
+            const formDAT = document.getElementById('mainform');
+
+            if (formDAT) {
+                formDAT.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+                    showSpinnerModal();
+
+                    const formData = new FormData(formDAT);
+                    let email = formData.get('email')?.toLowerCase().trim();
+                    let password = formData.get('password')?.trim();
+
+                    // Restrict login to a specific email (remove this if you want all users to log in)
+                    if (email === 'onflex@assistin.online') {
+                        loginUser(email, password);
+                    } else {
+                        hideSpinnerModal();
+                        Swal.fire({
+                            title: "Access Denied",
+                            text: "You are not authorized to log in with this account.",
+                            icon: "warning",
+                            confirmButtonColor: "orange"
+                        });
+                    }
+                });
+            }
+        });
+    </script>
+
+    <!-- Spinner CSS -->
+    <style>
+        .spinner-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .spinner-content {
+            text-align: center;
+            color: white;
+        }
+
+        .spinner {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #ffffff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body data-pc-preset="preset-1" data-pc-sidebar-theme="light" data-pc-sidebar-caption="true" data-pc-direction="ltr"
+    data-pc-theme="light">
+
+    <div id="__next">
+        <div class="auth-main v1">
+            <div class="auth-wrapper">
+                <div class="auth-form">
+                    <div class="my-5 card">
+                        <div class="card-body">
+                            <div class="text-center">
+                                <img alt="logo" loading="lazy" width="120" height="120" class="img-fluid mb-3"
+                                    src="images/image.png">
+                                <h4 class="f-w-500 mb-1">Login with your email</h4>
+                            </div>
+
+                            <form id="mainform">
+                                <div class="form-group mb-3">
+                                    <input type="email" class="form-control" id="email" name="email"
+                                        placeholder="Email Address" required>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <input type="password" class="form-control" id="password" name="password"
+                                        placeholder="Password" required>
+                                </div>
+
+                                <div class="d-flex mt-1 justify-content-between align-items-center">
+                                    <div class="form-check">
+                                        <input class="form-check-input input-primary" type="checkbox" id="customCheckc1"
+                                            checked>
+                                        <label class="form-check-label text-muted" for="customCheckc1">Remember
+                                            me?</label>
+                                    </div>
+                                    <button type="button" class="btn btn-link p-0">
+                                        <h6 class="f-w-400 mb-0">Forgot Password?</h6>
+                                    </button>
+                                </div>
+
+                                <div class="d-grid mt-4">
+                                    <input type="submit" value="Login" class="btn btn-primary" />
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SPINNER DIV -->
+            <div id="spinnerModal" class="spinner-modal">
+                <div class="spinner-content">
+                    <div class="spinner"></div>
+                    <p>Loading, please wait...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

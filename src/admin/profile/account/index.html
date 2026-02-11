@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>OnFlex - Login</title>
+	<link rel="manifest" href="manifest.json" />
+	<meta name="theme-color" content="#000000" />
+	<link rel="icon" href=".././logo.ico" type="image/x-icon">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
+	<style>
+		/* --- Mobile‑first, fluid layout --- */
+		*,
+		*::before,
+		*::after {
+			box-sizing: border-box;
+		}
+
+		html,
+		body {
+			width: 100%;
+			height: 100%;
+			overflow-x: hidden;
+		}
+
+		body {
+			margin: 0;
+			font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+			background: #f2f6f7;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			min-height: 100vh;
+			padding: clamp(12px, 4vw, 32px);
+		}
+
+		/* Card container uses grid: 1 column on mobile, 2 columns on wider screens */
+		.container {
+			width: 100%;
+			max-width: 980px;
+			background: #fff;
+			border-radius: 16px;
+			overflow: hidden;
+			/* ensures children never spill outside */
+			box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+			display: grid;
+			grid-template-columns: 1fr;
+		}
+
+		/* Welcome (left) panel */
+		.welcome-panel {
+			background: linear-gradient(135deg, #0a8f4d, #067c3b);
+			color: #fff;
+			padding: clamp(24px, 6vw, 48px);
+			text-align: center;
+		}
+
+		.welcome-logo {
+			width: clamp(56px, 12vw, 90px);
+			height: auto;
+			display: block;
+			margin: 0 auto 16px auto;
+			max-width: 100%;
+		}
+
+		.welcome-title {
+			margin: 8px 0 12px;
+			font-size: clamp(20px, 3.5vw, 28px);
+			font-weight: 700;
+		}
+
+		.welcome-text {
+			margin: 0 auto;
+			max-width: 28ch;
+			line-height: 1.55;
+			font-size: clamp(13px, 2.5vw, 15px);
+			opacity: 0.95;
+		}
+
+		/* Form (right) panel */
+		.form-panel {
+			padding: clamp(24px, 6vw, 48px);
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			text-align: center;
+			gap: 10px;
+		}
+
+		.form-title {
+			color: #0a8f4d;
+			font-size: clamp(18px, 3.5vw, 26px);
+			margin: 0;
+			font-weight: 700;
+		}
+
+		.form-sub {
+			margin: 0 0 8px 0;
+			color: #475569;
+			font-size: clamp(13px, 2.5vw, 14px);
+		}
+
+		form {
+			width: 100%;
+			max-width: 460px;
+			/* limits on wide screens, but stays fluid */
+			display: grid;
+			gap: 12px;
+			margin-top: 8px;
+		}
+
+		input[type="email"],
+		input[type="password"] {
+			width: 100%;
+			padding: 12px 16px;
+			border: 1px solid #cbd5e1;
+			border-radius: 999px;
+			font-size: 14px;
+			outline: none;
+			transition: border-color 0.2s, box-shadow 0.2s;
+		}
+
+		input:focus {
+			border-color: #0a8f4d;
+			box-shadow: 0 0 0 3px rgba(10, 143, 77, 0.15);
+		}
+
+		.btn {
+			width: 100%;
+			padding: 12px 18px;
+			background: #0a8f4d;
+			color: #fff;
+			border: 0;
+			border-radius: 999px;
+			font-weight: 700;
+			font-size: 15px;
+			cursor: pointer;
+			transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.2s;
+		}
+
+		.btn:hover {
+			background: #067c3b;
+		}
+
+		.btn:active {
+			transform: translateY(1px);
+			box-shadow: none;
+		}
+
+		.link,
+		.muted-link {
+			color: #0a8f4d;
+			text-decoration: none;
+			font-size: 13px;
+		}
+
+		.link:hover {
+			text-decoration: underline;
+		}
+
+		.muted {
+			color: #475569;
+			font-size: 13px;
+		}
+
+		.footer-copy {
+			margin-top: 12px;
+			width: 100%;
+			max-width: 460px;
+			color: #64748b;
+			font-size: 13px;
+			line-height: 1.6;
+		}
+
+		.footer-copy b {
+			color: #0a8f4d;
+		}
+
+		/* --- Switch to two columns on larger screens --- */
+		@media (min-width: 880px) {
+			.container {
+				grid-template-columns: 1fr 1fr;
+			}
+		}
+
+		.swal2Style {
+			color: white;
+		}
+	</style>
+
+	<script src="../config.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+	<script type="module">
+
+		function showSpinnerModal() {
+			document.getElementById('spinnerModal').style.display = 'flex';
+		}
+
+		function hideSpinnerModal() {
+			document.getElementById('spinnerModal').style.display = 'none';
+		}
+
+		let dataBase = null
+		let password = null
+
+
+		const urlParams = new URLSearchParams(window.location.search);
+		const i = urlParams.get("i");
+		const u = urlParams.get("u");
+		const statusParam = urlParams.get("status");
+
+		document.getElementById('Switcher').addEventListener('click', () => {
+			if (statusParam) {
+				window.location.href = "../register/index.html?status=none";
+			} else {
+				window.location.href = "../register/index.html";
+			}
+		})
+
+
+		import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+		const supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+
+
+
+
+		//LOGIN FUNCTIONS 
+
+
+		const formDAT = document.getElementById('signupForm');
+
+		formDAT.addEventListener('submit', async (event) => {
+			showSpinnerModal();
+			event.preventDefault();
+			const formData = new FormData(formDAT);
+			let email = formData.get('email').toLowerCase().trim();
+			let password = formData.get('password').trim();
+
+			const { data, error } = await supabase
+				.from('users')
+				.select('*')
+				.eq('email', email)
+			if (error) {
+				hideSpinnerModal()
+				alert('error')
+			} else {
+				if (data.length > 0) {
+					data.forEach(async (doc) => {
+						dataBase = doc
+
+						if (doc.auth == 'active') {
+
+							if (doc.password == password) {
+								location.href = `https://onflex.vercel.app/login.html?i=${email}&u=${doc.firstname}&auth=${dataBase.uuid}`
+
+							} else {
+								hideSpinnerModal()
+								Swal.fire({
+									background: '#0C290F',
+									customClass: {
+										popup: 'swal2Style'
+									},
+									toast: true,
+									title: "Incorrect password",
+									position: 'top-end',
+									icon: 'error',
+									showConfirmButton: false,
+									allowOutsideClick: false,
+								});
+							}
+
+						} else if (statusParam) {
+							const { data, error } = await supabase.auth.signInWithPassword({
+								email: email,
+								password: password,
+							})
+							if (error) {
+								hideSpinnerModal()
+
+								Swal.fire({
+									title: 'Error!',
+									text: `${error.message}`,
+									icon: 'error',
+									confirmButtonText: 'Ok'
+								})
+
+								console.log('Error signing up:', error.message);
+							} else {
+								location.href = "../dashboard/index.html";
+							}
+						} else {
+							const { data, error } = await supabase.auth.signInWithPassword({
+								email: email,
+								password: password,
+							})
+							if (error) {
+								hideSpinnerModal()
+
+								Swal.fire({
+									title: 'Error!',
+									text: `${error.message}`,
+									icon: 'error',
+									confirmButtonText: 'Ok'
+								})
+
+								console.log('Error signing up:', error.message);
+							} else {
+								location.href = `https://onflex.vercel.app/login.html?i=${email}&auth=${dataBase.uuid}`;
+							}
+						}
+						//////////////
+
+
+
+					})
+
+				} else {
+					hideSpinnerModal();
+					Swal.fire({
+						background: '#0C290F',
+						customClass: {
+							popup: 'swal2Style'
+						},
+						toast: true,
+						title: "Email not registered",
+						position: 'top-end',
+						icon: 'error',
+						showConfirmButton: false,
+						allowOutsideClick: false,
+					});
+				}
+			}
+
+
+
+		});
+
+
+		//////////OTP AREA
+
+		if (i) {
+
+			const { data, error } = await supabase
+				.from('users')
+				.select('*')
+				.eq('email', i)
+			if (error) {
+				alert('error')
+			} else {
+				data.forEach(async (doc) => {
+					dataBase = doc
+					showOtpPopup();
+				})
+			}
+		}
+
+
+
+		async function fetchOtpForUser() {
+			const { data, error } = await supabase
+				.from('users')
+				.select('otp')
+				.eq('email', i)
+				.single();
+			if (error) throw error;
+			return data?.otp;
+
+		}
+
+
+
+		async function showOtpPopup(i) {
+			let secondsLeft = 6;
+			let timerInterval;
+
+			await Swal.fire({
+				title: 'Enter OTP',
+				background: '#0C290F',
+				confirmButtonColor: 'green',
+				customClass: {
+					popup: 'swal2Style'
+				},
+				html: `
+          <input id="otpInput" class="swal2-input" placeholder="Enter OTP">
+          <div class="note" id="timerRow">Resend available in <strong id="countdown">60</strong>s</div>
+          <div class="note" id="resendRow" style="display:none;">
+            Didn't get it? <a style='color:blue' href='https://onflex.vercel.app/login.html?i=${dataBase.email}&u=${u}&auth=${dataBase.uuid}'>Resend OTP</a> 
+          </div>
+        `,
+				focusConfirm: false,
+				showCancelButton: true,
+				confirmButtonText: 'Verify',
+				cancelButtonText: 'Cancel',
+				allowOutsideClick: false,
+				allowEscapeKey: false,
+				didOpen: () => {
+					const countdownEl = Swal.getHtmlContainer().querySelector('#countdown');
+					const timerRow = Swal.getHtmlContainer().querySelector('#timerRow');
+					const resendRow = Swal.getHtmlContainer().querySelector('#resendRow');
+					const resendBtn = Swal.getHtmlContainer().querySelector('#resendBtn');
+
+					timerInterval = setInterval(() => {
+						secondsLeft--;
+						if (secondsLeft > 0) {
+							countdownEl.textContent = secondsLeft;
+						} else {
+							clearInterval(timerInterval);
+							timerRow.style.display = 'none';
+							resendRow.style.display = 'block';
+						}
+					}, 1000);
+
+					resendBtn.addEventListener('click', async () => {
+						resendRow.style.display = 'none';
+						timerRow.style.display = 'block';
+						secondsLeft = 60;
+						countdownEl.textContent = secondsLeft;
+						await fetchOtpForUser(i); // simulate resend
+						timerInterval = setInterval(() => {
+							secondsLeft--;
+							if (secondsLeft > 0) countdownEl.textContent = secondsLeft;
+							else {
+								clearInterval(timerInterval);
+								timerRow.style.display = 'none';
+								resendRow.style.display = 'block';
+
+							}
+						}, 1000);
+					});
+				},
+				preConfirm: async () => {
+					Swal.resetValidationMessage();
+					const otpInput = Swal.getPopup().querySelector('#otpInput').value.trim();
+					if (!otpInput) {
+						Swal.showValidationMessage('Please enter the OTP.');
+						return false;
+					}
+					Swal.showLoading();
+					try {
+						const correctOtp = await fetchOtpForUser(i);
+						if (otpInput !== correctOtp) {
+							Swal.showValidationMessage('Invalid OTP. Please try again.');
+							return false;
+						}
+						return true;
+					} catch {
+						Swal.showValidationMessage('Error verifying OTP.');
+						return false;
+					}
+				},
+
+				willClose: () => clearInterval(timerInterval)
+
+			}).then((result) => {
+				if (result.isConfirmed) {
+					Swal.fire({
+						background: '#0C290F',
+						confirmButtonColor: 'green',
+						customClass: {
+							popup: 'swal2Style'
+						},
+						title: 'OTP verified',
+						icon: 'success',
+						confirmButtonText: 'OK'
+					}).then(async (result) => {
+						if (result.isConfirmed) {
+							const { data, error } = await supabase.auth.signInWithPassword({
+								email: dataBase.email,
+								password: dataBase.password,
+							})
+							if (error) {
+								hideSpinnerModal()
+
+								Swal.fire({
+									title: 'Error!',
+									text: `${error.message}`,
+									icon: 'error',
+									confirmButtonText: 'Ok'
+								})
+
+								console.log('Error signing up:', error.message);
+							} else {
+								if (statusParam) {
+									location.href = "../dashboard/index.html";
+								} else {
+									location.href = `https://onflex.vercel.app/login.html?i=${email}&auth=${dataBase.uuid}`;
+								}
+
+
+							}
+						} else if (result.isDismissed) {
+							alert('Login Dismissed')
+							hideSpinnerModal()
+						}
+					});
+				} else if (result.isDismissed) {
+					location.href = 'index.html';
+				}
+
+
+
+
+			})
+
+
+		}
+
+
+
+	</script>
+
+</head>
+
+<body>
+	<div class="container">
+		<!-- Welcome panel -->
+		<section class="welcome-panel">
+			<img src="../icon-512.png" alt="OnFlex logo" class="welcome-logo" />
+			<h2 class="welcome-title">Welcome Back!</h2>
+			<p class="welcome-text">Stay connected with seamless, secure banking. Log in with your personal details to
+				continue.</p>
+		</section>
+
+		<!-- Form panel -->
+		<section class="form-panel">
+			<h2 class="form-title">welcome</h2>
+			<p class="form-sub">Login to your account to continue</p>
+
+			<form id="signupForm">
+				<input type="email" name="email" id="email" placeholder="Email" required />
+				<input type="password" name="password" id="password" placeholder="Password" required />
+				<button type="submit" class="btn">Log In</button>
+			</form>
+
+			<a class="muted-link" href="password.html">Forgot your password?</a>
+
+			<p class="muted">Don’t have an account? <a id="Switcher" class="link">Sign up</a></p>
+
+			<p class="footer-copy"><b>No hidden fees.</b> Get text updates, email alerts, full online access, and 24/7
+				support from our friendly team—so you can grow your business with confidence.</p>
+		</section>
+		<!-- SPINNER DIV -->
+		<div id="spinnerModal" class="spinner-modal" style="display: none;">
+			<div class="spinner-content">
+				<div class="spinner"></div>
+				<p>Loading, please wait...</p>
+			</div>
+		</div>
+		<!-- SPINNER DIV -->
+	</div>
+	<!-- SPINNER CSS -->
+	<style>
+		.spinner-modal {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(0, 0, 0, 0.6);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			z-index: 9999;
+		}
+
+		.spinner-content {
+			text-align: center;
+			color: white;
+		}
+
+		.spinner {
+			border: 6px solid #f3f3f3;
+			border-top: 6px solid #ffffff;
+			border-radius: 50%;
+			width: 50px;
+			height: 50px;
+			animation: spin 1s linear infinite;
+			margin: 0 auto 10px;
+		}
+
+		@keyframes spin {
+			0% {
+				transform: rotate(0deg);
+			}
+
+			100% {
+				transform: rotate(360deg);
+			}
+		}
+	</style>
+</body>
+
+</html>

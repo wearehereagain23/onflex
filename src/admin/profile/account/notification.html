@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Custom Push Notifications</title>
+    <style>
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            color: #fff;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        h1 {
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #ff9800, #ffc107);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            font-size: 0.9rem;
+            color: #ddd;
+            display: block;
+            margin-bottom: 0.4rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.9rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            transition: box-shadow 0.3s ease, transform 0.2s ease;
+        }
+
+        .form-group textarea:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(255, 152, 0, 0.6);
+            transform: scale(1.02);
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 0.9rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            transition: box-shadow 0.3s ease, transform 0.2s ease;
+        }
+
+        .form-group textarea:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(255, 152, 0, 0.6);
+            transform: scale(1.02);
+        }
+
+        button {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            background: linear-gradient(90deg, #ff9800, #ff5722);
+            color: #fff;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 152, 0, 0.5);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .footer {
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+            color: #ccc;
+            animation: fadeIn 1.2s ease-in;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .container {
+                padding: 1.5rem;
+                border-radius: 16px;
+            }
+
+            h1 {
+                font-size: 1.6rem;
+            }
+
+            button {
+                padding: 0.9rem;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
+</head>
+
+<body>
+    <div class="container">
+        <h1>🔔 Custom Push</h1>
+        <p>Refresh before sending any notification even if it was recent!</p>
+        <form id="notifyForm">
+            <div class="form-group">
+                <label for="titleInput">Title</label>
+                <input type="text" id="title" required>
+            </div>
+
+            <div class="form-group">
+                <label for="messageInput">Message</label>
+                <textarea id="message" required></textarea>
+            </div>
+
+            <button type="submit">Send Notification</button>
+        </form>
+        <div class="footer">Powered by SPIDER-WEB API 🚀</div>
+    </div>
+
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="../../../config.js"></script>
+    <script src="note.js"></script>
+</body>
+
+</html>

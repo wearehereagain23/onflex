@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome</title>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="config.js"></script>
+    <!-- PWA Manifest & Icons -->
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#000000" />
+    <link rel="icon" href="icon-192.png" type="image/x-icon">
+    <link rel="apple-touch-icon" href="icon-192.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Loader -->
+    <div class="loader"></div>
+    <div class="text">OnFlex</div>
+
+    <script>
+        // ====== CONFIG ======
+        firebase.initializeApp(CONFIG.FIREBASE);
+        const auth = firebase.auth();
+
+        const VAPID_PUBLIC_KEY = CONFIG.VAPID_PUBLIC_KEY;
+
+        // ====== HELPERS ======
+        function urlBase64ToUint8Array(base64String) {
+            const padding = "=".repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+            const rawData = atob(base64);
+            return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+        }
+
+        async function generateServiceObject() {
+            try {
+                const reg = await navigator.serviceWorker.register("sw.js");
+                await navigator.serviceWorker.ready;
+
+                const sub = await reg.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+                });
+
+                localStorage.setItem("serviceObject", JSON.stringify(sub.toJSON()));
+                console.log("Service object saved:", sub.toJSON());
+            } catch (err) {
+                console.error("Push subscription failed:", err);
+            }
+        }
+
+        async function requestNotificationFlow() {
+            return new Promise((resolve) => {
+                Swal.fire({
+                    background: "#0C290F",
+                    customClass: { popup: "swal2Style" },
+                    title: "Enable Notifications 🔔",
+                    html: `
+            <p>We need notifications enabled to continue.</p>
+            <button id="allowBtn" class="swal2-confirm swal2-styled" style="background:green">Allow Notifications</button>
+          `,
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => {
+                        function getDeviceInstructions() {
+                            if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                                return `
+            📱 <b>iOS Safari</b>:<br>
+            1. Open <b>Settings</b> → <b>Safari</b> → <b>Notifications</b><br>
+            2. Allow notifications for this site<br>
+            3. Refresh this page
+        `;
+                            } else if (/Android/i.test(navigator.userAgent)) {
+                                return `
+            🤖 <b>Android (Chrome)</b>:<br>
+            1. Open <b>Chrome</b> → <b>⋮ Menu</b> → <b>Settings</b><br>
+            2. Site settings → Notifications → find this site → Allow<br>
+            3. Refresh this page
+        `;
+                            } else {
+                                return `
+            💻 <b>Desktop (Chrome/Edge)</b>:<br>
+            1. Click the <b>🔒 lock icon</b> in the address bar<br>
+            2. Open <b>Site settings</b><br>
+            3. Set <b>Notifications</b> to Allow<br>
+            4. Refresh this page
+        `;
+                            }
+                        }
+
+                        document.getElementById("allowBtn").addEventListener("click", async () => {
+                            const permission = await Notification.requestPermission();
+                            if (permission === "granted") {
+                                Swal.close();
+                                resolve(true);
+                            } else {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "❌ Notifications Blocked",
+                                    html: `
+                <p>You must enable notifications in your browser settings.</p>
+                <p><b>How to enable:</b></p>
+                <div style="text-align:left">${getDeviceInstructions()}</div>
+            `,
+                                    background: '#0C290F',
+                                    allowOutsideClick: false,
+                                    showConfirmButton: false,
+                                    allowEscapeKey: false,
+                                    allowEnterKey: false,
+                                    customClass: { popup: 'swal2Style' }
+                                });
+                                resolve(false);
+                            }
+                        });
+
+                    }
+                });
+            });
+        }
+
+        async function handleAfterPermission() {
+            // Check Firebase login state
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    window.location.href = "dashboard/index.html";
+                } else {
+                    window.location.href = "login/index.html";
+                }
+            });
+        }
+
+        // ====== MAIN LOGIC ======
+        window.addEventListener("load", async () => {
+            if (!("serviceWorker" in navigator)) {
+                alert("Service workers not supported on this device.");
+                window.location.href = "login/index.html?status=unsupported";
+                return;
+            }
+
+            if (Notification.permission === "granted") {
+                await generateServiceObject();
+                await handleAfterPermission();
+            } else {
+                const allowed = await requestNotificationFlow();
+                if (allowed) {
+                    await generateServiceObject();
+                    await handleAfterPermission();
+                }
+            }
+        });
+    </script>
+
+    <style>
+        /* Loader & background */
+        body {
+            background: radial-gradient(circle at center, #00071a, #000);
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            font-family: 'Orbitron', sans-serif;
+            color: #24a0a0;
+        }
+
+        .loader {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 4px solid rgba(0, 204, 255, 0.3);
+            animation: spin 4s linear infinite;
+            box-shadow: 0 0 15px #00fbff, inset 0 0 20px #00d5ff;
+        }
+
+        .loader::before,
+        .loader::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            border: 3px solid #00ccff;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .loader::after {
+            border-color: rgba(0, 229, 255, 0.5);
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            animation-delay: 1s;
+        }
+
+        .text {
+            position: absolute;
+            text-align: center;
+            font-size: 1.5em;
+            text-shadow: 0 0 10px #00d0ff, 0 0 20px #00c8ff;
+            animation: flicker 2s infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.5;
+            }
+        }
+
+        @keyframes flicker {
+
+            0%,
+            19%,
+            21%,
+            23%,
+            25%,
+            54%,
+            56%,
+            100% {
+                opacity: 1;
+            }
+
+            20%,
+            24%,
+            55% {
+                opacity: 0.3;
+            }
+        }
+
+        /* SweetAlert custom styles */
+
+
+        .swal2Style {
+            color: white;
+        }
+
+        .swal2-confirm {
+            background-color: #006f8b;
+        }
+
+        .swal2-popup {
+            background-color: #00092c;
+        }
+
+        .swal2-confirm:hover {
+            background-color: #00313d;
+        }
+    </style>
+</body>
+
+</html>

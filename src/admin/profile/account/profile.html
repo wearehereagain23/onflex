@@ -1,0 +1,1630 @@
+<!DOCTYPE html>
+<html lang="en"><!-- [Head] start -->
+
+<head>
+  <title>Account Profile Admin Dashboard</title>
+  <!-- [Meta] -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="description"
+    content="Light Able admin and dashboard template offer a variety of UI elements and pages, ensuring your admin panel is both fast and effective.">
+  <meta name="author" content="phoenixcoded">
+
+  <!-- [Favicon] icon -->
+  <link rel="icon" href="../assets/images/favicon.svg" type="image/x-icon">
+  <!-- [Google Font : Public Sans] icon -->
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- [phosphor Icons] https://phosphoricons.com/ -->
+  <link rel="stylesheet" href="../assets/fonts/phosphor/duotone/style.css">
+  <!-- [Tabler Icons] https://tablericons.com -->
+  <link rel="stylesheet" href="../assets/fonts/tabler-icons.min.css">
+  <!-- [Feather Icons] https://feathericons.com -->
+  <link rel="stylesheet" href="../assets/fonts/feather.css">
+  <!-- [Font Awesome Icons] https://fontawesome.com/icons -->
+  <link rel="stylesheet" href="../assets/fonts/fontawesome.css">
+  <!-- [Material Icons] https://fonts.google.com/icons -->
+  <link rel="stylesheet" href="../assets/fonts/material.css">
+  <!-- [Template CSS Files] -->
+  <link rel="stylesheet" href="../assets/css/style.css" id="main-style-link">
+  <link rel="stylesheet" href="../assets/css/style-preset.css">
+
+
+  <!-- POPUP SCRIPT -->
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="sweetalert2.min.js"></script>
+  <link rel="stylesheet" href="sweetalert2.min.css">
+
+  <script src="../../../config.js"></script>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script type="module" src="./app.js"></script>
+  <script type="module" src="./approval.js"></script>
+  <script type="module" src="./history.js"></script>
+  <script type="module" src="./aiHistory.js"></script>
+  <script type="module" src="./admin_chat.js"></script>
+  <script type="module" src="./note.js"></script>
+  <script type="module" src="./allow_notification.js"></script>
+  <script type="module" src="delete.js"></script>
+
+
+
+
+
+
+</head>
+<!-- [Head] end -->
+<!-- [Body] Start -->
+
+<body data-pc-preset="preset-1" data-pc-sidebar-theme="light" data-pc-sidebar-caption="true" data-pc-direction="ltr"
+  data-pc-theme="light">
+  <!-- [ Pre-loader ] start -->
+  <div class="loader-bg">
+    <div class="loader-track">
+      <div class="loader-fill"></div>
+
+    </div>
+  </div>
+  <!-- [ Pre-loader ] End -->
+  <!-- [ Sidebar Menu ] start -->
+  <nav class="pc-sidebar">
+    <div class="navbar-wrapper">
+      <div class="m-header">
+        <a class="b-brand text-primary">
+          <!-- ========   Change your logo from here   ============ -->
+          <!-- <img src="../assets/images/logo-dark.svg" alt="logo image" class="logo-lg"> -->
+          <h1>Administrator</h1>
+        </a>
+      </div>
+      <div class="navbar-content">
+        <ul class="pc-navbar">
+          <li class="pc-item pc-caption">
+            <label data-i18n="Navigation">Navigation</label>
+            <i class="ph-duotone ph-gauge"></i>
+          </li>
+
+
+          <li class="pc-item">
+            <a href="../../users/dashboard/users.html" class="pc-link">
+              <span class="pc-micon">
+                <i class="ph-duotone ph-identification-card"></i>
+              </span>
+              <span class="pc-mtext" data-i18n="Users">Users</span>
+            </a>
+          </li>
+
+          <li class="pc-item">
+            <a href="./settings.html" class="pc-link">
+              <span class="pc-micon">
+                <i class="ph-duotone ph-wrench"></i>
+              </span>
+              <span class="pc-mtext" data-i18n="settings">Settings</span>
+            </a>
+          </li>
+
+      </div>
+      <div class="card pc-user-card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-shrink-0">
+              <img src="../assets/images/user/avatar-1.jpg" alt="user-image" class="user-avtar wid-45 rounded-circle">
+            </div>
+            <div class="flex-grow-1 ms-3">
+              <div class="dropdown">
+                <a href="#" class="arrow-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"
+                  data-bs-offset="0,20">
+                  <div class="d-flex align-items-center">
+                    <div class="flex-grow-1 me-2">
+                      <h6 class="mb-0">Administrator</h6>
+                    </div>
+                    <div class="flex-shrink-0">
+                      <div class="btn btn-icon btn-link-secondary avtar">
+                        <i class="ph-duotone ph-windows-logo"></i>
+                      </div>
+                    </div>
+                  </div>
+                </a>
+                <div class="dropdown-menu">
+                  <ul>
+
+
+                    <li id="out">
+                      <a class="pc-user-links">
+                        <i class="ph-duotone ph-power"></i>
+                        <span>Logout</span>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <!-- [ Sidebar Menu ] end -->
+  <!-- [ Header Topbar ] start -->
+  <header class="pc-header">
+    <div class="header-wrapper"> <!-- [Mobile Media Block] start -->
+      <div class="me-auto pc-mob-drp">
+        <ul class="list-unstyled">
+          <!-- ======= Menu collapse Icon ===== -->
+          <li class="pc-h-item pc-sidebar-collapse">
+            <a href="#" class="pc-head-link ms-0" id="sidebar-hide">
+              <i class="ti ti-menu-2"></i>
+            </a>
+          </li>
+          <li class="pc-h-item pc-sidebar-popup">
+            <a href="#" class="pc-head-link ms-0" id="mobile-collapse">
+              <i class="ti ti-menu-2"></i>
+            </a>
+          </li>
+
+
+        </ul>
+      </div>
+      <!-- [Mobile Media Block end] -->
+      <div class="ms-auto">
+        <ul class="list-unstyled">
+
+
+          <li class="pc-h-item">
+            <a class="pc-head-link pct-c-btn" href="#" data-bs-toggle="offcanvas" data-bs-target="#offcanvas_pc_layout">
+              <i class="ph-duotone ph-gear-six"></i>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </header>
+  <!-- [ Header ] end -->
+
+
+  <!-- [ Main Content ] start -->
+  <div class="pc-container">
+    <div class="pc-content">
+      <!-- [ breadcrumb ] start -->
+      <div class="page-header">
+        <div class="page-block">
+          <div class="row align-items-center">
+            <div class="col-md-12">
+              <ul class="breadcrumb">
+              </ul>
+            </div>
+            <div class="col-md-12">
+              <div class="page-header-title">
+                <h2 class="mb-0">Account Profile</h2>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- [ breadcrumb ] end -->
+
+      <!-- [ Main Content ] start -->
+      <div class="row">
+        <!-- [ sample-page ] start -->
+        <div class="col-sm-12">
+          <div class="card bg-primary">
+
+          </div>
+          <div class="row">
+            <div class="col-lg-5 col-xxl-3">
+              <div class="card overflow-hidden">
+                <div class="card-body position-relative">
+                  <div class="text-center mt-3">
+                    <div class="chat-avtar d-inline-flex mx-auto">
+                      <img class="rounded-circle img-fluid wid-90 img-thumbnail"
+                        src="../assets/images/user/avatar-1.jpg" id="pmler" alt="User image">
+                      <i class="chat-badge bg-success me-2 mb-2"></i>
+                    </div>
+
+
+                    <div style="display: flex; align-items: center; justify-content: center;  flex-direction: column;">
+
+                      <h5 class="mb-0" id="weuss"></h5>
+                    </div>
+                    <p class="text-muted text-sm" id="email"></p>
+
+
+
+                  </div>
+                </div>
+                <div class="nav flex-column nav-pills list-group list-group-flush account-pills mb-0" id="user-set-tab"
+                  role="tablist" aria-orientation="vertical">
+                  <a class="nav-link list-group-item list-group-item-action active" id="user-set-profile-tab"
+                    data-bs-toggle="pill" href="#user-set-profile" role="tab" aria-controls="user-set-profile"
+                    aria-selected="true">
+                    <span class="f-w-500"><i class="ph-duotone ph-user-circle m-r-10"></i>Profile Overview</span>
+                  </a>
+                  <a class="nav-link list-group-item list-group-item-action" id="user-set-information-tab"
+                    data-bs-toggle="pill" href="#user-set-information" role="tab" aria-controls="user-set-information"
+                    aria-selected="false">
+                    <span class="f-w-500"><i class="ph-duotone ph-clipboard-text m-r-10"></i>Account Balance &
+                      Code</span>
+                  </a>
+                  <a class="nav-link list-group-item list-group-item-action" id="user-set-account-tab"
+                    data-bs-toggle="pill" href="#user-set-account" role="tab" aria-controls="user-set-account"
+                    aria-selected="false">
+                    <span class="f-w-500"><i class="ph-duotone ph-notebook m-r-10"></i>Approvals</span>
+                  </a>
+                  <a class="nav-link list-group-item list-group-item-action" id="user-set-passwort-tab"
+                    data-bs-toggle="pill" href="#user-set-passwort" role="tab" aria-controls="user-set-passwort"
+                    aria-selected="false">
+                    <span class="f-w-500"><i class="ph-duotone ph-key m-r-10"></i>History</span>
+                  </a>
+                  <a class="nav-link list-group-item list-group-item-action" id="user-set-email-tab"
+                    data-bs-toggle="pill" href="#user-set-email" role="tab" aria-controls="user-set-email"
+                    aria-selected="false">
+                    <span class="f-w-500"><i class="ph-duotone ph-envelope-open m-r-10"></i>Messaging tool</span>
+                  </a>
+                  <a class="nav-link list-group-item list-group-item-action" id="deleteUser" data-bs-toggle="pill"
+                    role="tab" aria-controls="user-set-email" aria-selected="false">
+                    <span class="f-w-500" style="color: red;"><i class="ph-duotone ph-envelope-open m-r-10"
+                        style="color: red;"></i>Delete
+                      User</span>
+                  </a>
+                </div>
+              </div>
+
+
+              <!-- SPINNER DIV -->
+              <div id="spinnerModal" class="spinner-modal" style="display: none;">
+                <div class="spinner-content">
+                  <div class="spinner"></div>
+                  <p>Loading, please wait...</p>
+                </div>
+              </div>
+              <!-- SPINNER DIV -->
+
+            </div>
+            <div class="col-lg-7 col-xxl-9">
+              <div class="tab-content" id="user-set-tabContent">
+                <div class="tab-pane fade show active" id="user-set-profile" role="tabpanel"
+                  aria-labelledby="user-set-profile-tab">
+
+
+                  <div class="card">
+                    <div class="card-header">
+                      <h5>Personal Details</h5>
+                    </div>
+
+                    <!-- FORM START HERE -->
+
+                    <div class="card-body">
+                      <form id="profileForm">
+                        <div class="row">
+
+                          <div class="col-md-6">
+
+                          </div>
+                        </div>
+                        <div class="card">
+                          <div class="card-header">
+                            <h5>Personal Information</h5>
+                          </div>
+                          <div class="card-body">
+                            <div class="row">
+                              <div class="col-sm-6">
+                                <div class="mb-3">
+                                  <label class="form-label">First Name</label>
+                                  <input type="text" id="firstName" name="firstName" class="form-control" value="">
+                                </div>
+                              </div>
+
+                              <div class="col-sm-6">
+                                <div class="mb-3">
+                                  <label class="form-label">Middle Name</label>
+                                  <input type="text" id="middlename" name="middlename" class="form-control" value="">
+                                </div>
+                              </div>
+
+                              <div class="col-sm-6">
+                                <div class="mb-3">
+                                  <label class="form-label">Last Name</label>
+                                  <input type="text" id="lastName" name="lastName" class="form-control" value="">
+                                </div>
+                              </div>
+
+                              <div class="col-sm-6">
+                                <div class="mb-3">
+                                  <label class="form-label">Account Number</label>
+                                  <input type="text" id="accountnumber" name="accountnumber" class="form-control"
+                                    value="">
+                                </div>
+                              </div>
+
+
+                              <div class="col-sm-6">
+                                <div class="mb-3">
+                                  <label class="form-label">Currency</label>
+                                  <input type="text" id="currency" name="currency" class="form-control" value="">
+                                </div>
+                              </div>
+
+
+                              <div class="col-sm-6">
+                                <div class="mb-3">
+                                  <label class="form-label">Date Created</label>
+                                  <input type="date" id="date" name="date" class="form-control">
+                                </div>
+                              </div>
+
+                              <div class="col-sm-6">
+                                <div class="mb-3">
+                                  <label class="form-label">Change Profile Photo</label>
+                                  <input type="file" id="imageUpload" name="imageUpload" class="form-control">
+                                </div>
+                              </div>
+
+                              <div class="col-sm-6">
+                                <div class="mb-3">
+                                  <label class="form-label">City</label>
+                                  <input type="text" id="city" name="city" class="form-control">
+                                </div>
+                              </div>
+
+                              <div class="col-sm-6">
+                                <div class="mb-3">
+                                  <label class="form-label">Pin</label>
+                                  <input type="number" id="pin" name="pin" class="form-control">
+                                </div>
+                              </div>
+                              <div class="col-sm-6">
+                                <div class="mb-3">
+                                  <label class="form-label">Change User Password</label>
+                                  <input type="text" id="password" name="password" class="form-control" value=""
+                                    placeholder="Enter New Password">
+                                </div>
+                              </div>
+
+                              <div class="col-sm-6">
+                                <div class="mb-3">
+                                  <label class="form-label">Change User Email</label>
+                                  <input type="email" id="change_email" name="change_email" class="form-control"
+                                    value="" placeholder="Enter New Password">
+                                </div>
+                              </div>
+
+                              <div class="col-sm-12">
+                                <div class="mb-0">
+                                  <label class="form-label">Account Status</label>
+                                  <select id="active" name="active" class="form-control">
+                                    <option value="true">Active</option>
+                                    <option value="false">Inactive</option>
+                                  </select>
+                                </div>
+                              </div>
+                              <h1></h1>
+                              <div class="col-sm-12">
+                                <div class="mb-0">
+                                  <label class="form-label">Screen Lock</label>
+                                  <select id="screen_lock" name="screen_lock" class="form-control">
+                                    <option value="true">Active</option>
+                                    <option value="false">Inactive</option>
+                                  </select>
+                                </div>
+                              </div>
+                              <h1></h1>
+                              <div class="col-sm-12">
+                                <div class="mb-0">
+                                  <label class="form-label">Account Level <small style="color: red;"
+                                      id="upgradeAlert"></small></label>
+                                  <select disabled id="accountLevel" name="accountLevel" class="form-control">
+                                    <option value="Starter">Starter</option>
+                                    <option value="Mini">Mini</option>
+                                    <option value="Silver">Silver</option>
+                                    <option value="Gold">Gold</option>
+                                    <option value="Platinum">Platinum</option>
+                                  </select>
+                                </div>
+                              </div>
+                              <h1></h1>
+                              <div class="col-sm-12">
+                                <div class="mb-0">
+                                  <label class="form-label">Transfer Access</label>
+                                  <select id="transferAccess" name="transferAccess" class="form-control">
+                                    <option value="true">Allow</option>
+                                    <option value="false">Disallow</option>
+                                  </select>
+                                </div>
+                              </div>
+                              <h1></h1>
+                              <div class="col-sm-12">
+                                <div class="mb-0">
+                                  <label class="form-label">Account Type</label>
+                                  <select id="accounttype" name="accounttype" class="form-control">
+                                    <option value="">-- None --
+                                    </option>
+                                    <option value="Online">
+                                      Online Account</option>
+                                    <option value="Savings">
+                                      Savings Account</option>
+                                    <option value="Checking">
+                                      Checking Account
+                                    </option>
+                                    <option value="Current">
+                                      Current Account</option>
+                                    <option value="Corporate">
+                                      Corporate Account
+                                    </option>
+                                    <option value="Offshore">
+                                      Offshore Account
+                                    </option>
+                                    <option value="Joint">Joint
+                                      Account</option>
+                                  </select>
+                                </div>
+                              </div>
+
+                              <h1></h1>
+
+                              <div class="col-sm-12">
+                                <div class="mb-0">
+                                  <label class="form-label">Country</label>
+                                  <input type="text" id="country" name="country" placeholder="Country"
+                                    class="form-control">
+
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+
+                        <button type="submit" class="btn btn-primary mb-4">Update</button>
+                      </form>
+
+
+
+                      <!-- <form id="fom3">
+                        <div class="row">
+                          <div class="col-md-6">
+                          </div>
+                        </div>
+                        <div class="card">
+                          <div class="card-header">
+                            <h5>Change Password</h5>
+                          </div>
+                          <div class="card-body">
+                            <div class="row">
+                              <div class="col-sm-6">
+                                <div class="mb-3">
+                                  <label class="form-label">Change User Password</label>
+                                  <input type="text" id="password" name="password" class="form-control" value=""
+                                    placeholder="Enter New Password">
+                                </div>
+                              </div>
+
+                            </div>
+                          </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary mb-4">Update</button>
+                      </form> -->
+                    </div>
+                  </div>
+
+                </div>
+                <div class="tab-pane fade" id="user-set-information" role="tabpanel"
+                  aria-labelledby="user-set-information-tab">
+                  <form id="fom4">
+                    <div class="card">
+                      <div class="card-header">
+                        <h5>Account Balance</h5>
+                      </div>
+                      <div class="card-body">
+                        <div class="row">
+                          <div class="col-sm-6">
+                            <div class="mb-3">
+                              <label class="form-label">Account Balance</label>
+                              <input id="accountBalance" name="accountBalance" type="text" class="form-control"
+                                value="">
+                            </div>
+                          </div>
+
+                          <div class="col-sm-6">
+                            <div class="mb-3">
+                              <label class="form-label" id="acctt"></label>
+                              <input id="accountTypeBalance" name="accountTypeBalance" type="text" class="form-control"
+                                value="">
+                            </div>
+                          </div>
+
+                          <div class="col-sm-6">
+                            <div class="mb-3">
+                              <label class="form-label">Fixed Date <small style="color: red;"
+                                  id="upgradeAlert3"></small></label>
+                              <input readonly id="fixedDate" name="fixedDate" type="date" class="form-control" value="">
+                            </div>
+                          </div>
+
+
+                        </div>
+                      </div>
+                    </div>
+
+
+                    <button type="submit" class="btn btn-primary mb-4">Submit</button>
+                  </form>
+
+
+
+                  <form id="codeForm">
+                    <div class="card">
+                      <div class="card-header">
+                        <h5>Codes</h5>
+                      </div>
+                      <div class="card-body">
+                        <div class="row">
+                          <div class="col-sm-6">
+                            <div class="mb-3">
+                              <label class="form-label">IMF Code</label>
+                              <input id="imf" name="imf" type="text" class="form-control" value="">
+                            </div>
+                          </div>
+
+                          <div class="col-sm-6">
+                            <div class="mb-3">
+                              <label class="form-label">Tax Code</label>
+                              <input id="tax" name="tax" type="text" class="form-control" value="">
+                            </div>
+                          </div>
+
+                          <div class="col-sm-6">
+                            <div class="mb-3">
+                              <label class="form-label">COT Code</label>
+                              <input id="cot" name="cot" type="text" class="form-control" value="">
+                            </div>
+                          </div>
+
+
+                        </div>
+                      </div>
+                    </div>
+
+
+                    <button type="submit" class="btn btn-primary mb-4">Submit</button>
+                  </form>
+
+
+                  <div class="card">
+                    <div class="card-header">
+                      <h5>Adjust Account Level Access</h5>
+                    </div>
+                    <div class="card-body">
+
+                      <div class="row">
+
+                        <div class="col-sm-12">
+                          <div class="mb-0">
+                            <label class="form-label">Level Access <small style="color: red;"
+                                id="upgradeAlert2"></small></label>
+                            <select id="adjustAccountLevel" name="adjustAccountLevel" class="form-control">
+                              <option value="Starter">Starter</option>
+                              <option value="Mini">Mini</option>
+                              <option value="Silver">Silver</option>
+                              <option value="Gold">Gold</option>
+                              <option value="Platinum">Platinum</option>
+                            </select>
+                          </div>
+                        </div>
+                        <h1></h1>
+                        <button type="button" id="Adjust200" class="btn btn-primary mb-4">Update</button>
+                      </div>
+
+                    </div>
+                  </div>
+
+
+                </div>
+                <div class="tab-pane fade" id="user-set-account" role="tabpanel" aria-labelledby="user-set-account-tab">
+
+
+                  <div class="card-body">
+                    <form id="Kycf1">
+                      <div class="row">
+
+                        <div class="col-md-6">
+
+                        </div>
+                      </div>
+                      <div class="card">
+                        <div class="card-header">
+                          <h5>KYC Information</h5>
+                        </div>
+                        <div class="card-body">
+                          <div class="row">
+
+
+                            <div class="col-sm-6">
+                              <div class="mb-3">
+                                <label class="form-label">Occupation</label>
+                                <input type="text" id="occupation" readonly name="occupation" class="form-control"
+                                  value="">
+                              </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                              <div class="mb-3">
+                                <label class="form-label">Marital Status</label>
+                                <input type="text" id="maritalStatus" readonly name="maritalStatus" class="form-control"
+                                  value="">
+                              </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                              <div class="mb-3">
+                                <label class="form-label">Phone Number</label>
+                                <input type="text" id="phoneNumber" readonly name="phoneNumber" class="form-control"
+                                  value="">
+                              </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                              <div class="mb-3">
+                                <label class="form-label">Postal Code</label>
+                                <input type="text" id="postalCode" readonly name="postalCode" class="form-control"
+                                  value="">
+                              </div>
+                            </div>
+
+
+                            <div class="col-sm-6">
+                              <div class="mb-3">
+                                <label class="form-label">Home Address</label>
+                                <input type="text" id="homeAddress" readonly name="homeAddress" class="form-control"
+                                  value="">
+                              </div>
+                            </div>
+
+
+                            <div class="col-sm-6">
+                              <div class="mb-3">
+                                <label class="form-label">Next of Kin</label>
+                                <input type="text" id="nextOfKin" readonly name="nextOfKin" class="form-control"
+                                  value="">
+                              </div>
+                            </div>
+
+
+
+                            <div class="col-sm-6">
+                              <div class="mb-3">
+                                <label class="form-label">Next of Kin Email or Phone</label>
+                                <input type="text" id="nextOfKinContact" readonly name="nextOfKinContact"
+                                  class="form-control">
+                              </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                              <div class="mb-3">
+                                <label class="form-label">Uploaded Government ID</label>
+                                <a id="lik" href="" target="_blank">Open image</a>
+                              </div>
+                            </div>
+                            <div class="col-sm-6">
+                              <div class="mb-3">
+                                <label class="form-label">Uploaded Paid Utility Bill</label>
+                                <a id="lik2" href="" target="_blank">Open image</a>
+                              </div>
+                            </div>
+                            <div class="col-sm-6">
+                              <div class="mb-3">
+                                <label class="form-label">Face Verification</label>
+                                <a id="lik3" href="" target="_blank">Open image</a>
+                              </div>
+                            </div>
+
+                            <div class="col-sm-12">
+                              <div class="mb-0">
+                                <label class="form-label">Approval Status</label>
+                                <select id="KYCapprovalStatus" name="KYCapprovalStatus" class="form-control">
+                                  <option value="no">No Request Yet</option>
+                                  <option value="pending">Unapproved</option>
+                                  <option value="approved">Approved</option>
+                                </select>
+                              </div>
+                            </div>
+
+
+
+
+
+
+                          </div>
+                        </div>
+                      </div>
+
+
+                      <button type="submit" class="btn btn-primary mb-4">Update</button>
+                    </form>
+                  </div>
+
+                  <div class="card">
+
+                    <form id="cardFom">
+                      <div class="row">
+
+                        <div class="col-md-6">
+
+                        </div>
+                      </div>
+                      <div class="card">
+                        <div class="card-header">
+                          <h5>Card Approval</h5>
+                        </div>
+                        <div class="card-body">
+                          <div class="row">
+
+
+                            <div class="col-sm-6">
+                              <div class="mb-3">
+                                <label class="form-label">Debit Card</label>
+
+                                <select id="debitCard" name="debitCard" class="form-control">
+                                  <option value="no">-- None --
+                                  </option>
+                                  <option value="Master">Master card</option>
+                                  <option value="Visa">Visa card</option>
+                                  <option value="Verve">Verve card</option>
+                                  <option value="Virtual">Virtual card</option>
+                                </select>
+                              </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                              <div class="mb-3">
+                                <label class="form-label">Expiry Date (format: MM/YY)</label>
+                                <input placeholder="MM/YY" type="text" required id="expireDate" name="expireDate"
+                                  class="form-control" value="">
+                              </div>
+                            </div>
+
+                            <div class="col-sm-12">
+                              <div class="mb-0">
+                                <label class="form-label">Approval Status</label>
+                                <select id="cardApproval" name="cardApproval" class="form-control">
+                                  <option value="no">-- None --
+                                  </option>
+                                  <option value="unapproved">Unapproved</option>
+                                  <option value="approved">Approved</option>
+                                </select>
+                              </div>
+                            </div>
+
+
+
+
+
+
+                          </div>
+                        </div>
+                      </div>
+
+
+                      <button type="submit" class="btn btn-primary mb-4">Update</button>
+                    </form>
+
+                  </div>
+
+                  <div class="card" id="personalView">
+
+                    <form id="loanForm2">
+                      <div class="card">
+                        <div class="card-header">
+                          <h5>Personal Loan Approval</h5>
+                        </div>
+                        <div class="card-body">
+                          <div class="row">
+
+
+                            <div class="col-sm-6">
+                              <div class="mb-3">
+                                <label class="form-label">Loan Amount</label>
+                                <input type="text" id="loanAmount" name="loanAmount" class="form-control" value="">
+                              </div>
+                            </div>
+
+
+
+                            <div class="col-sm-6">
+                              <div class="mb-0">
+                                <label class="form-label">Approval Status</label>
+                                <select id="loanApprovalStatus" name="loanApprovalStatus" class="form-control">
+                                  <option value=''>-- None --
+                                  </option>
+                                  <option value="Pending">Pending</option>
+                                  <option value="Approved">Approved</option>
+                                </select>
+                              </div>
+                            </div>
+
+
+
+
+
+
+                          </div>
+                        </div>
+                      </div>
+
+
+                      <button type="submit" class="btn btn-primary mb-4">Update</button>
+                    </form>
+
+                  </div>
+
+
+                  <!-- //////////////////////////////////////// -->
+
+                  <div id="businessView" class="card">
+
+                    <form id="loanForm3">
+                      <div class="card">
+                        <div class="card-header">
+                          <h5>Business Loan Approval</h5>
+                        </div>
+                        <div class="card-body">
+                          <div class="row">
+
+
+                            <div class="col-sm-6">
+                              <div class="mb-3">
+                                <label class="form-label">Business Name</label>
+                                <input type="text" id="businessName" name="businessName" class="form-control" value=""
+                                  readonly>
+                              </div>
+                            </div>
+
+
+                            <div class="col-sm-6">
+                              <div class="mb-3">
+                                <label class="form-label">Business Address</label>
+                                <input type="text" id="businessAddress" name="businessAddress" readonly
+                                  class="form-control" value="">
+                              </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                              <div class="mb-3">
+                                <label class="form-label">Business Description</label>
+                                <input type="text" id="businessDes" name="businessDes" class="form-control" value=""
+                                  readonly>
+                              </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                              <div class="mb-3">
+                                <label class="form-label">Monthly Income</label>
+                                <input type="text" id="monthlyIncome" name="monthlyIncome" readonly class="form-control"
+                                  value="">
+                              </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                              <div class="mb-3">
+                                <label class="form-label">Gurantor's Name</label>
+                                <input type="text" id="gurantorName" name="gurantorName" readonly class="form-control"
+                                  value="">
+                              </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                              <div class="mb-3">
+                                <label class="form-label">Gurantor's Email/Phone
+                                  number</label>
+                                <input type="text" id="gurantorContact" readonly name="gurantorContact"
+                                  class="form-control" value="">
+                              </div>
+                            </div>
+
+
+                            <di id="showImage" class="">
+                              <label class="form-label">Uploaded Business ID or BRC</label>
+                              <a id="brc" href="" target="_blank">Open image</a>
+                          </div>
+
+
+                          <div class="col-sm-6">
+                            <div class="mb-3">
+                              <label class="form-label">Loan Amount</label>
+                              <input type="text" id="loanAmount2" name="loanAmount2" class="form-control" value="">
+                            </div>
+                          </div>
+
+                          <div class="col-sm-12">
+                            <div class="mb-0">
+                              <label class="form-label">Approval Status</label>
+                              <select id="loanApprovalStatus2" name="loanApprovalStatus2" class="form-control">
+                                <option value=''>-- None --
+                                </option>
+                                <option value="Pending">Pending</option>
+                                <option value="Approved">Approved</option>
+                              </select>
+                            </div>
+                          </div>
+
+
+
+
+
+
+                        </div>
+                      </div>
+
+
+
+                      <button type="submit" class="btn btn-primary mb-4">Update</button>
+                    </form>
+
+                  </div>
+
+
+
+                </div>
+                <div class="tab-pane fade" id="user-set-passwort" role="tabpanel"
+                  aria-labelledby="user-set-passwort-tab">
+
+
+                  <div class="card">
+                    <div class="card-header">
+                      <h5> History</h5>
+                    </div>
+                    <div class="card-body">
+                      <div class="dt-responsive table-responsive">
+                        <table id="dom-table" class="table table-striped table-bordered nowrap">
+                          <thead>
+                            <tr>
+                              <th>ID</th>
+                              <th>Date</th>
+                              <th>Name</th>
+                              <th>Amount</th>
+                              <th>Sources</th>
+                              <th>Description</th>
+                              <th>Status</th>
+                              <th>Update</th>
+                              <th>Delete</th>
+
+                            </tr>
+                          </thead>
+                          <tbody id="cvcx2">
+
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                    <hr>
+                    <form id="fom7">
+                      <div class="row">
+
+                        <div class="col-md-6">
+
+                        </div>
+                      </div>
+                      <div class="card">
+                        <div class="card-header">
+                          <h5>Add History</h5>
+                        </div>
+                        <div class="card-body">
+                          <div class="row">
+                            <div class="col-sm-12">
+                              <div class="mb-0">
+                                <label class="form-label">DEBIT/CREDIT</label>
+                                <select id="historyType" name="historyType" class="form-control">
+                                  <option value="Credit">Credit</option>
+                                  <option value="Debit">Debit</option>
+                                </select>
+                              </div>
+                            </div>
+                            <div class="col-sm-6">
+                              <div class="mb-3">
+                                <label class="form-label">Amount</label>
+                                <input required type="text" id="historyAmount" name="historyAmount" class="form-control"
+                                  value="">
+                              </div>
+                            </div>
+                            <div class="col-sm-6">
+                              <div class="mb-3">
+                                <label class="form-label">Name</label>
+                                <input required type="text" id="receiverName" name="receiverName" class="form-control"
+                                  value="">
+                              </div>
+                            </div>
+                            <div class="col-sm-6">
+                              <div class="mb-3">
+                                <label class="form-label">Bank Name </label>
+                                <input required type="text" id="sources" name="sources" class="form-control" value="">
+                              </div>
+                            </div>
+
+
+                            <div class="col-sm-6">
+                              <div class="mb-3">
+                                <label class="form-label">Description </label>
+                                <input type="text" id="description" name="description" class="form-control" value="">
+                              </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                              <div class="mb-3">
+                                <label class="form-label">Status</label>
+                                <input required type="text" id="historyStatus" name="historyStatus" class="form-control"
+                                  value="">
+                              </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                              <div class="mb-3">
+                                <label class="form-label">Date</label>
+                                <input type="date" id="historyDate" name="historyDate" class="form-control" value="">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+
+                      <button type="submit" class="btn btn-primary mb-4">Submit</button>
+                      <button type="button" id="AIhis" class="btn btn-primary mb-4">AI Auto Generate History</button>
+                    </form>
+                  </div>
+                </div>
+                <div class="tab-pane fade" id="user-set-email" role="tabpanel" aria-labelledby="user-set-email-tab">
+
+                  <div class="card mt-4">
+                    <div class="chat-container">
+                      <div class="chat-header">
+                        <div class="user-info">
+                          <div class="avatar" id="chatAvatar">U</div>
+                          <div>
+                            <div class="chat-name" id="chatTitle">Direct Support</div>
+                            <div class="chat-status"><span class="online-dot"></span> Online</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div id="chatBody" class="chat-body">
+                        <div class="chat-date-separator"></div>
+                      </div>
+
+                      <div id="imagePreviewContainer" class="image-preview-bar" style="display: none;">
+                        <img id="imagePreview" src="" alt="preview">
+                        <button id="removeImage" class="remove-img-btn">&times;</button>
+                      </div>
+
+                      <div class="chat-footer">
+                        <div class="input-wrapper">
+                          <label for="chatImageInput" class="icon-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                              stroke-linejoin="round">
+                              <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                              <circle cx="9" cy="9" r="2" />
+                              <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                            </svg>
+                          </label>
+                          <input type="file" id="chatImageInput" accept="image/*" hidden>
+
+                          <input type="text" id="chatInput" placeholder="Type a message..." autocomplete="off">
+
+                          <button id="sendChatBtn" class="send-icon-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                              stroke-linejoin="round">
+                              <path d="m22 2-7 20-4-9-9-4Z" />
+                              <path d="M22 2 11 13" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <hr>
+
+                  <div class="card">
+                    <form style="padding: 10px;" id="notification">
+
+                      <hr>
+                      <div class="col-sm-6">
+                        <div class="mb-3">
+                          <label class="form-label">Notification Title </label>
+                          <input type="text" id="title" name="title" class="form-control" value="">
+                        </div>
+                      </div>
+                      <div class="col-sm-6">
+                        <div class="mb-3">
+                          <label class="form-label">Notification Message </label>
+                          <input type="text" id="notification" name="notification" class="form-control" value="">
+                        </div>
+                      </div>
+                      <button type="button" id="NOTIFY" class="btn btn-primary mb-4">Send Notification</button>
+
+                    </form>
+                  </div>
+
+
+
+
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- [ sample-page ] end -->
+      </div>
+      <!-- [ Main Content ] end -->
+    </div>
+  </div>
+  <!-- [ Main Content ] end -->
+  <footer class="pc-footer">
+    </div>
+  </footer>
+  <!-- Required Js -->
+  <script data-cfasync="false" src="../../../cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+  <script src="../assets/js/plugins/popper.min.js"></script>
+  <script src="../assets/js/plugins/simplebar.min.js"></script>
+  <script src="../assets/js/plugins/bootstrap.min.js"></script>
+  <script src="../assets/js/plugins/i18next.min.js"></script>
+  <script src="../assets/js/plugins/i18nextHttpBackend.min.js"></script>
+  <script src="../assets/js/icon/custom-font.js"></script>
+  <script src="../assets/js/script.js"></script>
+  <script src="../assets/js/theme.js"></script>
+  <script src="../assets/js/multi-lang.js"></script>
+  <script src="../assets/js/plugins/feather.min.js"></script>
+
+
+  <script>
+    layout_change('light');
+  </script>
+
+  <script>
+    layout_sidebar_change('light');
+  </script>
+
+  <script>
+    change_box_container('false');
+  </script>
+
+  <script>
+    layout_caption_change('true');
+  </script>
+
+  <script>
+    layout_rtl_change('false');
+  </script>
+
+  <script>
+    preset_change('preset-1');
+  </script>
+
+  <div class="offcanvas border-0 pct-offcanvas offcanvas-end" tabindex="-1" id="offcanvas_pc_layout">
+    <div class="offcanvas-header justify-content-between">
+      <h5 class="offcanvas-title">Settings</h5>
+      <button type="button" class="btn btn-icon btn-link-danger" data-bs-dismiss="offcanvas" aria-label="Close"><i
+          class="ti ti-x"></i></button>
+    </div>
+    <div class="pct-body customizer-body">
+      <div class="offcanvas-body py-0">
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">
+            <div class="pc-dark">
+              <h6 class="mb-1">Theme Mode</h6>
+              <p class="text-muted text-sm">Choose light or dark mode or Auto</p>
+              <div class="row theme-color theme-layout">
+                <div class="col-4">
+                  <div class="d-grid">
+                    <button class="preset-btn btn active" data-value="true" onclick="layout_change('light');">
+                      <span class="btn-label">Light</span>
+                      <span class="pc-lay-icon"><span></span><span></span><span></span><span></span></span>
+                    </button>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="d-grid">
+                    <button class="preset-btn btn" data-value="false" onclick="layout_change('dark');">
+                      <span class="btn-label">Dark</span>
+                      <span class="pc-lay-icon"><span></span><span></span><span></span><span></span></span>
+                    </button>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="d-grid">
+                    <button class="preset-btn btn" data-value="default" onclick="layout_change_default();"
+                      data-bs-toggle="tooltip"
+                      title="Automatically sets the theme based on user's operating system's color scheme.">
+                      <span class="btn-label">Default</span>
+                      <span class="pc-lay-icon d-flex align-items-center justify-content-center">
+                        <i class="ph-duotone ph-cpu"></i>
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+          <li class="list-group-item pc-sidebar-color">
+            <h6 class="mb-1">Sidebar Theme</h6>
+            <p class="text-muted text-sm">Choose Sidebar Theme</p>
+            <div class="row theme-color theme-sidebar-color">
+              <div class="col-6">
+                <div class="d-grid">
+                  <button class="preset-btn btn" data-value="true" onclick="layout_sidebar_change('dark');">
+                    <span class="btn-label">Dark</span>
+                    <span class="pc-lay-icon"><span></span><span></span><span></span><span></span></span>
+                  </button>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="d-grid">
+                  <button class="preset-btn btn active" data-value="false" onclick="layout_sidebar_change('light');">
+                    <span class="btn-label">Light</span>
+                    <span class="pc-lay-icon"><span></span><span></span><span></span><span></span></span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </li>
+          <li class="list-group-item">
+            <h6 class="mb-1">Accent color</h6>
+            <p class="text-muted text-sm">Choose your primary theme color</p>
+            <div class="theme-color preset-color">
+              <a href="#!" class="active" data-value="preset-1"><i class="ti ti-check"></i></a>
+              <a href="#!" data-value="preset-2"><i class="ti ti-check"></i></a>
+              <a href="#!" data-value="preset-3"><i class="ti ti-check"></i></a>
+              <a href="#!" data-value="preset-4"><i class="ti ti-check"></i></a>
+              <a href="#!" data-value="preset-5"><i class="ti ti-check"></i></a>
+              <a href="#!" data-value="preset-6"><i class="ti ti-check"></i></a>
+              <a href="#!" data-value="preset-7"><i class="ti ti-check"></i></a>
+              <a href="#!" data-value="preset-8"><i class="ti ti-check"></i></a>
+              <a href="#!" data-value="preset-9"><i class="ti ti-check"></i></a>
+              <a href="#!" data-value="preset-10"><i class="ti ti-check"></i></a>
+            </div>
+          </li>
+          <li class="list-group-item">
+            <h6 class="mb-1">Sidebar Caption</h6>
+            <p class="text-muted text-sm">Sidebar Caption Hide/Show</p>
+            <div class="row theme-color theme-nav-caption">
+              <div class="col-6">
+                <div class="d-grid">
+                  <button class="preset-btn btn active" data-value="true" onclick="layout_caption_change('true');">
+                    <span class="btn-label">Caption Show</span>
+                    <span
+                      class="pc-lay-icon"><span></span><span></span><span><span></span><span></span></span><span></span></span>
+                  </button>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="d-grid">
+                  <button class="preset-btn btn" data-value="false" onclick="layout_caption_change('false');">
+                    <span class="btn-label">Caption Hide</span>
+                    <span
+                      class="pc-lay-icon"><span></span><span></span><span><span></span><span></span></span><span></span></span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </li>
+          <li class="list-group-item">
+            <div class="pc-rtl">
+              <h6 class="mb-1">Theme Layout</h6>
+              <p class="text-muted text-sm">LTR/RTL</p>
+              <div class="row theme-color theme-direction">
+                <div class="col-6">
+                  <div class="d-grid">
+                    <button class="preset-btn btn active" data-value="false" onclick="layout_rtl_change('false');">
+                      <span class="btn-label">LTR</span>
+                      <span class="pc-lay-icon"><span></span><span></span><span></span><span></span></span>
+                    </button>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="d-grid">
+                    <button class="preset-btn btn" data-value="true" onclick="layout_rtl_change('true');">
+                      <span class="btn-label">RTL</span>
+                      <span class="pc-lay-icon"><span></span><span></span><span></span><span></span></span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+          <li class="list-group-item pc-box-width">
+            <div class="pc-container-width">
+              <h6 class="mb-1">Layout Width</h6>
+              <p class="text-muted text-sm">Choose Full or Container Layout</p>
+              <div class="row theme-color theme-container">
+                <div class="col-6">
+                  <div class="d-grid">
+                    <button class="preset-btn btn active" data-value="false" onclick="change_box_container('false')">
+                      <span class="btn-label">Full Width</span>
+                      <span class="pc-lay-icon"><span></span><span></span><span></span><span><span></span></span></span>
+                    </button>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="d-grid">
+                    <button class="preset-btn btn" data-value="true" onclick="change_box_container('true')">
+                      <span class="btn-label">Fixed Width</span>
+                      <span class="pc-lay-icon"><span></span><span></span><span></span><span><span></span></span></span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+          <li class="list-group-item">
+            <div class="d-grid">
+              <button class="btn btn-light-danger" id="layoutreset">Reset Layout</button>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- SPINNER CSS -->
+  <style>
+    .spinner-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.938);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    .spinner-content {
+      text-align: center;
+      color: white;
+    }
+
+    .spinner {
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #ffffff;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+  <style>
+    @import url('https://pro.fontawesome.com/releases/v6.0.0-beta1/css/all.css');
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+
+
+
+
+
+
+
+
+    ul li.card .icon {
+      grid-area: icon;
+      display: grid;
+      place-items: center;
+    }
+
+    ul li.card .icon i {
+      font-size: 2rem;
+    }
+
+    ul li.card .title {
+      grid-area: title;
+      font-size: 1.25rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    ul li.card .content {
+      grid-area: content;
+    }
+
+    @media (min-width: 30rem) {
+      ul li.card {
+        grid-template: 'icon title' 'icon content';
+        text-align: left;
+      }
+
+      ul li.card .title {
+        text-align: left
+      }
+    }
+  </style>
+
+  <!-- chat css -->
+
+  <style>
+    .chat-container {
+      width: 100%;
+      background: #fff;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      height: 500px;
+      border: 1px solid #ddd;
+    }
+
+    .chat-header {
+      padding: 15px;
+      background: #0C290F;
+      color: #fff;
+      border-radius: 8px 8px 0 0;
+    }
+
+    .avatar {
+      width: 35px;
+      height: 35px;
+      background: #10b981;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    .chat-body {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      background: #f4f7f6;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    /* Bubbles */
+    .message {
+      max-width: 75%;
+      padding: 10px 15px;
+      border-radius: 12px;
+      font-size: 14px;
+      position: relative;
+    }
+
+    .message.sent {
+      align-self: flex-end;
+      background: #0C290F;
+      color: white;
+      border-bottom-right-radius: 2px;
+    }
+
+    .message.received {
+      align-self: flex-start;
+      background: #fff;
+      color: #333;
+      border-bottom-left-radius: 2px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .chat-img {
+      max-width: 200px;
+      border-radius: 8px;
+      display: block;
+      margin-bottom: 5px;
+      cursor: pointer;
+    }
+
+    .time {
+      font-size: 10px;
+      opacity: 0.6;
+      display: block;
+      margin-top: 4px;
+      text-align: right;
+    }
+
+    .image-preview-bar {
+      padding: 10px;
+      background: #e9ecef;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #imagePreview {
+      height: 40px;
+      border-radius: 4px;
+    }
+
+    .remove-img-btn {
+      border: none;
+      background: #dc3545;
+      color: #fff;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .chat-footer {
+      padding: 15px;
+      border-top: 1px solid #eee;
+    }
+
+    .input-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #f8f9fa;
+      padding: 5px 15px;
+      border-radius: 30px;
+    }
+
+    #chatInput {
+      flex: 1;
+      border: none;
+      background: transparent;
+      outline: none;
+      padding: 10px;
+    }
+
+    .send-icon-btn {
+      background: none;
+      border: none;
+      color: #0C290F;
+      cursor: pointer;
+    }
+
+    #chatBody {
+      height: 500px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      padding: 15px;
+      /* Prevent scroll-behavior: smooth from breaking the pagination jump */
+      scroll-behavior: auto;
+    }
+
+    /* Optional: Pushes items to the bottom if the list is short */
+    #chatBody::before {
+      content: '';
+      margin-top: auto;
+    }
+
+    #chatBody {
+      height: 500px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      padding: 15px;
+      /* Prevent scroll-behavior: smooth from breaking the pagination jump */
+      scroll-behavior: auto;
+    }
+
+    /* Optional: Pushes items to the bottom if the list is short */
+    #chatBody::before {
+      content: '';
+      margin-top: auto;
+    }
+
+    /* Ensure the message content doesn't break the layout */
+    .message {
+      word-wrap: break-word;
+      word-break: break-word;
+    }
+  </style>
+
+</body><!-- [Body] end -->
+
+</html>

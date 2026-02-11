@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <link rel="icon" href="images/favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Admin Login </title>
+    <meta name="next-head-count" content="5">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link data-next-font="size-adjust" rel="preconnect" href="/" crossorigin="anonymous">
+    <link rel="preload" href="css/69de85e1c8b0bbe0.css" as="style">
+    <link rel="stylesheet" href="css/69de85e1c8b0bbe0.css" data-n-g=""><noscript data-n-css=""></noscript>
+    <script defer="" nomodule="" src="js/polyfills-78c92fac7aa8fdd8.js"></script>
+    <script src="js/webpack-05bd2be2c3366e20.js" defer=""></script>
+    <script src="js/framework-b386dde6ac29e91c.js" defer=""></script>
+    <script src="js/main-e47cd8aff2b1a884.js" defer=""></script>
+    <script src="js/_app-94573948b3b66a8f.js" defer=""></script>
+    <script src="js/3061-37a40661de88121d.js" defer=""></script>
+    <script src="js/login-v1-1427a6c6a9662d1d.js" defer=""></script>
+    <script src="js/_buildManifest.js" defer=""></script>
+    <script src="js/_ssgManifest.js" defer=""></script>
+    <style data-href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap">
+        @font-face {
+            font-family: 'Public Sans';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url(fonts/ijwGs572Xtc6ZYQws9YVwllKVG8qX1oyOymuFpm5wA.woff) format('woff')
+        }
+
+        @font-face {
+            font-family: 'Public Sans';
+            font-style: normal;
+            font-weight: 500;
+            font-display: swap;
+            src: url(fonts/ijwGs572Xtc6ZYQws9YVwllKVG8qX1oyOymuJJm5wA.woff) format('woff')
+        }
+
+        @font-face {
+            font-family: 'Public Sans';
+            font-style: normal;
+            font-weight: 600;
+            font-display: swap;
+            src: url(fonts/ijwGs572Xtc6ZYQws9YVwllKVG8qX1oyOymuyJ65wA.woff) format('woff')
+        }
+
+        @font-face {
+            font-family: 'Public Sans';
+            font-style: normal;
+            font-weight: 700;
+            font-display: swap;
+            src: url(fonts/ijwGs572Xtc6ZYQws9YVwllKVG8qX1oyOymu8Z65wA.woff) format('woff')
+        }
+
+        @font-face {
+            font-family: 'Public Sans';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url(fonts/ijwRs572Xtc6ZYQws9YVwnNJfJ7QwOk1Fig.woff2) format('woff2');
+            unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB
+        }
+
+        @font-face {
+            font-family: 'Public Sans';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url(fonts/ijwRs572Xtc6ZYQws9YVwnNIfJ7QwOk1Fig.woff2) format('woff2');
+            unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF
+        }
+
+        @font-face {
+            font-family: 'Public Sans';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url(fonts/ijwRs572Xtc6ZYQws9YVwnNGfJ7QwOk1.woff2) format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD
+        }
+
+        @font-face {
+            font-family: 'Public Sans';
+            font-style: normal;
+            font-weight: 500;
+            font-display: swap;
+            src: url(fonts/ijwRs572Xtc6ZYQws9YVwnNJfJ7QwOk1Fig.woff2) format('woff2');
+            unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB
+        }
+
+        @font-face {
+            font-family: 'Public Sans';
+            font-style: normal;
+            font-weight: 500;
+            font-display: swap;
+            src: url(fonts/ijwRs572Xtc6ZYQws9YVwnNIfJ7QwOk1Fig.woff2) format('woff2');
+            unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF
+        }
+
+        @font-face {
+            font-family: 'Public Sans';
+            font-style: normal;
+            font-weight: 500;
+            font-display: swap;
+            src: url(fonts/ijwRs572Xtc6ZYQws9YVwnNGfJ7QwOk1.woff2) format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD
+        }
+
+        @font-face {
+            font-family: 'Public Sans';
+            font-style: normal;
+            font-weight: 600;
+            font-display: swap;
+            src: url(fonts/ijwRs572Xtc6ZYQws9YVwnNJfJ7QwOk1Fig.woff2) format('woff2');
+            unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB
+        }
+
+        @font-face {
+            font-family: 'Public Sans';
+            font-style: normal;
+            font-weight: 600;
+            font-display: swap;
+            src: url(fonts/ijwRs572Xtc6ZYQws9YVwnNIfJ7QwOk1Fig.woff2) format('woff2');
+            unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF
+        }
+
+        @font-face {
+            font-family: 'Public Sans';
+            font-style: normal;
+            font-weight: 600;
+            font-display: swap;
+            src: url(fonts/ijwRs572Xtc6ZYQws9YVwnNGfJ7QwOk1.woff2) format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD
+        }
+
+        @font-face {
+            font-family: 'Public Sans';
+            font-style: normal;
+            font-weight: 700;
+            font-display: swap;
+            src: url(fonts/ijwRs572Xtc6ZYQws9YVwnNJfJ7QwOk1Fig.woff2) format('woff2');
+            unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB
+        }
+
+        @font-face {
+            font-family: 'Public Sans';
+            font-style: normal;
+            font-weight: 700;
+            font-display: swap;
+            src: url(fonts/ijwRs572Xtc6ZYQws9YVwnNIfJ7QwOk1Fig.woff2) format('woff2');
+            unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF
+        }
+
+        @font-face {
+            font-family: 'Public Sans';
+            font-style: normal;
+            font-weight: 700;
+            font-display: swap;
+            src: url(fonts/ijwRs572Xtc6ZYQws9YVwnNGfJ7QwOk1.woff2) format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD
+        }
+    </style>
+
+    <!-- POPUP SCRIPT -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../../config.js"></script>
+    <script type="module" src="../../website.js"></script>
+    <script type="module">
+        // Call the check immediately
+        window.checkSiteVisibility();
+    </script>
+    <script type="module">
+        // Helper functions for the loading spinner
+        function showSpinnerModal() {
+            document.getElementById('spinnerModal').style.display = 'flex';
+        }
+
+        function hideSpinnerModal() {
+            document.getElementById('spinnerModal').style.display = 'none';
+        }
+
+        // Initialize Supabase Client
+        import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+        const supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+
+        const formDAT = document.getElementById('mainform');
+
+        formDAT.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            showSpinnerModal();
+
+            const formData = new FormData(formDAT);
+            const email = formData.get('email').toLowerCase().trim();
+            const password = formData.get('password').trim();
+
+            try {
+                // --- NEW LOCAL AUTH LOGIC ---
+                // We query your custom 'admin' table instead of Supabase Auth
+                const { data, error } = await supabase
+                    .from('admin')
+                    .select('*')
+                    .eq('email', email)
+                    .eq('password', password) // Comparing plain text as per your table structure
+                    .single();
+
+                if (error || !data) {
+                    hideSpinnerModal();
+
+                    // Show error if user not found or password mismatched
+                    Swal.fire({
+                        title: 'Login Failed',
+                        text: 'Invalid admin email or password.',
+                        icon: 'error',
+                        confirmButtonText: 'Try Again',
+                        background: '#ffffff'
+                    });
+                } else {
+                    // SUCCESS: Save a local session indicator and redirect
+                    localStorage.setItem('adminSession', 'active');
+                    localStorage.setItem('adminEmail', data.email);
+
+                    window.location.href = "../users/dashboard/users.html";
+                }
+
+            } catch (err) {
+                hideSpinnerModal();
+                console.error("Auth error:", err.message);
+                Swal.fire({
+                    title: 'System Error',
+                    text: 'Something went wrong. Please check your connection.',
+                    icon: 'error',
+                    confirmButtonText: 'Ok'
+                });
+            }
+        });
+    </script>
+</head>
+
+<body data-pc-preset="preset-1" data-pc-sidebar-theme="light" data-pc-sidebar-caption="true" data-pc-direction="ltr"
+    data-pc-theme="light">
+    <div id="__next">
+        <div class="auth-main v1">
+            <div class="auth-wrapper">
+                <div class="auth-form">
+                    <div class="my-5 card">
+                        <div class="card-body">
+                            <div class="text-center"><img alt="images" loading="lazy" width="120" height="120"
+                                    decoding="async" data-nimg="1" class="img-fluid mb-3" style="color:transparent"
+                                    srcset="images/image_1.png 1x, images/image.png 2x" src="images/image.png">
+                                <h4 class="f-w-500 mb-1">Login with your email</h4>
+                            </div>
+                            <form id="mainform">
+                                <div class="form-group mb-3">
+                                    <input type="email" class="form-control" id="email" name="email"
+                                        placeholder="Email Address">
+                                </div>
+
+
+                                <!-- SPINNER DIV -->
+                                <div id="spinnerModal" class="spinner-modal" style="display: none;">
+                                    <div class="spinner-content">
+                                        <div class="spinner"></div>
+                                        <p>Loading, please wait...</p>
+                                    </div>
+                                </div>
+                                <!-- SPINNER DIV -->
+
+
+                                <div class="form-group mb-3">
+                                    <input type="password" class="form-control" id="password" name="password"
+                                        placeholder="Password">
+                                </div>
+                                <div class="d-flex mt-1 justify-content-between align-items-center">
+                                    <div class="form-check">
+                                        <input class="form-check-input input-primary" type="checkbox" id="customCheckc1"
+                                            checked="">
+                                        <label class="form-check-label text-muted" for="customCheckc1">Remember
+                                            me?</label>
+                                    </div><a>
+                                        <h6 class="f-w-400 mb-0">Forgot Password?</h6>
+                                    </a>
+
+                                </div>
+                                <div class="d-grid mt-4"><input type="submit" value="Login" class="btn btn-primary" />
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- SPINNER CSS -->
+            <style>
+                .spinner-modal {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.6);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 9999;
+                }
+
+                .spinner-content {
+                    text-align: center;
+                    color: white;
+                }
+
+                .spinner {
+                    border: 6px solid #f3f3f3;
+                    border-top: 6px solid #ffffff;
+                    border-radius: 50%;
+                    width: 50px;
+                    height: 50px;
+                    animation: spin 1s linear infinite;
+                    margin: 0 auto 10px;
+                }
+
+                @keyframes spin {
+                    0% {
+                        transform: rotate(0deg);
+                    }
+
+                    100% {
+                        transform: rotate(360deg);
+                    }
+                }
+            </style>
+
+</body>
+
+</html>

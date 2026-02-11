@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Supabase (not used here but included if needed later) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- PWA Manifest & Theme -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#000000" />
+
+    <!-- For iOS PWA -->
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+
+    <style>
+        /* Loader & background */
+        body {
+            background: radial-gradient(circle at center, #00071a, #000);
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            font-family: 'Orbitron', sans-serif;
+            color: #24a0a0;
+        }
+
+        .loader {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 4px solid rgba(0, 204, 255, 0.3);
+            animation: spin 4s linear infinite;
+            box-shadow: 0 0 15px #003f40, inset 0 0 20px #00d5ff;
+        }
+
+        .loader::before,
+        .loader::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            border: 3px solid #00ccff;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .loader::after {
+            border-color: rgba(0, 229, 255, 0.5);
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            animation-delay: 1s;
+        }
+
+        .text {
+            position: absolute;
+            text-align: center;
+            font-size: 1.5em;
+            text-shadow: 0 0 10px #00d0ff, 0 0 20px #00c8ff;
+            animation: flicker 2s infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.5;
+            }
+        }
+
+        @keyframes flicker {
+
+            0%,
+            19%,
+            21%,
+            23%,
+            25%,
+            54%,
+            56%,
+            100% {
+                opacity: 1;
+            }
+
+            20%,
+            24%,
+            55% {
+                opacity: 0.3;
+            }
+        }
+
+        /* SweetAlert custom styles */
+        .swal2Style {
+            color: white;
+        }
+
+        .swal2-confirm {
+            background-color: #006f8b;
+        }
+
+        .swal2-popup {
+            background-color: #00092c;
+        }
+
+        .swal2-confirm:hover {
+            background-color: #00313d;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="loader"></div>
+    <div class="text">OnFlex</div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="config.js"></script>
+    <script>
+        const ua = navigator.userAgent.toLowerCase();
+        const isIos = /iphone|ipad|ipod/.test(ua);
+        const isAndroid = /android/.test(ua);
+        const supportsSW = 'serviceWorker' in navigator;
+
+        // 1. Capture the data to decide the path
+        const urlParams = new URLSearchParams(window.location.search);
+        const isRegistering = urlParams.has("i");
+
+        async function showInstallInstructions() {
+            // Fallback for extremely old browsers
+            if (!supportsSW) {
+                window.location.href = isRegistering ? "register/index.html" : "login/index.html";
+                return;
+            }
+
+            // 2. Register SW for all devices (Mobile & PC)
+            try {
+                await navigator.serviceWorker.register('/sw.js');
+            } catch (err) {
+                console.error("SW registration failed:", err);
+            }
+
+            // 3. Device Logic
+            if (isIos) {
+                Swal.fire({
+                    title: "📲 Install OnFlex",
+                    html: `Tap <b>Share</b> and choose <b>Add to Home Screen</b>.`,
+                    icon: "info",
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    background: '#0C290F',
+                    customClass: { popup: 'swal2Style' }
+                });
+            } else if (isAndroid) {
+                Swal.fire({
+                    title: "📲 Install OnFlex",
+                    html: `Tap <b>Install App</b> from your browser menu.`,
+                    icon: "info",
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    background: '#0C290F',
+                    customClass: { popup: 'swal2Style' }
+                });
+            } else {
+                // 4. Desktop Redirect: Decision made here, but URL is kept clean
+                if (isRegistering) {
+                    window.location.href = "register/index.html";
+                } else {
+                    window.location.href = "login/index.html";
+                }
+            }
+        }
+
+        window.addEventListener("load", showInstallInstructions);
+    </script>
+
+
+</body>
+
+</html>

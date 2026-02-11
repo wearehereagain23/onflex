@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="zxx">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/flaticon.css">
+  <link rel="stylesheet" href="css/remixicon.css">
+  <link rel="stylesheet" href="css/owl.carousel.min.css">
+  <link rel="stylesheet" href="css/odometer.min.css">
+  <link rel="stylesheet" href="css/fancybox.css">
+  <link rel="stylesheet" href="css/aos.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dark-theme.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <title>OnFlex Trusted & Swift Online Banking System</title>
+  <link rel="icon" type="image/png" href="images/favicon.png">
+</head>
+
+<body>
+
+  <div class="loader js-preloader">
+    <div></div>
+    <div></div>
+    <div></div>
+  </div>
+
+
+
+
+  <div class="page-wrapper">
+
+    <header class="header-wrap style1">
+      <div class="header-top">
+        <button type="button" class="close-sidebar">
+          <i class="ri-close-fill"></i>
+        </button>
+        <div class="container">
+          <div class="row align-items-center">
+            <div class="col-lg-8 col-md-12">
+              <div class="header-top-left">
+                <ul class="contact-info list-style">
+                  <!-- <li><i class="flaticon-call"></i> <a href="tel:1234567890">(+888) 888 88 888</a></li> -->
+                  <li><i class="flaticon-email-1"></i> <a href="#" id="admin-email-link"><span class="__cf_email__"
+                        id="admin-email"></span></a></li>
+                  <li><i class="flaticon-pin"></i>
+                    <p id="admin-address"></p>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-12">
+              <div class="header-top-right">
+                <ul class="header-top-menu list-style">
+                  <li><a href="./contact/index.html">Support</a></li>
+                  <li><a href="./contact/index.html">Help</a></li>
+                </ul>
+                <div class="select-lang">
+                  <i class="ri-global-line"></i>
+                  <div class="navbar-option-item navbar-language dropdown language-option">
+                    <div id="google_translate_element"> </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="header-bottom">
+        <div class="container">
+          <nav class="navbar navbar-expand-md navbar-light">
+            <a class="navbar-brand logo-container" href="#">
+              <h1 class="logo-light logo"><img src="./logo.PNG" alt=""></h1>
+              <h1 class="logo-dark"><img src="./logo.PNG" alt=""></h1>
+            </a>
+            <div class="collapse navbar-collapse main-menu-wrap" id="navbarSupportedContent">
+              <div class="menu-close xl-none">
+                <a href="javascript:void(0)"> <i class="ri-close-line"></i></a>
+              </div>
+              <ul class="navbar-nav ms-auto">
+                <li class="nav-item  ">
+                  <a href="#" class="nav-link active">
+                    Home
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="./about/index.html" class="nav-link">
+                    About Us
+                  </a>
+                </li>
+                <li class="nav-item ">
+                  <a href="./services/index.html" class="nav-link">
+                    Service
+                  </a>
+                </li>
+
+                <li class="nav-item">
+                  <a href="./contact/index.html" class="nav-link">Contact Us</a>
+                </li>
+                <li class="nav-item xl-none">
+                  <a href="./access.html" class="btn style1">Login</a>
+                </li>
+                <li class="nav-item xl-none">
+                  <a href="./access.html?i=reg" class="btn style1">Register Now</a>
+                </li>
+              </ul>
+              <div class="others-options  lg-none">
+                <div class="searchbox">
+                  <input type="search" placeholder="Search">
+                  <button type="button">
+                    <i class="flaticon-search"></i>
+                  </button>
+                </div>
+                <div class="header-btn lg-none">
+                  <a href="./access.html" class="btn style1">Login</a>
+                </div>
+
+                <div class="header-btn lg-none" style="margin-left: 3%;">
+                  <a href="./access.html?i=reg" class="btn style1">Register Now</a>
+                </div>
+              </div>
+            </div>
+          </nav>
+          <div class="mobile-bar-wrap">
+            <div class="mobile-sidebar">
+              <i class="ri-menu-4-line"></i>
+            </div>
+            <button class="searchbtn xl-none" type="button">
+              <i class="flaticon-search"></i>
+            </button>
+            <div class="mobile-menu xl-none">
+              <a href="javascript:void(0)"><i class="ri-menu-line"></i></a>
+            </div>
+          </div>
+        </div>
+        <div class="search-area">
+          <div class="container">
+            <form action="#">
+              <div class="form-group">
+                <input type="search" placeholder="Search Here" autofocus="">
+              </div>
+            </form>
+            <button type="button" class="close-searchbox">
+              <i class="ri-close-line"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+
+    <section class="hero-wrap style1 bg-spring">
+      <img src="images/hero-shape-1.png" alt="Image" class="hero-shape-one">
+      <img src="images/hero-shape-2.png" alt="Image" class="hero-shape-two">
+      <img src="images/hero-shape-3.png" alt="Image" class="hero-shape-three">
+      <img src="images/hero-shape-4.png" alt="Image" class="hero-shape-four md-none">
+      <div class="hero-slider-two owl-carousel">
+        <div class="hero-slide-item">
+          <div class="container-fluid">
+            <div class="row align-items-center">
+              <div class="col-lg-6">
+                <div class="hero-content">
+                  <span>Simple. Transparent. Secure </span>
+                  <h1>Fast &amp; Secure Online Money Transfer</h1>
+                  <p>Whether you’re new to budgets or a seasoned investor, we’ve got products and resources that can
+                    help.</p>
+                  <a href="./access.html" class="btn style1">Get Started</a>
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="hero-img-wrap">
+                  <img src="images/hero-slide-4.png" alt="Image">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="hero-slide-item">
+          <div class="container-fluid">
+            <div class="row align-items-center">
+              <div class="col-lg-6">
+                <div class="hero-content">
+                  <span>Reliable. Zero Service Charge </span>
+                  <h1>Move Your Money In Easy Secured Steps</h1>
+                  <p>Whether you’re new to budgets or a seasoned investor, we’ve got products and resources that can
+                    help.</p>
+                  <a href="./access.html" class="btn style1">Get Started</a>
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="hero-img-wrap">
+                  <img src="images/hero-slide-5.png" alt="Image">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="hero-slide-item">
+          <div class="container-fluid">
+            <div class="row align-items-center">
+              <div class="col-lg-6">
+                <div class="hero-content">
+                  <span>Easy. Fastest . Secure </span>
+                  <h1>Secured &amp; Easy Online Payment Solution </h1>
+                  <p>Whether you’re new to budgets or a seasoned investor, we’ve got products and resources that can
+                    help.</p>
+                  <a href="./access.html" class="btn style1">Get Started</a>
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="hero-img-wrap">
+                  <img src="images/hero-slide-6.png" alt="Image">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="about-wrap style1 ptb-100">
+      <div class="container">
+        <div class="row gx-5 align-items-center">
+          <div class="col-lg-6">
+            <div class="about-img-wrap">
+              <img src="images/about-shape-1.png" alt="Image" class="about-shape-one bounce">
+              <img src="images/about-shape-2.png" alt="Image" class="about-shape-two moveHorizontal">
+              <img src="images/about-img-1.png" alt="Image" class="about-img">
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="about-content">
+              <img src="images/about-shape-3.png" alt="Image" class="about-shape-three">
+              <div class="content-title style1">
+                <span>Smart Banking</span>
+                <h2>The Better Way To Save &amp; Invest Online Banking</h2>
+                <p>OnFlex is designed for cross-border businesses trading in multiple currencies. For importers
+                  and exporters, whether you do business on a marketplace.</p>
+              </div>
+              <ul class="content-feature-list style1 list-style">
+                <li><span><i class="flaticon-tick"></i></span>Cards that work all across the world.</li>
+                <li><span><i class="flaticon-tick"></i></span>Highest Returns on your investments.</li>
+                <li><span><i class="flaticon-tick"></i></span>No ATM fees. No minimum balance. No overdrafts.</li>
+              </ul>
+              <a href="./about/index.html" class="btn style1">More About us</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="feature-wrap pt-100 pb-75 bg-albastor">
+      <div class="container">
+        <div class="section-title style1 text-center mb-40">
+          <span>Our Feature</span>
+          <h2>Payment Services Worldwide</h2>
+        </div>
+        <div class="row justify-content-center">
+          <div class="col-xl-4 col-lg-6 col-md-6">
+            <div class="feature-card style1">
+              <div class="feature-info">
+                <div class="feature-title">
+                  <span><img src="images/feature-icon-4.png" alt="Image"></span>
+                  <h3>Protect Your Card</h3>
+                </div>
+                <p>Shop privately and securely. Pay with Active Privacy Cards that shield your card info.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-xl-4 col-lg-6 col-md-6">
+            <div class="feature-card style1">
+              <div class="feature-info">
+                <div class="feature-title">
+                  <span><img src="images/feature-icon-5.png" alt="Image"></span>
+                  <h3>Send Money</h3>
+                </div>
+                <p>Receive and send money internationally to over 100+ plus countries instantly</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-xl-4 col-lg-6 col-md-6">
+            <div class="feature-card style1">
+              <div class="feature-info">
+                <div class="feature-title">
+                  <span><img src="images/feature-icon-6.png" alt="Image"></span>
+                  <h3>Online Banking</h3>
+                </div>
+                <p>We are growing and expanding fast, join our waitlist and we will give you a shout-out when you
+                  deposit in your account.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="security-wrap ptb-100">
+      <div class="container">
+        <div class="row gx-5 align-items-center">
+          <div class="col-lg-6 col-12 order-lg-1 order-2">
+            <div class="security-content">
+              <div class="content-title style1">
+                <span>Banking Security</span>
+                <h2>The Safest Way To Transact Your Money Fast</h2>
+                <p>OnFlex is designed for cross-border businesses trading in multiple currencies. For importers
+                  and exporters, whether you do business on a marketplace.</p>
+              </div>
+              <div class="feature-item-wrap">
+                <div class="feature-item">
+                  <div class="feature-icon">
+                    <img src="images/security-icon-1.png" alt="Image">
+                  </div>
+                  <div class="feature-text">
+                    <h3>Pay Online Securely</h3>
+                    <p>Get Instant Notification For Any Transaction On Your Account Immediately.</p>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">
+                    <img src="images/security-icon-2.png" alt="Image">
+                  </div>
+                  <div class="feature-text">
+                    <h3>Convert Your Money In Seconds</h3>
+                    <p>Swap From One Currency To Another In Matter Of Seconds.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-6 col-12 order-lg-2 order-1">
+            <div class="security-img-wrap">
+              <img src="images/security-shape-1.png" alt="Image" class="security-shape-one">
+              <img src="images/security-shape-2.png" alt="Image" class="security-shape-two">
+              <img src="images/security-1.png" alt="Image">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="service-wrap style1 pt-100 pb-75">
+      <div class="container">
+        <div class="row gx-5 align-items-center">
+          <div class="col-xl-6 col-lg-12 service-card-wrap">
+            <div class="row">
+              <div class="col-md-6 mmt-45">
+                <div class="service-card style1">
+                  <span class="service-icon">
+                    <img src="images/service-icon-1.png" alt="Image">
+                  </span>
+                  <h3><a href="service-details.html">Deadline Reminders</a></h3>
+                  <p></p>
+                </div>
+                <div class="service-card style1">
+                  <span class="service-icon">
+                    <img src="images/service-icon-2.png" alt="Image">
+                  </span>
+                  <h3><a href="service-details.html">Drag Functionality</a></h3>
+                  <p></p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="service-card style1">
+                  <span class="service-icon">
+                    <img src="images/service-icon-3.png" alt="Image">
+                  </span>
+                  <h3><a href="service-details.html">Simple Dashboard</a></h3>
+                  <p></p>
+                </div>
+                <div class="service-card style1">
+                  <span class="service-icon">
+                    <img src="images/service-icon-4.png" alt="Image">
+                  </span>
+                  <h3><a href="service-details.html">Email Notification</a></h3>
+                  <p></p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-xl-6 col-lg-12">
+            <div class="service-content">
+              <div class="content-title style1">
+                <span>Our Services</span>
+                <h2>Providing Services For Last 25 Years With Reputation</h2>
+                <p>Our Top Priority Here At OnFlex Is to Keep And Secure Our Customers Assets And Funds With One
+                  Of
+                  The Best Security In The World.</p>
+              </div>
+              <a href="./services/index.html" class="btn style1">View All Services</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="app-wrap style3 ptb-100">
+      <div class="container">
+        <div class="row align-items-center gx-5">
+          <div class="col-lg-6">
+            <div class="app-img-wrap">
+              <img class="bounce" src="images/app-1.png" alt="Image">
+              <img class="app-shape-one" src="images/app-shape-1.png" alt="Image">
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="app-content">
+              <div class="content-title style1">
+                <span>Download Our Mobile App</span>
+                <h2>You Can Find All Things You Need In Our App</h2>
+                <p>Sending International Business Payments or Sending Money To Family Overseas? OnFlex Are Your
+                  Fast And Simple Solution.</p>
+              </div>
+              <div class="app-btn">
+                <a href="https://www.apple.com/app-store/"><img src="images/apple-store.png" alt="Image"></a>
+                <a href="https://play.google.com/store/apps"><img src="images/play-store.png" alt=""></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="testimonial-wrap pt-100 pb-75 bg-albastor">
+      <div class="container">
+        <div class="row">
+          <div class="col-xl-6 offset-xl-3 col-lg-8 offset-lg-2">
+            <div class="section-title style1 text-center mb-40">
+              <span>Our Testimonials</span>
+              <h2>What Client Says About Us</h2>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-slider-one owl-carousel">
+          <div class="testimonial-card style1">
+            <div class="client-info-area">
+              <div class="client-info-wrap">
+                <div class="client-img">
+                  <img src="images/client-1.jpg" alt="Image">
+                </div>
+              </div>
+              <div class="quote-icon">
+                <i class="flaticon-quote"></i>
+              </div>
+            </div>
+            <p class="client-quote">The Bank makes decisions at best level – the same way I do. The Treasury Management
+              team walked us through the efficiencies of online and mobile banking and the security of having positive
+              pay protection – all of which keep our bookkeeper very happy!</p>
+            <div class="client-info">
+              <h3>Jim Morison</h3>
+              <span>Director, BAT</span>
+            </div>
+          </div>
+          <div class="testimonial-card style1">
+            <div class="client-info-area">
+              <div class="client-info-wrap">
+                <div class="client-img">
+                  <img src="images/client-2.jpg" alt="Image">
+                </div>
+              </div>
+              <div class="quote-icon">
+                <i class="flaticon-quote"></i>
+              </div>
+            </div>
+            <p class="client-quote">OnFlex a partner at a critical time, and immediately responsive to our PPP
+              needs. We moved our entire banking relationship to OnFlex. Their personable team made the
+              transition,
+              of all our accounts, very smooth.</p>
+            <div class="client-info">
+              <h3>Alex Cruis</h3>
+              <span>CEO, IBAC</span>
+            </div>
+          </div>
+          <div class="testimonial-card style1">
+            <div class="client-info-area">
+              <div class="client-info-wrap">
+                <div class="client-img">
+                  <img src="images/client-3.jpg" alt="Image">
+                </div>
+              </div>
+              <div class="quote-icon">
+                <i class="flaticon-quote"></i>
+              </div>
+            </div>
+            <p class="client-quote">From the start, OnFlex has taken the time to understand our business and our
+              goals. It is clear that the Bank is aligned with us to grow together for the long-term. We feel secure
+              working with a stable and diversified bank staffed with diligent and responsive employees.</p>
+            <div class="client-info">
+              <h3>Tom Haris</h3>
+              <span>Engineer, Olleo</span>
+            </div>
+          </div>
+          <div class="testimonial-card style1">
+            <div class="client-info-area">
+              <div class="client-info-wrap">
+                <div class="client-img">
+                  <img src="images/client-4.jpg" alt="Image">
+                </div>
+              </div>
+              <div class="quote-icon">
+                <i class="flaticon-quote"></i>
+              </div>
+            </div>
+            <p class="client-quote">We're really impressed with OnFlex. Their personal touch is what drew us to
+              them. They take great care of us and treat us like family. The Bank's culture of trust and care for the
+              client is exactly how we do business ourselves.</p>
+            <div class="client-info">
+              <h3>Harry Jackson</h3>
+              <span>Enterpreneur</span>
+            </div>
+          </div>
+          <div class="testimonial-card style1">
+            <div class="client-info-area">
+              <div class="client-info-wrap">
+                <div class="client-img">
+                  <img src="images/client-5.jpg" alt="Image">
+                </div>
+              </div>
+              <div class="quote-icon">
+                <i class="flaticon-quote"></i>
+              </div>
+            </div>
+            <p class="client-quote">OnFlex is amazing. They're responsive, eager to help, and they cut through red
+              tape to make things happen. The staff is friendly and they volunteer at our events.</p>
+            <div class="client-info">
+              <h3>Chris Haris</h3>
+              <span>MD, ITec</span>
+            </div>
+          </div>
+          <div class="testimonial-card style1">
+            <div class="client-info-area">
+              <div class="client-info-wrap">
+                <div class="client-img">
+                  <img src="images/client-6.jpg" alt="Image">
+                </div>
+              </div>
+              <div class="quote-icon">
+                <i class="flaticon-quote"></i>
+              </div>
+            </div>
+            <p class="client-quote">The additional care the Bank places on client service goes above and beyond our
+              expectations.</p>
+            <div class="client-info">
+              <h3>Mark Owen</h3>
+              <span>Enterpreneur</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="cta-wrap style1 ptb-100 ">
+      <div class="container">
+        <img src="images/cta-shape-1.png" alt="Image" class="cta-shape-one xs-none">
+        <img src="images/cta-shape-2.png" alt="Image" class="cta-shape-two xs-none">
+        <div class="row">
+          <div class="col-xl-6 offset-xl-3 col-lg-8 offset-lg-2">
+            <div class="content-title style1 text-center mb-40">
+              <span>Contact Us</span>
+              <h2>Raxa Is A Quick Solution For Business Payments</h2>
+            </div>
+            <div class="cta-btn">
+              <a href="./access.html" class="btn style1">Personal Account</a>
+              <a href="./access.html" class="btn style3">Business Account</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+
+    <footer class="footer-wrap bg-rock">
+      <div class="container">
+        <img src="images/footer-shape-1.png" alt="Image" class="footer-shape-one">
+        <img src="images/footer-shape-2.png" alt="Image" class="footer-shape-two">
+        <div class="row pt-100 pb-75">
+          <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6">
+            <div class="footer-widget">
+              <a class="navbar-brand logo-container" href="#">
+                <h1 class="logo-light logo"><img src="./logo.PNG" alt=""></h1>
+                <h1 class="logo-dark"><img src="./logo.PNG" alt=""></h1>
+              </a>
+              <p class="comp-desc">
+                On the other hand, we denounce whteous indig nation and dislike men wh beguiled moraized er hand consec
+                teturus adipis iscing elit eiusmod tempordunt labore dolore magna aliqua consector tetur adip iscing.
+              </p>
+              <div class="social-link">
+                <ul class="social-profile list-style style1">
+                  <li>
+                    <a target="_blank" href="https://facebook.com">
+                      <i class="ri-facebook-fill"></i>
+                    </a>
+                  </li>
+                  <li>
+                    <a target="_blank" href="https://twitter.com">
+                      <i class="ri-twitter-fill"></i>
+                    </a>
+                  </li>
+                  <li>
+                    <a target="_blank" href="https://linkedin.com">
+                      <i class="ri-linkedin-fill"></i>
+                    </a>
+                  </li>
+                  <li>
+                    <a target="_blank" href="https://instagram.com">
+                      <i class="ri-pinterest-fill"></i>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6">
+            <div class="footer-widget">
+              <h3 class="footer-widget-title">Our Company</h3>
+              <ul class="footer-menu list-style">
+                <li>
+                  <a href="./about/index.html">
+                    <i class="flaticon-next"></i>
+                    Company &amp; Team
+                  </a>
+                </li>
+                <li>
+                  <a href="./services/index.html">
+                    <i class="flaticon-next"></i>
+                    Our Services
+                  </a>
+                </li>
+                <li>
+                  <a href="#">
+                    <i class="flaticon-next"></i>
+                    News &amp; Blog
+                  </a>
+                </li>
+                <li>
+                  <a href="#">
+                    <i class="flaticon-next"></i>
+                    Pricing Plan
+                  </a>
+                </li>
+                <li>
+                  <a href="./contact/index.html">
+                    <i class="flaticon-next"></i>
+                    Contact Us
+                  </a>
+                </li>
+                <li>
+                  <a href="./about/index.html">
+                    <i class="flaticon-next"></i>
+                    Privacy Policy
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6">
+            <div class="footer-widget">
+              <h3 class="footer-widget-title">Products</h3>
+              <ul class="footer-menu list-style">
+                <li>
+                  <a href="./access.html">
+                    <i class="flaticon-next"></i>
+                    Online Payment
+                  </a>
+                </li>
+                <li>
+                  <a href="./access.html">
+                    <i class="flaticon-next"></i>
+                    Deposit Skim
+                  </a>
+                </li>
+                <li>
+                  <a href="./access.html">
+                    <i class="flaticon-next"></i>
+                    Online Shopping
+                  </a>
+                </li>
+                <li>
+                  <a href="./access.html">
+                    <i class="flaticon-next"></i>
+                    Master Card
+                  </a>
+                </li>
+                <li>
+                  <a href="./access.html">
+                    <i class="flaticon-next"></i>
+                    Receive Money
+                  </a>
+                </li>
+                <li>
+                  <a href="./access.html">
+                    <i class="flaticon-next"></i>
+                    Affiliate Program
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6">
+            <div class="footer-widget">
+              <h3 class="footer-widget-title">Subscribe</h3>
+              <p class="newsletter-text">Tablished fact that a reader will be distrated by the readable content</p>
+              <form action="#" class="newsletter-form">
+                <input type="email" placeholder="Your Email">
+                <button type="button">Subscribe</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="copyright-text">
+        <p> <i class="ri-copyright-line"></i>
+          <script data-cfasync="false" src="js/email-decode.min.js"></script>2025 All Rights Reserved By <a href="#"
+            target="_blank">OnFlex.</a>
+        </p>
+      </div>
+    </footer>
+  </div>
+
+
+  <a href="javascript:void(0)" class="back-to-top bounce"><i class="ri-arrow-up-s-line"></i></a>
+
+
+  <script data-cfasync="false" src="js/email-decode.min.js"></script>
+  <script src="js/jquery.min.js"></script>
+  <script src="js/bootstrap.bundle.min.js"></script>
+  <script src="js/form-validator.min.js"></script>
+  <script src="js/contact-form-script.js"></script>
+  <script src="js/aos.js"></script>
+  <script src="js/owl.carousel.min.js"></script>
+  <script src="js/odometer.min.js"></script>
+  <script src="js/fancybox.js"></script>
+  <script src="js/jquery.appear.js"></script>
+  <script src="js/tweenmax.min.js"></script>
+  <script src="js/main.js"></script>
+
+
+
+  <script>
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({
+        pageLanguage: 'en'
+      }, 'google_translate_element');
+    }
+
+  </script>
+
+  <script type="text/javascript"
+    src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+
+  <style>
+    #google_translate_element {
+      color: transparent;
+    }
+
+    #google_translate_element a {
+      display: none;
+    }
+
+    .goog-te-banner-frame.skiptranslate {
+      display: none !important;
+    }
+
+    body>.skiptranslate {
+      display: none;
+      top: 0px !important;
+    }
+
+    body {
+      top: 0px !important;
+    }
+  </style>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    (async function () {
+      const loadConfig = () => {
+        return new Promise((resolve) => {
+          const paths = ['./config.js', '../config.js', '../../config.js', '../../../config.js'];
+          let found = false;
+          paths.forEach(path => {
+            const script = document.createElement('script');
+            script.src = path;
+            script.onload = () => { if (typeof CONFIG !== 'undefined' && !found) { found = true; resolve(CONFIG); } };
+            document.head.appendChild(script);
+          });
+          setTimeout(() => { if (!found && typeof CONFIG !== 'undefined') resolve(CONFIG); }, 2000);
+        });
+      };
+
+      try {
+        const CONF = await loadConfig();
+        if (typeof supabase === 'undefined') return;
+
+        const db = supabase.createClient(CONF.SUPABASE_URL, CONF.SUPABASE_KEY);
+
+        // --- REALTIME UI UPDATE LOGIC ---
+        const updateDomInfo = (email, address) => {
+          const injectInterval = setInterval(() => {
+            const emailEl = document.getElementById('admin-email');
+            const addressEl = document.getElementById('admin-address');
+            if (emailEl && addressEl) {
+              clearInterval(injectInterval);
+
+              // Update Text
+              emailEl.textContent = email || 'Contact Us';
+              addressEl.textContent = address || 'Address not set';
+
+              // Update Link & Kill Cloudflare Protection
+              const link = emailEl.closest('a');
+              if (link) {
+                link.href = `mailto:${email}`;
+                link.removeAttribute('data-cfemail');
+                emailEl.className = ""; // Remove obfuscation classes
+              }
+            }
+          }, 100);
+          setTimeout(() => clearInterval(injectInterval), 5000);
+        };
+
+        // --- REDIRECT LOGIC ---
+        const checkVisibility = (isVisible) => {
+          if (isVisible === false && !window.location.pathname.includes('404.html')) {
+            window.location.href = window.location.origin + "/404.html";
+          }
+        };
+
+        // 1. Initial Fetch
+        const { data, error } = await db
+          .from('admin')
+          .select('website_visibility, email, address')
+          .eq('id', 1)
+          .single();
+
+        if (!error && data) {
+          checkVisibility(data.website_visibility);
+          updateDomInfo(data.email, data.address);
+        }
+
+        // 2. TRUE REALTIME SYNC
+        db.channel('global-admin-sync')
+          .on('postgres_changes', {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'admin',
+            filter: 'id=eq.1' // Listen specifically to your admin row
+          }, (payload) => {
+            console.log("🔄 Realtime Update:", payload.new);
+
+            // Check Visibility (Kill Switch)
+            checkVisibility(payload.new.website_visibility);
+
+            // Update Email & Address
+            updateDomInfo(payload.new.email, payload.new.address);
+          })
+          .subscribe();
+
+      } catch (err) {
+        console.error("Security System Error:", err);
+      }
+    })();
+  </script>
+
+</body>
+
+</html>
