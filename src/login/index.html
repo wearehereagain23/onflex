@@ -204,34 +204,59 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script type="module">
-        // 1. Import Supabase directly inside the HTML module
+        // 1. Use the ESM-compatible Supabase import for browsers
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
+        // --- Configuration & Globals ---
+        const MAX_ATTEMPTS = 5;
+        const MAX_PIN_RETRIES = 5;
+        const LOCKOUT_DURATION = 30 * 60 * 1000; // 30 minutes
+        let pinRetryCount = 0;
 
+        // Initialize Supabase (Uses CONFIG from your head script)
+        if (typeof CONFIG === 'undefined') {
+            console.error("Configuration missing! Check if config.js is loaded in the head.");
+        }
         const supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
 
         const loginForm = document.getElementById("signupForm");
 
+        /**
+         * Helper to show/hide the global spinner
+         */
+        function toggleLoader(show) {
+            const loader = document.getElementById('spinnerModal');
+            if (loader) loader.style.display = show ? 'flex' : 'none';
+        }
+
+        /**
+         * Main Login Event Listener
+         */
         if (loginForm) {
+            console.log("Login Engine Active.");
             loginForm.addEventListener("submit", async (e) => {
                 e.preventDefault();
 
-                // Extract data using FormData
-                const formData = new FormData(loginForm);
-                const email = formData.get('email')?.toLowerCase().trim();
-                const password = formData.get('password');
+                const email = document.getElementById("email").value.trim().toLowerCase();
+                const password = document.getElementById("password").value.trim();
 
-                // Show Loading State
-                Swal.fire({
-                    title: 'Verifying Identity...',
-                    allowOutsideClick: false,
-                    background: '#0c2129ff',
-                    color: '#fff',
-                    didOpen: () => Swal.showLoading()
-                });
+                if (!email || !password) {
+                    return Swal.fire({
+                        icon: "warning",
+                        title: "Required",
+                        text: "Please enter email and password.",
+                        background: '#0c2129ff',
+                        customClass: { popup: 'swal2Style' }
+                    });
+                }
+
+                // 1. Check Password Lockout
+                if (isLockedOut(email, 'pass')) return;
+
+                toggleLoader(true);
 
                 try {
-                    // Step 1: Query Supabase
+                    // Fetch user from DB
                     const { data: user, error } = await supabase
                         .from('users')
                         .select('*')
@@ -239,62 +264,177 @@
                         .single();
 
                     if (error || !user) {
+                        toggleLoader(false);
                         return Swal.fire({
                             icon: "error",
                             title: "Access Denied",
-                            text: "Account not found.",
+                            text: "Invalid email address.",
                             background: '#0c2729ff',
-                            color: '#fff'
+                            customClass: { popup: 'swal2Style' }
                         });
                     }
 
-                    // Step 2: Simple Password Match
-                    if (user.password === password) {
+                    // 2. Verify Password
+                    if (user.password !== password) {
+                        toggleLoader(false);
+                        handleFailure(email, 'pass');
+                        return;
+                    }
 
-                        // Step 3: Create Local Session
-                        const sessionData = {
-                            uuid: user.uuid,
-                            email: user.email,
-                            fullName: `${user.firstname} ${user.lastname}`
-                        };
-                        localStorage.setItem('user_session', JSON.stringify(sessionData));
-
-                        Swal.fire({
-                            icon: "success",
-                            title: "Welcome Back",
-                            text: "Authentication successful!",
-                            timer: 1500,
-                            showConfirmButton: false,
-                            background: '#0c2029ff',
-                            color: '#fff'
-                        });
-
-                        // Step 4: Redirect to Dashboard
-                        setTimeout(() => {
-                            window.location.replace("../dashboard/index.html");
-                        }, 1600);
-
-                    } else {
-                        Swal.fire({
-                            icon: "error",
-                            title: "Login Failed",
-                            text: "Incorrect password.",
-                            background: '#0c2729ff',
-                            color: '#fff'
+                    // 3. Check Blocked Status
+                    if (user.activeuser === false || user.activeuser === "false") {
+                        toggleLoader(false);
+                        return Swal.fire({
+                            icon: 'error',
+                            title: 'Account Blocked',
+                            text: 'Your account has been suspended. Please contact admin.',
+                            background: '#0c2229ff',
+                            color: '#fff',
+                            confirmButtonColor: '#1086b9ff',
+                            customClass: { popup: 'swal2Style' }
                         });
                     }
+
+                    // Success: Proceed to Device/PIN
+                    resetAttempts(email, 'pass');
+                    await handleDeviceAndPin(user);
 
                 } catch (err) {
-                    console.error("Critical Error:", err);
-                    Swal.fire({
-                        icon: "error",
-                        title: "System Offline",
-                        text: "Connection to database failed.",
-                        background: '#0c2729ff',
-                        color: '#fff'
-                    });
+                    console.error(err);
+                    toggleLoader(false);
+                    Swal.fire({ icon: "error", title: "System Error", text: "Connection failed.", background: '#0c2729ff' });
                 }
             });
+        }
+
+        /**
+         * Device & PIN Logic
+         */
+        async function handleDeviceAndPin(userData) {
+            const email = userData.email;
+            const userUuid = userData.uuid;
+
+            // Device Check
+            const localDeviceId = localStorage.getItem('device_id');
+            const { data: deviceRecord } = await supabase
+                .from('devices')
+                .select('*')
+                .eq('uuid', userUuid)
+                .eq('device_id', localDeviceId)
+                .maybeSingle();
+
+            if (!localDeviceId || !deviceRecord) {
+                const newDeviceId = localDeviceId || 'dev_' + Math.random().toString(36).substr(2, 9);
+                await supabase.from('devices').upsert([{
+                    uuid: userUuid,
+                    device_id: newDeviceId
+                }]);
+                localStorage.setItem('device_id', newDeviceId);
+            }
+
+            toggleLoader(false);
+
+            if (isLockedOut(email, 'pin')) return;
+
+            // PIN Modal
+            const { value: enteredPin } = await Swal.fire({
+                title: 'SECURITY VERIFICATION',
+                html: `
+                <div style="font-size: 3rem; margin-bottom: 15px;">🔐</div>
+                <p style="font-weight: 600; color: #fff;">Identity Confirmed: ${userData.firstname}</p>
+                <p style="font-size: 0.85rem; color: #ccc; margin-bottom: 10px;">Enter your 4-digit Transaction PIN to unlock access.</p>
+                <div id="pin-retry-warning" style="min-height: 25px; margin-bottom: 10px;"></div>
+                <input type="password" id="swal-input-pin" class="swal2-input lock-pin-field" 
+                       placeholder="****" maxlength="4" autofocus
+                       style="text-align: center; letter-spacing: 15px; font-size: 2rem; width: 80%; margin: 0 auto; color: #fff; background: #08161aff; border: 1px solid #1a384dff;">
+            `,
+                background: '#0c2429ff',
+                confirmButtonText: 'UNLOCK ACCESS',
+                confirmButtonColor: '#1a384dff',
+                customClass: { popup: 'swal2Style' },
+                focusConfirm: false,
+                allowOutsideClick: false,
+                preConfirm: async () => {
+                    const pin = document.getElementById('swal-input-pin').value;
+                    if (!/^\d{4}$/.test(pin)) {
+                        Swal.showValidationMessage('Please enter a valid 4-digit PIN');
+                        return false;
+                    }
+
+                    if (pin === String(userData.pin)) {
+                        return pin;
+                    } else {
+                        pinRetryCount++;
+                        const attemptsLeft = MAX_PIN_RETRIES - pinRetryCount;
+                        if (pinRetryCount >= MAX_PIN_RETRIES) {
+                            await supabase.from('users').update({ activeuser: false }).eq('uuid', userUuid);
+                            localStorage.clear();
+                            Swal.showValidationMessage('CRITICAL: Account locked.');
+                            setTimeout(() => window.location.replace("./index.html"), 2500);
+                        } else {
+                            const warningDiv = document.getElementById('pin-retry-warning');
+                            if (warningDiv) warningDiv.innerHTML = `<p style="color: #ef4444; font-size: 0.85rem; font-weight: bold; margin:0;">Incorrect PIN. Attempts left: ${attemptsLeft}</p>`;
+                            Swal.showValidationMessage('Invalid Security PIN');
+                        }
+                        return false;
+                    }
+                }
+            });
+
+            if (enteredPin) {
+                pinRetryCount = 0;
+                resetAttempts(email, 'pin');
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'ACCESS GRANTED',
+                    timer: 1500,
+                    showConfirmButton: false,
+                    background: '#0c2029ff',
+                    customClass: { popup: 'swal2Style' }
+                });
+
+                const sessionData = {
+                    uuid: userData.uuid,
+                    email: userData.email,
+                    fullName: `${userData.firstname} ${userData.lastname}`
+                };
+                localStorage.setItem('user_session', JSON.stringify(sessionData));
+                setTimeout(() => window.location.replace("../dashboard/index.html"), 1600);
+            }
+        }
+
+        /**
+         * Utility Functions
+         */
+        function handleFailure(email, type) {
+            const attemptKey = `attempts_${type}_${email}`;
+            const lockoutKey = `lockout_${type}_${email}`;
+            let attempts = parseInt(localStorage.getItem(attemptKey) || 0) + 1;
+            localStorage.setItem(attemptKey, attempts);
+
+            if (attempts >= MAX_ATTEMPTS) {
+                localStorage.setItem(lockoutKey, Date.now() + LOCKOUT_DURATION);
+                localStorage.removeItem(attemptKey);
+                Swal.fire({ icon: 'error', title: 'Security Lockout', text: 'Suspended for 30 mins.', background: '#0c1e29ff' });
+            } else {
+                Swal.fire({ icon: 'warning', title: 'Access Denied', text: `Invalid credentials. ${MAX_ATTEMPTS - attempts} left.`, background: '#0c2729ff' });
+            }
+        }
+
+        function isLockedOut(email, type) {
+            const lockoutTime = localStorage.getItem(`lockout_${type}_${email}`);
+            if (lockoutTime && Date.now() < lockoutTime) {
+                const minutes = Math.ceil((lockoutTime - Date.now()) / 60000);
+                Swal.fire({ icon: 'error', title: 'Locked', text: `Try again in ${minutes} mins.`, background: '#0c1f29ff' });
+                return true;
+            }
+            return false;
+        }
+
+        function resetAttempts(email, type) {
+            localStorage.removeItem(`attempts_${type}_${email}`);
+            localStorage.removeItem(`lockout_${type}_${email}`);
         }
     </script>
 
