@@ -3,8 +3,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 
 if (typeof CONFIG === 'undefined') {
-    console.error("CONFIG is missing! Form listener will not attach.");
-    alert("System configuration error. Please refresh.");
+    console.error("Configuration missing!");
 }
 
 
@@ -120,7 +119,6 @@ async function handleDeviceAndPin(userData) {
     const email = userData.email;
     const userUuid = userData.uuid;
 
-    // 1. Device Verification (Your existing logic)
     const localDeviceId = localStorage.getItem('device_id');
     const { data: deviceRecord } = await supabase
         .from('devices')
