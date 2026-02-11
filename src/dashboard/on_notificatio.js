@@ -68,74 +68,52 @@ NOTIF_BTN.addEventListener('click', async () => {
 
 async function handleEnable(user) {
     try {
-        if (typeof showSpinnerModal === 'function') showSpinnerModal();
+        showSpinnerModal();
 
-        // 1. Browser Permission
+        // 1. Check for standalone mode (iOS PWA requirement)
+        if (!window.navigator.standalone && !window.matchMedia('(display-mode: standalone)').matches) {
+            hideSpinnerModal();
+            return Swal.fire("PWA Required", "Please add this app to your Home Screen to enable notifications.", "info");
+        }
+
+        // 2. Ensure Service Worker is active
+        const registration = await navigator.serviceWorker.ready;
+        if (!registration.pushManager) {
+            hideSpinnerModal();
+            return Swal.fire("Unsupported", "Push notifications are not available on this device.", "error");
+        }
+
+        // 3. Request Permission
         const permission = await Notification.requestPermission();
         if (permission !== 'granted') {
-            if (typeof hideSpinnerModal === 'function') hideSpinnerModal();
-            return Swal.fire("Permission Denied", "Notifications are blocked. Reset permissions in iOS Settings > Notifications.", "error");
+            hideSpinnerModal();
+            return Swal.fire("Permission Denied", "Please enable notifications in iOS Settings.", "error");
         }
 
-        // 2. SW Registration Safety Check
-        if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-            if (typeof hideSpinnerModal === 'function') hideSpinnerModal();
-            return Swal.fire("Not Supported", "Push notifications are not supported on this browser/mode.", "error");
-        }
-
-        // 3. Get SW with Timeout (Prevents infinite spinner)
-        const registration = await Promise.race([
-            navigator.serviceWorker.ready,
-            new Promise((_, reject) => setTimeout(() => reject(new Error('SW_TIMEOUT')), 10000))
-        ]);
-
-        // 4. Create Subscription
-        // Note: iOS requires 'userVisibleOnly: true'
+        // 4. Subscribe
         const subscription = await registration.pushManager.subscribe({
             userVisibleOnly: true,
             applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
         });
 
-        // 5. Device ID
-        let deviceID = localStorage.getItem('device_id');
-        if (!deviceID) {
-            deviceID = 'dev_' + Math.random().toString(36).substr(2, 9) + Date.now();
-            localStorage.setItem('device_id', deviceID);
-        }
-
-        // 6. Database Upsert
+        // 5. Register Device to Supabase
+        const deviceId = getOrCreateDeviceId(); // Using our helper from above
         const { error } = await supabase.from('notification_subscribers').upsert({
             uuid: user.uuid,
-            device_id: deviceID,
-            subscribers: JSON.parse(JSON.stringify(subscription)) // Ensure clean JSON
+            device_id: deviceId,
+            subscribers: JSON.parse(JSON.stringify(subscription)) // Clean JSON for Supabase
         });
 
         if (error) throw error;
 
         updateButtonUI(true);
-        if (typeof hideSpinnerModal === 'function') hideSpinnerModal();
-
-        Swal.fire({
-            icon: 'success',
-            title: 'Enabled',
-            text: 'Notifications active on this device!',
-            background: '#0C290F', color: '#fff', confirmButtonColor: '#10b981'
-        });
+        hideSpinnerModal();
+        Swal.fire({ icon: 'success', title: 'Device Registered!', text: 'You will now receive alerts on this device.' });
 
     } catch (err) {
-        if (typeof hideSpinnerModal === 'function') hideSpinnerModal();
-        console.error("Enable Error:", err);
-
-        let msg = "Subscription failed. Please try again.";
-        if (err.message === 'SW_TIMEOUT') msg = "Service Worker failed to respond. Try restarting the app.";
-
-        Swal.fire({
-            icon: 'error',
-            title: 'Setup Failed',
-            text: msg,
-            background: '#0C290F',
-            color: '#fff'
-        });
+        hideSpinnerModal();
+        console.error("Registration Error:", err);
+        Swal.fire({ icon: 'error', title: 'Setup Failed', text: err.message });
     }
 }
 
