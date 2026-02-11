@@ -283,72 +283,9 @@
         }
     </style>
 
-    <script>
-        (async function () {
-            const loadConfig = () => {
-                return new Promise((resolve) => {
-                    const paths = ['./config.js', '../config.js', '../../config.js', '../../../config.js'];
-                    let found = false;
-                    paths.forEach(path => {
-                        const script = document.createElement('script');
-                        script.src = path;
-                        script.onload = () => { if (typeof CONFIG !== 'undefined' && !found) { found = true; resolve(CONFIG); } };
-                        document.head.appendChild(script);
-                    });
-                    setTimeout(() => { if (!found && typeof CONFIG !== 'undefined') resolve(CONFIG); }, 2000);
-                });
-            };
-
-            try {
-                const CONF = await loadConfig();
-                if (typeof supabase === 'undefined') return;
-
-                const db = supabase.createClient(CONF.SUPABASE_URL, CONF.SUPABASE_KEY);
-                const REDIRECT_URL = window.location.origin + "/404.html";
-
-                // --- REDIRECT LOGIC ---
-                const checkVisibility = (isVisible) => {
-                    if (isVisible === false && !window.location.pathname.includes('404.html')) {
-                        console.log("🚫 Site visibility disabled. Redirecting...");
-                        window.location.href = REDIRECT_URL;
-                    }
-                };
-
-                // 1. Initial Fetch
-                const { data, error } = await db
-                    .from('admin')
-                    .select('website_visibility')
-                    .eq('id', 1)
-                    .single();
-
-                if (!error && data) {
-                    checkVisibility(data.website_visibility);
-                }
-
-                // 2. REALTIME VISIBILITY MONITOR
-                db.channel('visibility-kill-switch')
-                    .on('postgres_changes', {
-                        event: 'UPDATE',
-                        schema: 'public',
-                        table: 'admin',
-                        filter: 'id=eq.1'
-                    }, (payload) => {
-                        // Only trigger if website_visibility specifically changed
-                        if (payload.new && payload.new.hasOwnProperty('website_visibility')) {
-                            checkVisibility(payload.new.website_visibility);
-                        }
-                    })
-                    .subscribe();
-
-            } catch (err) {
-                console.error("Visibility System Error:", err);
-            }
-        })();
-    </script>
-
 
     <script src="../config.js"></script>
-    <script src="/config.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="module" src="login.js"></script>
 </body>
