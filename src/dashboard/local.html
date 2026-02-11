@@ -1112,32 +1112,22 @@
 
                     // Reusable function that matches your chat.js logic exactly
                     const triggerPush = async (targetUuid, roleTitle, msg) => {
-                        const { data: subData } = await supabase
-                            .from('notification_subscribers')
-                            .select('subscribers')
-                            .eq('uuid', targetUuid)
-                            .limit(1);
-
-                        if (subData && subData.length > 0) {
-                            try {
-                                await fetch('/subscribe', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({
-                                        uuid: window.dataBase.uuid,
-                                        subscription: subData[0].subscribers,
-                                        title: roleTitle,
-                                        message: msg,
-                                        url: "/dashboard/history.html"
-                                    })
-                                });
-                                console.log(`✅ Push Sent to ${targetUuid}`);
-                            } catch (e) { console.error("Fetch Error:", e); }
-                        } else {
-                            console.log(`⚠️ No subscriber record found for ${targetUuid}`);
+                        try {
+                            await fetch('/subscribe', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    uuid: targetUuid, // CRITICAL: This determines WHO gets the push
+                                    title: roleTitle,
+                                    message: msg,
+                                    url: "/dashboard/history.html"
+                                })
+                            });
+                            console.log(`✅ Multi-device push triggered for: ${targetUuid}`);
+                        } catch (e) {
+                            console.error("Push Trigger Error:", e);
                         }
                     };
-
                     // Trigger for both parties
                     await triggerPush(senderUuid, "Transfer Successful", `You sent ${amountStr} to ${tx.receiverName}`);
                     await triggerPush(receiverUuid, "Credit Alert", `You received ${amountStr} from ${tx.senderName}`);
