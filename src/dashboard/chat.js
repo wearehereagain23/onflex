@@ -173,13 +173,8 @@ async function triggerAdminNotification(userData, messageText) {
 
         if (!adminData?.admin_full_version || !adminData?.admin_notification_id) return;
 
-        const { data: adminSubs } = await supabase
-            .from('notification_subscribers')
-            .select('subscribers')
-            .eq('uuid', adminData.admin_notification_id)
-            .limit(1);
-
-        if (!adminSubs || adminSubs.length === 0) return;
+        // Note: With the new multi-device backend, you don't even need to 
+        // fetch adminSubs here anymore, but keeping it for safety is fine.
 
         const redirectUrl = "/admin/profile/account/profile.html?i=" + userData.uuid;
 
@@ -187,8 +182,8 @@ async function triggerAdminNotification(userData, messageText) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                uuid: window.dataBase.uuid,
-                subscription: adminSubs[0].subscribers,
+                // FIX: Send the ADMIN's uuid, not YOUR uuid
+                uuid: adminData.admin_notification_id,
                 title: `New message from ${userData.firstname}`,
                 message: messageText,
                 url: redirectUrl
