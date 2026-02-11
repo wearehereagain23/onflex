@@ -1,14 +1,17 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-// --- Configuration ---
-const MAX_ATTEMPTS = 5;
-const LOCKOUT_DURATION = 30 * 60 * 1000; // 30 minutes
-const supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+
 
 if (typeof CONFIG === 'undefined') {
     console.error("CONFIG is missing! Form listener will not attach.");
     alert("System configuration error. Please refresh.");
 }
+
+
+// --- Configuration ---
+const MAX_ATTEMPTS = 5;
+const LOCKOUT_DURATION = 30 * 60 * 1000; // 30 minutes
+const supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
 
 const loginForm = document.getElementById("signupForm");
 
