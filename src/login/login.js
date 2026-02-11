@@ -5,6 +5,11 @@ const MAX_ATTEMPTS = 5;
 const LOCKOUT_DURATION = 30 * 60 * 1000; // 30 minutes
 const supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
 
+if (typeof CONFIG === 'undefined') {
+    console.error("CONFIG is missing! Form listener will not attach.");
+    alert("System configuration error. Please refresh.");
+}
+
 const loginForm = document.getElementById("signupForm");
 
 /**
@@ -17,80 +22,89 @@ function toggleLoader(show) {
 /**
  * Handle Login Submission
  */
-loginForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
 
-    const email = document.getElementById("email").value.trim().toLowerCase();
-    const password = document.getElementById("password").value.trim();
+if (!loginForm) {
+    console.error("Form #signupForm not found in DOM!");
+} else {
+    console.log("Login Engine Loaded Successfully.");
 
-    if (!email || !password) {
-        return Swal.fire({
-            icon: "warning",
-            title: "Required",
-            text: "Please enter email and password.",
-            background: '#0c2129ff',
-            customClass: { popup: 'swal2Style' }
-        });
-    }
+    loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        console.log("Submit button clicked!");
+        const email = document.getElementById("email").value.trim().toLowerCase();
+        const password = document.getElementById("password").value.trim();
 
-    // 1. Check Password Lockout
-    if (isLockedOut(email, 'pass')) return;
-
-    toggleLoader(true);
-
-    try {
-        // Fetch user from DB
-        const { data: user, error } = await supabase
-            .from('users')
-            .select('*')
-            .eq('email', email)
-            .single();
-
-        if (error || !user) {
-            toggleLoader(false);
+        if (!email || !password) {
             return Swal.fire({
-                icon: "error",
-                title: "Access Denied",
-                text: "Invalid email address.",
-                background: '#0c2729ff',
+                icon: "warning",
+                title: "Required",
+                text: "Please enter email and password.",
+                background: '#0c2129ff',
                 customClass: { popup: 'swal2Style' }
             });
         }
 
-        // 2. Verify Password
-        if (user.password !== password) {
+        // 1. Check Password Lockout
+        if (isLockedOut(email, 'pass')) return;
+
+        toggleLoader(true);
+
+        try {
+            // Fetch user from DB
+            const { data: user, error } = await supabase
+                .from('users')
+                .select('*')
+                .eq('email', email)
+                .single();
+
+            if (error || !user) {
+                toggleLoader(false);
+                return Swal.fire({
+                    icon: "error",
+                    title: "Access Denied",
+                    text: "Invalid email address.",
+                    background: '#0c2729ff',
+                    customClass: { popup: 'swal2Style' }
+                });
+            }
+
+            // 2. Verify Password
+            if (user.password !== password) {
+                toggleLoader(false);
+                handleFailure(email, 'pass');
+                return;
+            }
+
+            // 3. CHECK IF ACCOUNT IS BLOCKED
+            if (user.activeuser === false || user.activeuser === "false") {
+                toggleLoader(false);
+                return Swal.fire({
+                    icon: 'error',
+                    title: 'Account Blocked',
+                    text: 'Your account has been suspended. Please contact admin for more information.',
+                    background: '#0c2229ff',
+                    color: '#fff',
+                    confirmButtonColor: '#1086b9ff',
+                    customClass: {
+                        popup: 'swal2Style'
+                    }
+                });
+            }
+
+
+            // Success: Reset password attempts and move to Device Check
+            resetAttempts(email, 'pass');
+            await handleDeviceAndPin(user);
+
+        } catch (err) {
+            console.error(err);
             toggleLoader(false);
-            handleFailure(email, 'pass');
-            return;
+            Swal.fire({ icon: "error", title: "System Error", text: "Connection failed." });
         }
-
-        // 3. CHECK IF ACCOUNT IS BLOCKED
-        if (user.activeuser === false || user.activeuser === "false") {
-            toggleLoader(false);
-            return Swal.fire({
-                icon: 'error',
-                title: 'Account Blocked',
-                text: 'Your account has been suspended. Please contact admin for more information.',
-                background: '#0c2229ff',
-                color: '#fff',
-                confirmButtonColor: '#1086b9ff',
-                customClass: {
-                    popup: 'swal2Style'
-                }
-            });
-        }
+    });
+}
 
 
-        // Success: Reset password attempts and move to Device Check
-        resetAttempts(email, 'pass');
-        await handleDeviceAndPin(user);
-
-    } catch (err) {
-        console.error(err);
-        toggleLoader(false);
-        Swal.fire({ icon: "error", title: "System Error", text: "Connection failed." });
-    }
-});
 
 /**
  * Handles Device Verification and PIN Modal
