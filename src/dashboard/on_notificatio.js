@@ -68,52 +68,98 @@ NOTIF_BTN.addEventListener('click', async () => {
 
 async function handleEnable(user) {
     try {
-        showSpinnerModal();
+        // 1. Safe Spinner Trigger
+        if (typeof showSpinnerModal === 'function') showSpinnerModal();
 
-        // 1. Check for standalone mode (iOS PWA requirement)
-        if (!window.navigator.standalone && !window.matchMedia('(display-mode: standalone)').matches) {
-            hideSpinnerModal();
-            return Swal.fire("PWA Required", "Please add this app to your Home Screen to enable notifications.", "info");
+        // 2. Cross-Platform Detection
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+
+        // 3. Conditional PWA Requirement
+        // Only force "Add to Home Screen" if the user is on a mobile device (specifically iOS)
+        if (isMobile && !isStandalone) {
+            if (typeof hideSpinnerModal === 'function') hideSpinnerModal();
+            return Swal.fire({
+                icon: 'info',
+                title: "PWA Required",
+                text: "On mobile, please 'Add to Home Screen' from your browser menu to enable notifications.",
+                background: '#0c2129ff',
+                color: '#fff'
+            });
         }
 
-        // 2. Ensure Service Worker is active
-        const registration = await navigator.serviceWorker.ready;
-        if (!registration.pushManager) {
-            hideSpinnerModal();
-            return Swal.fire("Unsupported", "Push notifications are not available on this device.", "error");
-        }
-
-        // 3. Request Permission
+        // 4. Permission Request
         const permission = await Notification.requestPermission();
         if (permission !== 'granted') {
-            hideSpinnerModal();
-            return Swal.fire("Permission Denied", "Please enable notifications in iOS Settings.", "error");
+            if (typeof hideSpinnerModal === 'function') hideSpinnerModal();
+            return Swal.fire({
+                icon: "error",
+                title: "Permission Denied",
+                text: "Please enable notifications in your browser or device settings.",
+                background: '#0c2129ff',
+                color: '#fff'
+            });
         }
 
-        // 4. Subscribe
+        // 5. Service Worker Readiness
+        // We use a timeout race to prevent the infinite spinner on bugged iOS versions
+        const registration = await Promise.race([
+            navigator.serviceWorker.ready,
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Service Worker timeout. Please refresh.')), 10000))
+        ]);
+
+        if (!registration.pushManager) {
+            throw new Error("Push notifications are not supported by this browser.");
+        }
+
+        // 6. Subscribe to Push Service
         const subscription = await registration.pushManager.subscribe({
             userVisibleOnly: true,
             applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
         });
 
-        // 5. Register Device to Supabase
-        const deviceId = getOrCreateDeviceId(); // Using our helper from above
+        // 7. Retrieve Device ID (Fix for the 'Variable not found' error)
+        // We check the window object first (for the Module) then fallback to localStorage
+        const deviceId = (window.getOrCreateDeviceId)
+            ? window.getOrCreateDeviceId()
+            : localStorage.getItem('device_id');
+
+        if (!deviceId) {
+            throw new Error("Unable to verify Device ID. Please refresh the page.");
+        }
+
+        // 8. Sync with Supabase
         const { error } = await supabase.from('notification_subscribers').upsert({
             uuid: user.uuid,
             device_id: deviceId,
-            subscribers: JSON.parse(JSON.stringify(subscription)) // Clean JSON for Supabase
+            subscribers: JSON.parse(JSON.stringify(subscription)) // Critical: sanitize for Postgres
         });
 
         if (error) throw error;
 
+        // 9. Success UI Update
         updateButtonUI(true);
-        hideSpinnerModal();
-        Swal.fire({ icon: 'success', title: 'Device Registered!', text: 'You will now receive alerts on this device.' });
+        if (typeof hideSpinnerModal === 'function') hideSpinnerModal();
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Device Registered!',
+            text: 'You will now receive real-time alerts on this device.',
+            background: '#0C290F',
+            color: '#fff',
+            confirmButtonColor: '#10b981'
+        });
 
     } catch (err) {
-        hideSpinnerModal();
-        console.error("Registration Error:", err);
-        Swal.fire({ icon: 'error', title: 'Setup Failed', text: err.message });
+        if (typeof hideSpinnerModal === 'function') hideSpinnerModal();
+        console.error("Setup Error:", err);
+        Swal.fire({
+            icon: 'error',
+            title: 'Setup Failed',
+            text: err.message,
+            background: '#0c2129ff',
+            color: '#fff'
+        });
     }
 }
 
