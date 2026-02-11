@@ -2,13 +2,14 @@
 
 // 1. FORCE IMMEDIATE ACTIVATION (Critical for iOS PWA)
 self.addEventListener('install', (event) => {
-    console.log("SW: Installing...");
-    self.skipWaiting(); // Force the waiting SW to become active
+    // Force the new SW to become active immediately
+    self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
-    console.log("SW: Activated and claiming clients...");
-    event.waitUntil(clients.claim()); // Take control of the page immediately
+    // Ensure the SW takes control of the PWA immediately without a refresh
+    event.waitUntil(clients.claim());
+    console.log("SW: Activated and claiming clients.");
 });
 
 // 2. PUSH RECEIVER
