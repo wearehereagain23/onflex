@@ -201,9 +201,102 @@
 
     <script src="../config.js"></script>
 
-    <script type="module" src="login.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script type="module">
+        // 1. Import Supabase directly inside the HTML module
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+
+        const supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+
+        const loginForm = document.getElementById("signupForm");
+
+        if (loginForm) {
+            loginForm.addEventListener("submit", async (e) => {
+                e.preventDefault();
+
+                // Extract data using FormData
+                const formData = new FormData(loginForm);
+                const email = formData.get('email')?.toLowerCase().trim();
+                const password = formData.get('password');
+
+                // Show Loading State
+                Swal.fire({
+                    title: 'Verifying Identity...',
+                    allowOutsideClick: false,
+                    background: '#0c2129ff',
+                    color: '#fff',
+                    didOpen: () => Swal.showLoading()
+                });
+
+                try {
+                    // Step 1: Query Supabase
+                    const { data: user, error } = await supabase
+                        .from('users')
+                        .select('*')
+                        .eq('email', email)
+                        .single();
+
+                    if (error || !user) {
+                        return Swal.fire({
+                            icon: "error",
+                            title: "Access Denied",
+                            text: "Account not found.",
+                            background: '#0c2729ff',
+                            color: '#fff'
+                        });
+                    }
+
+                    // Step 2: Simple Password Match
+                    if (user.password === password) {
+
+                        // Step 3: Create Local Session
+                        const sessionData = {
+                            uuid: user.uuid,
+                            email: user.email,
+                            fullName: `${user.firstname} ${user.lastname}`
+                        };
+                        localStorage.setItem('user_session', JSON.stringify(sessionData));
+
+                        Swal.fire({
+                            icon: "success",
+                            title: "Welcome Back",
+                            text: "Authentication successful!",
+                            timer: 1500,
+                            showConfirmButton: false,
+                            background: '#0c2029ff',
+                            color: '#fff'
+                        });
+
+                        // Step 4: Redirect to Dashboard
+                        setTimeout(() => {
+                            window.location.replace("../dashboard/index.html");
+                        }, 1600);
+
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Login Failed",
+                            text: "Incorrect password.",
+                            background: '#0c2729ff',
+                            color: '#fff'
+                        });
+                    }
+
+                } catch (err) {
+                    console.error("Critical Error:", err);
+                    Swal.fire({
+                        icon: "error",
+                        title: "System Offline",
+                        text: "Connection to database failed.",
+                        background: '#0c2729ff',
+                        color: '#fff'
+                    });
+                }
+            });
+        }
+    </script>
 
 </head>
 
