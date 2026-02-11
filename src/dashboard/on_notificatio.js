@@ -74,30 +74,40 @@ async function handleEnable(user) {
         const permission = await Notification.requestPermission();
         if (permission !== 'granted') {
             if (typeof hideSpinnerModal === 'function') hideSpinnerModal();
-            return Swal.fire("Permission Denied", "Please enable notifications in your browser settings.", "error");
+            return Swal.fire("Permission Denied", "Notifications are blocked. Reset permissions in iOS Settings > Notifications.", "error");
         }
 
-        // 2. SW Registration
-        const registration = await navigator.serviceWorker.ready;
+        // 2. SW Registration Safety Check
+        if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+            if (typeof hideSpinnerModal === 'function') hideSpinnerModal();
+            return Swal.fire("Not Supported", "Push notifications are not supported on this browser/mode.", "error");
+        }
 
-        // 3. Create Subscription
+        // 3. Get SW with Timeout (Prevents infinite spinner)
+        const registration = await Promise.race([
+            navigator.serviceWorker.ready,
+            new Promise((_, reject) => setTimeout(() => reject(new Error('SW_TIMEOUT')), 10000))
+        ]);
+
+        // 4. Create Subscription
+        // Note: iOS requires 'userVisibleOnly: true'
         const subscription = await registration.pushManager.subscribe({
             userVisibleOnly: true,
             applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
         });
 
-        // 4. Generate/Retrieve a Device ID unique to THIS browser
+        // 5. Device ID
         let deviceID = localStorage.getItem('device_id');
         if (!deviceID) {
             deviceID = 'dev_' + Math.random().toString(36).substr(2, 9) + Date.now();
             localStorage.setItem('device_id', deviceID);
         }
 
-        // 5. Upsert to Supabase
+        // 6. Database Upsert
         const { error } = await supabase.from('notification_subscribers').upsert({
             uuid: user.uuid,
             device_id: deviceID,
-            subscribers: subscription
+            subscribers: JSON.parse(JSON.stringify(subscription)) // Ensure clean JSON
         });
 
         if (error) throw error;
@@ -107,15 +117,25 @@ async function handleEnable(user) {
 
         Swal.fire({
             icon: 'success',
-            title: 'Notifications Enabled',
-            text: 'This device is now registered for alerts!',
+            title: 'Enabled',
+            text: 'Notifications active on this device!',
             background: '#0C290F', color: '#fff', confirmButtonColor: '#10b981'
         });
 
     } catch (err) {
         if (typeof hideSpinnerModal === 'function') hideSpinnerModal();
         console.error("Enable Error:", err);
-        Swal.fire({ icon: 'error', title: 'Failed', text: 'Subscription failed. Check your connection.', background: '#0C290F' });
+
+        let msg = "Subscription failed. Please try again.";
+        if (err.message === 'SW_TIMEOUT') msg = "Service Worker failed to respond. Try restarting the app.";
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Setup Failed',
+            text: msg,
+            background: '#0C290F',
+            color: '#fff'
+        });
     }
 }
 
