@@ -1,5 +1,4 @@
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-
+import { createClient } from 'https://jspm.dev/@supabase/supabase-js';
 
 
 if (typeof CONFIG === 'undefined') {
