@@ -69,6 +69,13 @@ app.get('/manifest.json', (req, res) => {
 });
 
 
+//  admin side PWA
+
+app.get('/sw.js', (req, res) => {
+  res.sendFile(path.join(__dirname, 'src/admin/sw.js'));
+});
+
+
 app.get('/manifest.json', (req, res) => {
   res.sendFile(path.join(__dirname, 'src/admin/manifest.json'));
 });
