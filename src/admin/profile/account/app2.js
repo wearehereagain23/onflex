@@ -7,13 +7,8 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 // We initialize inside the export to ensure CONFIG is ready when called
 
 export async function initAdminSettingsPage() {
-    // Check if CONFIG exists in any global form
     const config = window.CONFIG || (typeof CONFIG !== 'undefined' ? CONFIG : null);
-
-    if (!config) {
-        console.error("Configuration Error: CONFIG is not defined. Check your config.js path.");
-        return;
-    }
+    if (!config) return console.error("CONFIG missing");
 
     const supabase = createClient(config.SUPABASE_URL, config.SUPABASE_KEY);
 
