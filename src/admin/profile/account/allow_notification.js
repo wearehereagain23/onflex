@@ -1,8 +1,20 @@
+/**
+ * src/admin/profile/account/allow_notification.js
+ * No-Import Style
+ */
 async function initAdminNotification(buttonId) {
-    if (typeof supabase === 'undefined') return;
-    const adminDb = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+    // Check if the HTML-loaded Supabase exists
+    if (typeof window.supabase === 'undefined' || typeof window.supabase.createClient !== 'function') {
+        console.error("Supabase library not found. Ensure the HTML script is correct.");
+        return;
+    }
+
+    const adminDb = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
     const CONFIG_BTN = document.getElementById(buttonId);
+    const VAPID_PUBLIC_KEY = 'BA0Y8SCjnZI0oRFfM8IH4ZY1Hpbh2kmeSVjQNwakIpz0ZndaH6OiuBhNO672CiLKDmCNqicVt4waCxbphGMGXEU';
+
     if (!CONFIG_BTN) return;
+
     // --- INTERNAL HELPERS ---
     const updateBtnUI = (isEnabled) => {
         if (isEnabled) {
@@ -25,9 +37,9 @@ async function initAdminNotification(buttonId) {
 
     // --- 1. SYNC STATE ---
     const syncState = async () => {
-        const { data: admin } = await supabase.from('admin').select('*').eq('id', 1).single();
+        // Use adminDb here consistently
+        const { data: admin } = await adminDb.from('admin').select('*').eq('id', 1).single();
 
-        // Check actual browser registration
         const registration = await navigator.serviceWorker.getRegistration('/admin/');
         const subscription = await registration?.pushManager.getSubscription();
 
@@ -36,7 +48,6 @@ async function initAdminNotification(buttonId) {
             CONFIG_BTN.innerHTML = '<i class="fa fa-lock me-2"></i>Upgrade Required';
             return;
         }
-
         updateBtnUI(!!subscription);
     };
 
@@ -48,10 +59,9 @@ async function initAdminNotification(buttonId) {
 
         try {
             if (Notification.permission === 'denied') {
-                return Swal.fire({ title: "Blocked", text: "Please reset notification permissions.", icon: "error" });
+                return Swal.fire({ title: "Blocked", text: "Reset notification permissions in your browser.", icon: "error" });
             }
 
-            // Target Admin Scope Service Worker
             let registration = await navigator.serviceWorker.getRegistration('/admin/');
             if (!registration) {
                 registration = await navigator.serviceWorker.register('/admin/sw.js', { scope: '/admin/' });
@@ -59,20 +69,17 @@ async function initAdminNotification(buttonId) {
             await navigator.serviceWorker.ready;
 
             if (isCurrentlyEnabled) {
-                // --- DISABLE ---
                 const sub = await registration.pushManager.getSubscription();
                 if (sub) await sub.unsubscribe();
 
                 const localId = localStorage.getItem('admin_device_id');
                 if (localId) {
-                    await supabase.from('notification_subscribers').delete().eq('device_id', localId);
+                    await adminDb.from('notification_subscribers').delete().eq('device_id', localId);
                 }
 
                 updateBtnUI(false);
                 Swal.fire({ title: "Disabled", icon: "success" });
-
             } else {
-                // --- ENABLE ---
                 const permission = await Notification.requestPermission();
                 if (permission !== 'granted') return;
 
@@ -81,20 +88,19 @@ async function initAdminNotification(buttonId) {
                     applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
                 });
 
-                const { data: adminData } = await supabase.from('admin').select('admin_notification_id').eq('id', 1).single();
+                const { data: adminData } = await adminDb.from('admin').select('admin_notification_id').eq('id', 1).single();
                 const targetUuid = adminData?.admin_notification_id || 'admin_global';
 
                 const uniqueId = 'admin_dev_' + Math.random().toString(36).substr(2, 9);
                 localStorage.setItem('admin_device_id', uniqueId);
 
-                const { error } = await supabase.from('notification_subscribers').upsert({
+                const { error } = await adminDb.from('notification_subscribers').upsert({
                     uuid: targetUuid,
                     device_id: uniqueId,
                     subscribers: JSON.parse(JSON.stringify(sub))
                 });
 
                 if (error) throw error;
-
                 updateBtnUI(true);
                 Swal.fire({ title: "Enabled!", icon: "success" });
             }
@@ -104,3 +110,6 @@ async function initAdminNotification(buttonId) {
         }
     };
 }
+
+// Attach function to window so it can be called by the HTML module script
+window.initAdminNotification = initAdminNotification;

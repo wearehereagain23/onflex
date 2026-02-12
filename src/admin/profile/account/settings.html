@@ -36,19 +36,24 @@
   <script src="allow_notification.js"></script>
 
   <script type="module">
-    // 1. Import Supabase only here
+    // 1. Import Supabase ONCE here
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-    // 2. Make it global so app2.js can see it
+    // 2. Pass it to the window so your files can see it
     window.supabase = { createClient };
 
-    // 3. Trigger the functions from your JS files
-    try {
-      await window.initAdminSettingsPage();
-      await window.initAdminNotification('config_button');
-    } catch (e) {
-      console.error("Initialization failed", e);
-    }
+    // 3. RUN THE FUNCTIONS
+    document.addEventListener('DOMContentLoaded', async () => {
+      // These functions now exist globally because of the "window.init..." lines in your JS files
+      if (typeof initAdminSettingsPage === 'function') {
+        await initAdminSettingsPage();
+      }
+
+      if (typeof initAdminNotification === 'function') {
+        // Passes the ID of your notification button
+        await initAdminNotification('config_button');
+      }
+    });
   </script>
 </head>
 <!-- [Head] end -->
