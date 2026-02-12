@@ -1,8 +1,5 @@
 alert('rhyhryh');
 
-
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-
 // We initialize inside the export to ensure CONFIG is ready when called
 
 export async function initAdminSettingsPage() {
