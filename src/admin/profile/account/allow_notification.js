@@ -1,220 +1,44 @@
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-
-const supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
-const CONFIG_BTN = document.getElementById('config_button');
-
 /**
- * 🔄 REALTIME & INITIAL SYNC
+ * admin_notification.js - Adapted for Admin Scope
  */
-const initAdminNotifyLogic = async () => {
-    if (!CONFIG_BTN) return;
-    await syncAdminState();
 
-    supabase.channel('admin-notif-sync')
-        .on('postgres_changes', {
-            event: 'UPDATE',
-            schema: 'public',
-            table: 'admin',
-            filter: 'id=eq.1'
-        }, payload => {
-            syncAdminState();
-        }).subscribe();
+const ADMIN_NOTIF_BTN = document.getElementById('config_button'); // Matches your admin ID
+const VAPID_PUBLIC_KEY = 'BA0Y8SCjnZI0oRFfM8IH4ZY1Hpbh2kmeSVjQNwakIpz0ZndaH6OiuBhNO672CiLKDmCNqicVt4waCxbphGMGXEU';
+
+const initAdminNotifications = () => {
+    checkAdminSubscriptionState();
 };
 
-async function syncAdminState() {
-    const { data: admin } = await supabase.from('admin').select('*').eq('id', 1).single();
-    const localId = localStorage.getItem('admin_notification_id');
-    const browserPermission = Notification.permission;
+/**
+ * Checks the Admin Service Worker scope directly.
+ */
+async function checkAdminSubscriptionState() {
+    if (!ADMIN_NOTIF_BTN || !('serviceWorker' in navigator)) return;
 
-    // 1. Upgrade Required
-    if (admin && !admin.admin_full_version) {
-        CONFIG_BTN.disabled = true;
-        CONFIG_BTN.innerHTML = '<i class="fa fa-lock me-2"></i>Upgrade Required';
-        return;
+    try {
+        // CRITICAL: Point to the /admin/ scope
+        const registration = await navigator.serviceWorker.getRegistration('/admin/');
+        const subscription = await registration?.pushManager.getSubscription();
+
+        updateAdminButtonUI(!!subscription);
+    } catch (err) {
+        console.error("Admin SW Check Error:", err);
+        updateAdminButtonUI(false);
     }
+}
 
-    // 2. Cleanup if permission was manually revoked in browser
-    if (browserPermission === 'denied' && (localId || admin?.admin_notification_id)) {
-        await cleanupAdminSubscription(admin?.admin_notification_id || localId);
-        updateBtnUI(false);
-        return;
-    }
-
-    // 3. Sync UI
-    if (localId) {
-        const { data: sub } = await supabase.from('notification_subscribers')
-            .select('*')
-            .eq('device_id', localId)
-            .maybeSingle();
-
-        updateBtnUI(!!sub);
+function updateAdminButtonUI(isSubscribed) {
+    if (!ADMIN_NOTIF_BTN) return;
+    if (isSubscribed) {
+        ADMIN_NOTIF_BTN.innerHTML = 'Disable Admin Notification 🔕';
+        ADMIN_NOTIF_BTN.className = "btn btn-danger mb-4"; // Red for disable
     } else {
-        updateBtnUI(false);
+        ADMIN_NOTIF_BTN.innerHTML = 'Enable Admin Notification 🔔';
+        ADMIN_NOTIF_BTN.className = "btn btn-primary mb-4"; // Blue/Green for enable
     }
 }
 
-/**
- * 🧹 CLEANUP LOGIC - DELETES ALL TRACES OF SUBSCRIPTION
- */
-async function cleanupAdminSubscription(id) {
-    if (!id) return;
-
-    // A. Delete from subscribers table (using both possible column matches)
-    await supabase.from('notification_subscribers')
-        .delete()
-        .or(`device_id.eq.${id},uuid.eq.${id}`);
-
-    // B. Clear the admin table link
-    await supabase.from('admin')
-        .update({ admin_notification_id: null })
-        .eq('id', 1);
-
-    // C. Remove local storage trace
-    localStorage.removeItem('admin_notification_id');
-
-    console.log("Admin subscription completely deleted from DB and LocalStorage.");
-}
-
-/**
- * 🎨 UI UPDATE
- */
-function updateBtnUI(isEnabled) {
-    if (!CONFIG_BTN) return;
-    if (isEnabled) {
-        CONFIG_BTN.innerHTML = "Disable Admin Notification 🔕";
-        CONFIG_BTN.className = "btn btn-danger mb-4"; // Changed to red to signify disable
-        CONFIG_BTN.onclick = () => handleToggle(true);
-    } else {
-        CONFIG_BTN.innerHTML = "Enable Admin Notification 🔔";
-        CONFIG_BTN.className = "btn btn-primary mb-4";
-        CONFIG_BTN.onclick = () => handleToggle(false);
-    }
-}
-
-/**
- * ⚡ TOGGLE HANDLER
- */
-/**
- * ⚡ TOGGLE HANDLER - ADMIN MULTI-DEVICE EDITION
- */
-async function handleToggle(isCurrentlyEnabled) {
-    // 1. Check for blocked permissions
-    if (Notification.permission === 'denied') {
-        return Swal.fire({
-            title: "Access Blocked",
-            text: "Please reset notification permissions in your browser settings to enable alerts.",
-            icon: "error",
-            background: '#0c1d29ff',
-            color: '#fff'
-        });
-    }
-
-    // 2. Locate the Admin-specific Service Worker
-    // We use the specific scope to ensure we don't grab the user-side worker
-    if ('serviceWorker' in navigator) {
-        await navigator.serviceWorker.register('/admin/sw.js', { scope: '/admin/' });
-    }
-    const registration = await navigator.serviceWorker.ready;
-
-    if (!registration) {
-        return Swal.fire({
-            title: "PWA Error",
-            text: "Admin Service Worker not detected. Please ensure you have added this app to your home screen.",
-            icon: "warning",
-            background: '#0c1d29ff',
-            color: '#fff'
-        });
-    }
-
-    if (isCurrentlyEnabled) {
-        // --- 🔕 DISABLE PROCESS ---
-        const localId = localStorage.getItem('admin_notification_id');
-
-        try {
-            // Unsubscribe from the Push Server via the browser
-            const sub = await registration.pushManager.getSubscription();
-            if (sub) await sub.unsubscribe();
-        } catch (e) {
-            console.warn("Browser unsubscription failed, proceeding with DB cleanup.", e);
-        }
-
-        // Wipe Database and LocalStorage traces
-        await cleanupAdminSubscription(localId);
-
-        updateBtnUI(false);
-        Swal.fire({
-            title: "Disabled",
-            text: "This device will no longer receive admin alerts.",
-            icon: "success",
-            background: '#0c1d29ff',
-            color: '#fff'
-        });
-
-    } else {
-        // --- 🔔 ENABLE PROCESS ---
-        try {
-            // Request permission
-            const permission = await Notification.requestPermission();
-            if (permission !== 'granted') return syncAdminState();
-
-            // Fetch VAPID Key from your Node.js backend
-            const res = await fetch('/vapidPublicKey');
-            const { key } = await res.json();
-
-            // Subscribe the current device to the Push Server
-            const sub = await registration.pushManager.subscribe({
-                userVisibleOnly: true,
-                applicationServerKey: urlBase64ToUint8Array(key)
-            });
-
-            /**
-             * 🔗 MULTI-DEVICE LOGIC:
-             * We fetch the 'admin_notification_id' from the admin table (e.g., 'admin_1').
-             * This 'uuid' is shared by all admin devices, while 'device_id' remains unique.
-             */
-            const { data: adminData } = await supabase
-                .from('admin')
-                .select('admin_notification_id')
-                .eq('id', 1)
-                .single();
-
-            const targetUuid = adminData?.admin_notification_id || 'admin_global_id';
-
-            // Create a unique ID for THIS specific browser/phone
-            const uniqueDeviceId = 'dev_' + Math.random().toString(36).substr(2, 9);
-
-            localStorage.setItem('admin_notification_id', uniqueDeviceId);
-
-            // Save to 'notification_subscribers'
-            // Using UPSERT with device_id ensures we don't create duplicates for the same browser
-            await supabase.from('notification_subscribers').upsert({
-                uuid: targetUuid,        // The person (Admin)
-                device_id: uniqueDeviceId, // The specific device (iPhone/Chrome)
-                subscribers: sub         // The push token
-            });
-
-            updateBtnUI(true);
-            Swal.fire({
-                title: "Enabled",
-                text: "This device is now registered for Admin alerts!",
-                icon: "success",
-                background: '#0c1d29ff',
-                color: '#fff'
-            });
-
-        } catch (err) {
-            console.error("Subscription Error:", err);
-            Swal.fire({
-                title: "Error",
-                text: "Could not establish connection to the push server.",
-                icon: "error",
-                background: '#0c1f29ff',
-                color: '#fff'
-            });
-        }
-    }
-}
-
+// Helper for VAPID (Keep as is)
 function urlBase64ToUint8Array(base64String) {
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
     const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
@@ -224,4 +48,86 @@ function urlBase64ToUint8Array(base64String) {
     return outputArray;
 }
 
-initAdminNotifyLogic();
+ADMIN_NOTIF_BTN.addEventListener('click', async () => {
+    // Check state by button text
+    const isCurrentlyEnabled = ADMIN_NOTIF_BTN.innerHTML.includes('Disable');
+
+    if (isCurrentlyEnabled) {
+        await handleAdminDisable();
+    } else {
+        await handleAdminEnable();
+    }
+});
+
+async function handleAdminEnable() {
+    try {
+        if (typeof showSpinnerModal === 'function') showSpinnerModal();
+
+        // 1. Point specifically to Admin SW
+        let registration = await navigator.serviceWorker.getRegistration('/admin/');
+        if (!registration) {
+            registration = await navigator.serviceWorker.register('/admin/sw.js', { scope: '/admin/' });
+        }
+
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') {
+            if (typeof hideSpinnerModal === 'function') hideSpinnerModal();
+            return Swal.fire("Permission Denied", "Please allow notifications in settings.", "error");
+        }
+
+        const subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+        });
+
+        // 2. Fetch Global Admin ID from DB
+        const { data: adminData } = await supabase.from('admin').select('admin_notification_id').eq('id', 1).single();
+        const targetUuid = adminData?.admin_notification_id || 'admin_global_id';
+
+        // 3. Unique Device ID (prevents one admin device from deleting another)
+        const deviceId = 'admin_dev_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('admin_device_id', deviceId);
+
+        // 4. Upsert to Subscribers Table
+        await supabase.from('notification_subscribers').upsert({
+            uuid: targetUuid,
+            device_id: deviceId,
+            subscribers: JSON.parse(JSON.stringify(subscription))
+        });
+
+        updateAdminButtonUI(true);
+        if (typeof hideSpinnerModal === 'function') hideSpinnerModal();
+        Swal.fire({ icon: 'success', title: 'Admin Alerts Enabled!' });
+
+    } catch (err) {
+        if (typeof hideSpinnerModal === 'function') hideSpinnerModal();
+        console.error("Admin Setup Error:", err);
+        Swal.fire({ icon: 'error', title: 'Setup Failed', text: err.message });
+    }
+}
+
+async function handleAdminDisable() {
+    const deviceID = localStorage.getItem('admin_device_id');
+    if (typeof showSpinnerModal === 'function') showSpinnerModal();
+
+    try {
+        const registration = await navigator.serviceWorker.getRegistration('/admin/');
+        const sub = await registration?.pushManager.getSubscription();
+        if (sub) await sub.unsubscribe();
+
+        if (deviceID) {
+            await supabase
+                .from('notification_subscribers')
+                .delete()
+                .eq('device_id', deviceID);
+        }
+
+        updateAdminButtonUI(false);
+        Swal.fire({ icon: 'success', title: 'Disabled', text: 'Admin alerts off for this device.' });
+    } catch (err) {
+        console.error("Disable error:", err);
+    }
+    if (typeof hideSpinnerModal === 'function') hideSpinnerModal();
+}
+
+initAdminNotifications();
