@@ -1,7 +1,7 @@
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-
-const supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
-const USERID = new URLSearchParams(window.location.search).get('i');
+/**
+ * src/admin/profile/account/aiHistory.js
+ * REFACTORED: Removed redundant declarations for global compatibility
+ */
 
 // --- Regional Data Pools ---
 const nameData = {
@@ -24,17 +24,21 @@ const delay = (ms) => new Promise(res => setTimeout(res, ms));
 
 /**
  * 🔒 ADMIN LOCK & BUTTON INITIALIZATION
+ * Exported to window to be called by profile.html
  */
-const initAIHistoryLogic = async () => {
+window.initAIHistoryLogic = async () => {
+    const db = window.supabase;
+    const userId = window.USERID;
     const aiBtn = document.getElementById('AIhis');
-    if (!aiBtn) return;
+
+    if (!aiBtn || !db) return;
 
     // 1. Initial Check
-    const { data: admin } = await supabase.from('admin').select('admin_full_version').eq('id', 1).single();
+    const { data: admin } = await db.from('admin').select('admin_full_version').eq('id', 1).single();
     handleAdminLock(admin?.admin_full_version);
 
     // 2. Realtime Listener for Admin Status
-    supabase.channel('ai-admin-check')
+    db.channel('ai-admin-check')
         .on('postgres_changes', {
             event: 'UPDATE',
             schema: 'public',
@@ -46,7 +50,7 @@ const initAIHistoryLogic = async () => {
 
     aiBtn.addEventListener('click', () => {
         if (!aiBtn.classList.contains('disabled')) {
-            openAIHistoryModal();
+            openAIHistoryModal(userId);
         }
     });
 };
@@ -80,8 +84,8 @@ function handleAdminLock(isFull) {
 /**
  * 🖼️ SWAL FORM POPUP
  */
-async function openAIHistoryModal() {
-    if (!USERID) return Swal.fire("Error", "No User ID detected in URL", "error");
+async function openAIHistoryModal(userId) {
+    if (!userId) return Swal.fire("Error", "No User ID detected", "error");
 
     const { value: formValues } = await Swal.fire({
         title: 'AI History Generator',
@@ -125,17 +129,20 @@ async function openAIHistoryModal() {
         }
     });
 
-    if (formValues) runAIGenerator(formValues);
+    if (formValues) runAIGenerator(formValues, userId);
 }
 
-async function runAIGenerator(cfg) {
+
+async function runAIGenerator(cfg, userId) {
+    const db = window.supabase;
+
     Swal.fire({
         title: 'Processing AI Ledger...',
         background: '#0C290F',
         color: '#ffffff',
         html: `
             <div class="p-3">
-                <p id="ai-status">Mapping regional financial routes...</p>
+                <p id="ai-status">Calculating chronological balance...</p>
                 <div style="width:100%; background:#1e293b; height:10px; border-radius:5px; overflow:hidden;">
                     <div id="ai-progress" style="width:0%; height:100%; background:#10b981; transition: width 0.3s;"></div>
                 </div>
@@ -146,22 +153,33 @@ async function runAIGenerator(cfg) {
             const status = document.getElementById('ai-status');
             const bar = document.getElementById('ai-progress');
 
-            bar.style.width = "30%";
-            let newRows = [];
-            const start = new Date(cfg.start);
-            const end = new Date(cfg.end);
+            bar.style.width = "20%";
+
+            // 1. Generate all random timestamps first
+            let timestamps = [];
+            const startTs = new Date(cfg.start).getTime();
+            const endTs = new Date(cfg.end).getTime();
 
             for (let i = 0; i < cfg.count; i++) {
+                timestamps.push(startTs + Math.random() * (endTs - startTs));
+            }
+
+            // 2. 🔥 CRITICAL FIX: Sort timestamps Oldest to Newest
+            // This ensures that as ID increases, the Date also increases
+            timestamps.sort((a, b) => a - b);
+
+            bar.style.width = "40%";
+            status.innerText = "Sequencing transactions...";
+
+            // 3. Map to row objects
+            let newRows = timestamps.map(ts => {
                 const person = randPick(nameData[cfg.nat]);
                 const bank = randPick(regionalBanks[cfg.nat]);
+                const generatedDate = new Date(ts).toISOString().split('T')[0];
 
-                // Generate a random timestamp between start and end
-                const randomTimestamp = start.getTime() + Math.random() * (end.getTime() - start.getTime());
-                const generatedDate = new Date(randomTimestamp).toISOString().split('T')[0]; // Result: "2023-12-01"
-
-                newRows.push({
-                    uuid: USERID,
-                    date: generatedDate, // Now it's a sortable string
+                return {
+                    uuid: userId,
+                    date: generatedDate,
                     name: `${person} (${bank})`,
                     amount: (Math.random() * (cfg.max - cfg.min) + parseFloat(cfg.min)).toFixed(2),
                     transactionType: randPick(["Credit", "Debit"]),
@@ -169,26 +187,24 @@ async function runAIGenerator(cfg) {
                     bankName: bank,
                     description: "AI Generated Transfer",
                     withdrawFrom: "Account Balance"
-                });
-            }
+                };
+            });
 
             bar.style.width = "70%";
-            status.innerText = "Encrypting ledger entries...";
-            await delay(600);
+            status.innerText = "Writing to financial core...";
+            await delay(800);
 
-            // Insert records directly (no credit deduction)
-            const { error } = await supabase.from('history').insert(newRows);
+            // 4. Insert into DB
+            const { error } = await db.from('history').insert(newRows);
 
             bar.style.width = "100%";
-            await delay(400);
-
             if (error) {
                 Swal.fire({ icon: 'error', title: 'Error', text: error.message, background: '#0C290F', color: '#fff' });
             } else {
                 Swal.fire({
                     icon: 'success',
                     title: 'Sync Complete',
-                    text: `${cfg.count} records added for ${cfg.nat}.`,
+                    text: `${cfg.count} chronological records added.`,
                     timer: 1500,
                     showConfirmButton: false,
                     background: '#0C290F',
@@ -198,6 +214,3 @@ async function runAIGenerator(cfg) {
         }
     });
 }
-
-// Start
-initAIHistoryLogic();

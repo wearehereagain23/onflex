@@ -33,21 +33,53 @@
   <!-- POPUP SCRIPT -->
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="sweetalert2.min.js"></script>
-  <link rel="stylesheet" href="sweetalert2.min.css">
-
   <script src="../../../config.js"></script>
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <script type="module" src="./app.js"></script>
-  <script type="module" src="./approval.js"></script>
-  <script type="module" src="./history.js"></script>
-  <script type="module" src="./aiHistory.js"></script>
-  <script type="module" src="./admin_chat.js"></script>
-  <script type="module" src="./note.js"></script>
-  <script type="module" src="./allow_notification.js"></script>
-  <script type="module" src="delete.js"></script>
-  <script src="../../checker.js"></script>
-  <script src="../../../website.js" type="module"></script>
+
+  <script src="app.js"></script>
+  <script src="approval.js"></script>
+  <script src="history.js"></script>
+  <script src="admin_chat.js"></script>
+  <script src="aiHistory.js"></script>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+    // Define Globals on window so every file can see them without re-declaring
+    window.urlParams = new URLSearchParams(window.location.search);
+    window.USERID = window.urlParams.get('i');
+    window.supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+
+    // Define Utilities ONCE
+    window.showSpinnerModal = () => document.getElementById('spinnerModal').style.display = 'flex';
+    window.hideSpinnerModal = () => document.getElementById('spinnerModal').style.display = 'none';
+
+    // Run all initializers ONLY after the DOM is fully loaded
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        if (window.initAdminLogicRealtime) await window.initAdminLogicRealtime();
+        if (window.initUserRealtime) await window.initUserRealtime();
+        if (window.initApprovalsRealtime) await window.initApprovalsRealtime();
+        if (window.initAIHistoryLogic) await window.initAIHistoryLogic();
+        // THIS LINE ALREADY CALLS THE FORM LISTENER INTERNALLY
+        if (window.initHistoryRealtime) await window.initHistoryRealtime();
+
+        if (window.initAdminChat) await window.initAdminChat();
+
+        // Initialize shared form listeners
+        if (window.initFormListeners) window.initFormListeners();
+        if (window.initApprovalFormListeners) window.initApprovalFormListeners();
+
+        // REMOVE OR COMMENT OUT THIS LINE:
+        // if (window.initHistoryFormListener) window.initHistoryFormListener();
+
+      } catch (err) {
+        console.error("Startup Error:", err);
+      }
+    });
+  </script>
+
+  <!-- <script src="../../checker.js"></script>
+  <script src="../../../website.js" type="module"></script> -->
 
 
 

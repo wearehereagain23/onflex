@@ -1218,7 +1218,7 @@
                     .from('history')
                     .select('*')
                     .eq('uuid', userUuid)
-                    .order('created_at', { ascending: false })
+                    .order('id', { ascending: false })
                     .limit(5);
 
                 if (error || !data || data.length === 0) {

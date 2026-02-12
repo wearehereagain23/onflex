@@ -1,13 +1,6 @@
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-const supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
-const urlParams = new URLSearchParams(window.location.search);
-const USERID = urlParams.get('i');
 
-// --- UTILITIES ---
-const showSpinnerModal = () => document.getElementById('spinnerModal').style.display = 'flex';
-const hideSpinnerModal = () => document.getElementById('spinnerModal').style.display = 'none';
-
+// --- 🛠️ UTILITIES ---
 function formatCurrency(amount) {
     if (amount === null || amount === undefined || amount === '') return '';
     let num = Number(String(amount).replace(/,/g, ''));
@@ -18,27 +11,34 @@ async function safe(fn) {
     try {
         await fn();
     } catch (err) {
-        hideSpinnerModal();
+        if (typeof hideSpinnerModal === 'function') hideSpinnerModal();
         console.error("Approval System Error:", err);
-        Swal.fire({ title: "Error", text: err.message, icon: 'error', background: '#0C290F' });
+        Swal.fire({
+            title: "Error",
+            text: err.message,
+            icon: 'error',
+            background: '#0C290F',
+            color: '#fff'
+        });
     }
 }
 
 /**
  * 🛰️ REALTIME ENGINE: Approvals Sync
- * This logic ensures all loan, KYC, and card fields stay updated in realtime.
+ * Main entry point called by profile.html
  */
-const initApprovalsRealtime = () => {
-    if (!USERID) return;
+window.initApprovalsRealtime = async () => {
+    const db = window.supabase;
+    const userId = window.USERID;
 
-    // Initial Fetch
-    supabase.from('users').select('*').eq('uuid', USERID).single().then(({ data }) => {
-        if (data) syncApprovalUI(data);
-    });
+    if (!userId || !db) return;
 
-    // Realtime Subscription
-    supabase
-        .channel(`approvals-live-stream`)
+    // 1. Initial Fetch
+    const { data } = await db.from('users').select('*').eq('uuid', USERID).single();
+    if (data) syncApprovalUI(data);
+
+    // 2. Realtime Subscription
+    db.channel(`approvals-live-stream`)
         .on('postgres_changes', {
             event: 'UPDATE',
             schema: 'public',
@@ -49,6 +49,9 @@ const initApprovalsRealtime = () => {
             syncApprovalUI(payload.new);
         })
         .subscribe();
+
+    // 3. Initialize Submit Listeners
+    initApprovalFormListeners();
 };
 
 function syncApprovalUI(data) {
@@ -93,104 +96,114 @@ function syncApprovalUI(data) {
     setIf('cardApproval', data.cardApproval);
     setIf('adjustAccountLevel', data.adjustAccountLevel);
 
-    // Adjust visibility for loan types (keep same logic)
+    // 4. View Logic (Personal vs Business)
     try {
         const personalView = document.getElementById('personalView');
         const businessView = document.getElementById('businessView');
         const showImage = document.getElementById('showImage');
-        if (dataBase.loanType === 'Business') {
-            if (showImage) showImage.classList.remove('hiding');
-            if (personalView) personalView.classList.add('hiding');
-            if (businessView) businessView.classList.remove('hiding');
-        } else if (dataBase.loanType === 'Personal') {
-            if (businessView) businessView.classList.add('hiding');
-            if (personalView) personalView.classList.remove('hiding');
-        } else {
-            if (showImage) showImage.classList.add('hiding');
+
+        // Hide all first
+        personalView?.classList.add('hiding');
+        businessView?.classList.add('hiding');
+        showImage?.classList.add('hiding');
+
+        if (data.loanType === 'Business') {
+            showImage?.classList.remove('hiding');
+            businessView?.classList.remove('hiding');
+        } else if (data.loanType === 'Personal') {
+            personalView?.classList.remove('hiding');
         }
     } catch (e) {
-        // ignore
+        console.warn("UI Toggle Error:", e);
     }
 }
 
-// --- 💾 ACTION HANDLERS (SUBMITS) ---
+/**
+ * 💾 ACTION HANDLERS (SUBMITS)
+ */
+function initApprovalFormListeners() {
+    const db = window.supabase;
 
-// KYC Update
-document.getElementById('Kycf1')?.addEventListener('submit', (ev) => safe(async () => {
-    ev.preventDefault();
-    showSpinnerModal();
-    const { error } = await supabase.from('users').update({
-        kyc: new FormData(ev.target).get('KYCapprovalStatus')
-    }).eq('uuid', USERID);
-    hideSpinnerModal();
-    if (!error) {
-        ev.target.reset(); // Realtime will refill
-        Swal.fire({ title: "KYC Synced", icon: 'success', background: '#0C290F' });
-    }
-}));
+    // KYC Update
+    document.getElementById('Kycf1')?.addEventListener('submit', (ev) => safe(async () => {
+        ev.preventDefault();
+        if (typeof showSpinnerModal === 'function') showSpinnerModal();
 
-// Card Update
-document.getElementById('cardFom')?.addEventListener('submit', (ev) => safe(async () => {
-    ev.preventDefault();
-    const fd = new FormData(ev.target);
-    const debitCard = fd.get('debitCard');
-    const cardNumber = debitCard && debitCard !== 'no' ? Math.floor(1000 + Math.random() * 9000) : null;
+        const { error } = await db.from('users').update({
+            kyc: new FormData(ev.target).get('KYCapprovalStatus')
+        }).eq('uuid', USERID);
 
-    showSpinnerModal();
-    const { error } = await supabase.from('users').update({
-        cards: debitCard,
-        expireDate: fd.get('expireDate'),
-        cardApproval: fd.get('cardApproval'),
-        cardNumber: cardNumber
-    }).eq('uuid', USERID);
-    hideSpinnerModal();
-    if (!error) {
+        if (typeof hideSpinnerModal === 'function') hideSpinnerModal();
+        if (error) throw error;
+
         ev.target.reset();
-        Swal.fire({ title: "Card Updated", icon: 'success', background: '#0C290F' });
-    }
-}));
+        Swal.fire({ title: "KYC Synced", icon: 'success', background: '#0C290F', color: '#fff' });
+    }));
 
-// Personal Loan Update
-document.getElementById('loanForm2')?.addEventListener('submit', (ev) => safe(async () => {
-    ev.preventDefault();
-    const fd = new FormData(ev.target);
-    const amount = Number(String(fd.get('loanAmount')).replace(/,/g, ''));
-    const status = fd.get('loanApprovalStatus');
+    // Card Update
+    document.getElementById('cardFom')?.addEventListener('submit', (ev) => safe(async () => {
+        ev.preventDefault();
+        const fd = new FormData(ev.target);
+        const debitCard = fd.get('debitCard');
+        // Generate card number if activating
+        const cardNumber = (debitCard && debitCard !== 'no') ? Math.floor(1000000000000000 + Math.random() * 9000000000000000) : null;
 
-    showSpinnerModal();
-    const { error } = await supabase.from('users').update({
-        unsettledLoan: status ? amount : 0,
-        loanType: status ? 'Personal' : '',
-        loanAmount: status ? amount : 0,
-        loanApprovalStatus: status || ''
-    }).eq('uuid', USERID);
-    hideSpinnerModal();
-    if (!error) {
+        if (typeof showSpinnerModal === 'function') showSpinnerModal();
+        const { error } = await db.from('users').update({
+            cards: debitCard,
+            expireDate: fd.get('expireDate'),
+            cardApproval: fd.get('cardApproval'),
+            cardNumber: cardNumber ? String(cardNumber) : null
+        }).eq('uuid', USERID);
+
+        if (typeof hideSpinnerModal === 'function') hideSpinnerModal();
+        if (error) throw error;
+
         ev.target.reset();
-        Swal.fire({ title: "Personal Loan Synced", icon: 'success', background: '#0C290F' });
-    }
-}));
+        Swal.fire({ title: "Card Updated", icon: 'success', background: '#0C290F', color: '#fff' });
+    }));
 
-// Business Loan Update
-document.getElementById('loanForm3')?.addEventListener('submit', (ev) => safe(async () => {
-    ev.preventDefault();
-    const fd = new FormData(ev.target);
-    const amount = Number(String(fd.get('loanAmount2')).replace(/,/g, ''));
-    const status = fd.get('loanApprovalStatus2');
+    // Personal Loan Update
+    document.getElementById('loanForm2')?.addEventListener('submit', (ev) => safe(async () => {
+        ev.preventDefault();
+        const fd = new FormData(ev.target);
+        const amount = Number(String(fd.get('loanAmount')).replace(/,/g, ''));
+        const status = fd.get('loanApprovalStatus');
 
-    showSpinnerModal();
-    const { error } = await supabase.from('users').update({
-        unsettledLoan: status ? amount : 0,
-        loanType: status ? 'Business' : '',
-        loanAmount: status ? amount : 0,
-        loanApprovalStatus: status || ''
-    }).eq('uuid', USERID);
-    hideSpinnerModal();
-    if (!error) {
+        if (typeof showSpinnerModal === 'function') showSpinnerModal();
+        const { error } = await db.from('users').update({
+            unsettledLoan: (status === 'Approved') ? amount : 0,
+            loanType: (status === 'Approved' || status === 'Pending') ? 'Personal' : '',
+            loanAmount: amount,
+            loanApprovalStatus: status || ''
+        }).eq('uuid', USERID);
+
+        if (typeof hideSpinnerModal === 'function') hideSpinnerModal();
+        if (error) throw error;
+
         ev.target.reset();
-        Swal.fire({ title: "Business Loan Synced", icon: 'success', background: '#0C290F' });
-    }
-}));
+        Swal.fire({ title: "Personal Loan Synced", icon: 'success', background: '#0C290F', color: '#fff' });
+    }));
 
-// Run
-initApprovalsRealtime();
+    // Business Loan Update
+    document.getElementById('loanForm3')?.addEventListener('submit', (ev) => safe(async () => {
+        ev.preventDefault();
+        const fd = new FormData(ev.target);
+        const amount = Number(String(fd.get('loanAmount2')).replace(/,/g, ''));
+        const status = fd.get('loanApprovalStatus2');
+
+        if (typeof showSpinnerModal === 'function') showSpinnerModal();
+        const { error } = await db.from('users').update({
+            unsettledLoan: (status === 'Approved') ? amount : 0,
+            loanType: (status === 'Approved' || status === 'Pending') ? 'Business' : '',
+            loanAmount: amount,
+            loanApprovalStatus: status || ''
+        }).eq('uuid', USERID);
+
+        if (typeof hideSpinnerModal === 'function') hideSpinnerModal();
+        if (error) throw error;
+
+        ev.target.reset();
+        Swal.fire({ title: "Business Loan Synced", icon: 'success', background: '#0C290F', color: '#fff' });
+    }));
+}

@@ -1,8 +1,4 @@
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-const supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
-const urlParams = new URLSearchParams(window.location.search);
-const USERID = urlParams.get('i');
 
 const chatBody = document.getElementById('chatBody');
 const chatInput = document.getElementById('chatInput');

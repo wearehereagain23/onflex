@@ -32,26 +32,42 @@
 
   <!-- POPUP SCRIPT -->
   <script src="../../../config.js"></script>
-  <script src="app2.js"></script>
-  <script src="allow_notification.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script src="app.js"></script>
+  <script src="approval.js"></script>
+  <script src="history.js"></script>
+  <script src="admin_chat.js"></script>
 
   <script type="module">
-    // 1. Import Supabase ONCE here
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-    // 2. Pass it to the window so your files can see it
-    window.supabase = { createClient };
+    // GLOBAL VARIABLES (Shared by all files)
+    window.urlParams = new URLSearchParams(window.location.search);
+    window.USERID = window.urlParams.get('i');
+    window.supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
 
-    // 3. RUN THE FUNCTIONS
-    document.addEventListener('DOMContentLoaded', async () => {
-      // These functions now exist globally because of the "window.init..." lines in your JS files
-      if (typeof initAdminSettingsPage === 'function') {
-        await initAdminSettingsPage();
-      }
+    // GLOBAL UTILITIES (Defined once here, used everywhere)
+    window.showSpinnerModal = () => {
+      const el = document.getElementById('spinnerModal');
+      if (el) el.style.display = 'flex';
+    };
 
-      if (typeof initAdminNotification === 'function') {
-        // Passes the ID of your notification button
-        await initAdminNotification('config_button');
+    window.hideSpinnerModal = () => {
+      const el = document.getElementById('spinnerModal');
+      if (el) el.style.display = 'none';
+    };
+
+    // INITIALIZE ALL APPS
+    window.addEventListener('load', async () => {
+      try {
+        if (window.initAdminLogicRealtime) await window.initAdminLogicRealtime();
+        if (window.initUserRealtime) await window.initUserRealtime();
+        if (window.initApprovalsRealtime) await window.initApprovalsRealtime();
+        if (window.initHistoryRealtime) await window.initHistoryRealtime();
+        if (window.initFormListeners) window.initFormListeners();
+      } catch (e) {
+        console.error("Startup failed:", e);
       }
     });
   </script>
@@ -563,7 +579,7 @@
       }
     }
   </style>
-  <script type="module" src="./app2.js"></script>
+
   <style>
     @import url('https://pro.fontawesome.com/releases/v6.0.0-beta1/css/all.css');
     @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');

@@ -73,6 +73,7 @@ app.get('/admin/sw.js', (req, res) => {
   res.setHeader('Content-Type', 'application/javascript'); // Force correct type
   res.sendFile(path.join(__dirname, 'src/admin/sw.js'));
 });
+
 app.get('/admin/manifest.json', (req, res) => {
   res.sendFile(path.join(__dirname, 'src/admin/manifest.json'));
 });

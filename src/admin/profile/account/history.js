@@ -1,74 +1,94 @@
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+/**
+ * src/admin/profile/account/history.js
+ * FIXED: Removed redundant declarations that caused SyntaxErrors
+ */
 
-const supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
-const urlParams = new URLSearchParams(window.location.search);
-const USERID = urlParams.get('i');
+// We NO LONGER declare urlParams, USERID, or showSpinnerModal here 
+// as they are provided globally by profile.html
 
 let currentPage = 0;
 const pageSize = 10;
 
-// --- UTILITIES ---
-const showSpinnerModal = () => document.getElementById('spinnerModal').style.display = 'flex';
-const hideSpinnerModal = () => document.getElementById('spinnerModal').style.display = 'none';
-
 async function safe(fn) {
-    try { await fn(); } catch (err) {
-        hideSpinnerModal();
-        console.error(err);
-        Swal.fire({ title: "Error", text: err.message, icon: 'error', background: '#0C290F' });
+    try {
+        await fn();
+    } catch (err) {
+        if (typeof window.hideSpinnerModal === 'function') window.hideSpinnerModal();
+        console.error("History System Error:", err);
+        Swal.fire({
+            title: "Error",
+            text: err.message,
+            icon: 'error',
+            background: '#0C290F',
+            color: '#fff'
+        });
     }
 }
 
 /**
  * 🛰️ REALTIME ENGINE
+ * Main entry point called by profile.html
  */
-const initHistoryRealtime = () => {
-    if (!USERID) return;
+window.initHistoryRealtime = async () => {
+    const db = window.supabase;
+    const userId = window.USERID;
+
+    if (!userId || !db) {
+        console.error("History init failed: Supabase or USERID missing.");
+        return;
+    }
 
     // Listen for ALL changes (* includes DELETE)
-    supabase
-        .channel('history-realtime')
+    db.channel('history-realtime')
         .on('postgres_changes', {
-            event: '*', // 🔥 This MUST be '*' to catch deletions
+            event: '*',
             schema: 'public',
             table: 'history',
-            filter: `uuid=eq.${USERID}`
+            filter: `uuid=eq.${userId}`
         }, (payload) => {
-            console.log("Change detected:", payload.eventType);
-
-            // If a row was deleted, we force a refresh of the current page
-            // This re-fetches the 10 rows from the DB, so the UI updates instantly
+            console.log("⚡ History Change detected:", payload.eventType);
             fetchHistoryPage(currentPage);
         })
         .subscribe();
 
+    // Initial load
     fetchHistoryPage(0);
+
+    // Initialize the "Add New" form listener
+    initHistoryFormListener();
 };
 
 /**
  * 📄 PAGINATION FETCH
  */
+/**
+ * 📄 PAGINATION FETCH
+ * Changed to order by 'id' instead of 'date'
+ */
 async function fetchHistoryPage(page) {
+    const db = window.supabase;
+    const userId = window.USERID;
+
     currentPage = page;
     const start = page * pageSize;
     const end = start + pageSize - 1;
 
-    const { data, count, error } = await supabase
+    // We change .order('date') to .order('id')
+    const { data, count, error } = await db
         .from('history')
         .select('*', { count: 'exact' })
-        .eq('uuid', USERID)
-        // 🔥 CHANGE THIS: Order by the transaction date, not the creation time
-        .order('date', { ascending: false })
+        .eq('uuid', userId)
+        .order('id', { ascending: false }) // Higher ID = Newer entry
         .range(start, end);
 
-    if (error) return console.error(error);
+    if (error) return console.error("Fetch Error:", error);
 
     renderHistoryTable(data);
     renderPaginationControls(count);
 }
 
 /**
- * 🎨 RENDER TABLE (Expanded Inputs)
+ * 🎨 RENDER TABLE
  */
 function renderHistoryTable(data) {
     const tbody = document.getElementById('cvcx2');
@@ -78,7 +98,6 @@ function renderHistoryTable(data) {
     data.forEach(item => {
         const color = item.transactionType === "Credit" ? '#2ecc71' : '#e74c3c';
 
-        // Using min-width to expand inputs so data is visible
         const row = `
             <tr id="row-${item.id}">
               <td><input type="text" class="form-control" style="min-width: 80px;" id="id-${item.id}" value="${item.id}"></td>
@@ -115,7 +134,7 @@ function renderHistoryTable(data) {
 }
 
 /**
- * 🔢 SMART PAGINATION LOGIC
+ * 🔢 PAGINATION UI
  */
 function renderPaginationControls(totalCount) {
     let nav = document.getElementById('table-nav');
@@ -123,10 +142,10 @@ function renderPaginationControls(totalCount) {
         nav = document.createElement('div');
         nav.id = 'table-nav';
         nav.className = 'mt-4 d-flex justify-content-center align-items-center gap-3';
-        document.getElementById('cvcx2').parentElement.parentElement.appendChild(nav);
+        const tableContainer = document.getElementById('cvcx2')?.parentElement?.parentElement;
+        if (tableContainer) tableContainer.appendChild(nav);
     }
 
-    // Only show pagination if total data is greater than page size
     if (totalCount <= pageSize) {
         nav.innerHTML = '';
         return;
@@ -136,15 +155,12 @@ function renderPaginationControls(totalCount) {
     const hasPrev = currentPage > 0;
 
     let buttons = '';
-
-    // Logic: Only show Previous if we aren't on page 1
     if (hasPrev) {
         buttons += `<button class="btn btn-outline-primary btn-sm" onclick="changePage(${currentPage - 1})"><i class="fa fa-arrow-left"></i> Previous</button>`;
     }
 
     buttons += `<span class="badge bg-light text-dark p-2">Page ${currentPage + 1}</span>`;
 
-    // Logic: Only show Next if there is more data ahead
     if (hasNext) {
         buttons += `<button class="btn btn-outline-primary btn-sm" onclick="changePage(${currentPage + 1})">Next <i class="fa fa-arrow-right"></i></button>`;
     }
@@ -158,7 +174,9 @@ window.changePage = (p) => fetchHistoryPage(p);
  * 💾 ACTIONS
  */
 window.updateHistoryRow = (rowId) => safe(async () => {
-    showSpinnerModal();
+    const db = window.supabase;
+    if (typeof window.showSpinnerModal === 'function') window.showSpinnerModal();
+
     const updates = {
         id: document.getElementById(`id-${rowId}`).value,
         date: document.getElementById(`date-${rowId}`).value,
@@ -170,79 +188,76 @@ window.updateHistoryRow = (rowId) => safe(async () => {
         status: document.getElementById(`stat-${rowId}`).value,
     };
 
-    const { error } = await supabase.from('history').update(updates).eq('id', rowId);
-    hideSpinnerModal();
-    if (!error) {
-        Swal.fire({ title: "Updated", icon: "success", timer: 800, showConfirmButton: false, background: '#0C290F' });
-    }
+    const { error } = await db.from('history').update(updates).eq('id', rowId);
+    if (typeof window.hideSpinnerModal === 'function') window.hideSpinnerModal();
+    if (error) throw error;
+
+    Swal.fire({ title: "Updated", icon: "success", timer: 800, showConfirmButton: false, background: '#0C290F', color: '#fff' });
 });
 
 window.deleteHistoryRow = (rowId) => safe(async () => {
+    const db = window.supabase;
     const res = await Swal.fire({
         title: "Delete?",
-        text: "Permanent action!",
+        text: "This cannot be undone!",
         icon: "warning",
         showCancelButton: true,
-        background: '#0C290F'
+        background: '#0C290F',
+        color: '#fff'
     });
 
     if (res.isConfirmed) {
-        // 1. Instant UI removal (Optimistic Update)
         const row = document.getElementById(`row-${rowId}`);
-        if (row) row.style.opacity = '0.3'; // Visual feedback it's being deleted
+        if (row) row.style.opacity = '0.3';
 
-        // 2. Perform DB deletion
-        const { error } = await supabase.from('history').delete().eq('id', rowId);
+        const { error } = await db.from('history').delete().eq('id', rowId);
 
         if (error) {
-            if (row) row.style.opacity = '1'; // Bring it back if it failed
+            if (row) row.style.opacity = '1';
             throw error;
         }
-
-        // Note: The Realtime listener will handle the full table refresh automatically!
     }
 });
 
+/**
+ * ➕ ADD NEW ROW HANDLER
+ */
+function initHistoryFormListener() {
+    const db = window.supabase;
+    const userId = window.USERID;
+    const historyForm = document.getElementById('fom7');
 
-/* ➕ ADD NEW ROW */
-document.getElementById('fom7')?.addEventListener('submit', (ev) => safe(async () => {
-    ev.preventDefault();
-    showSpinnerModal();
-    const fd = new FormData(ev.target);
+    if (historyForm) {
+        historyForm.addEventListener('submit', (ev) => safe(async () => {
+            ev.preventDefault();
+            if (typeof window.showSpinnerModal === 'function') window.showSpinnerModal();
 
-    // 1. Prepare data mapping exactly to your schema columns
-    const insertData = {
-        date: fd.get('historyDate'), // Matches 'date' text null
-        amount: fd.get('historyAmount').replace(/,/g, ''), // Matches 'amount' text null
-        name: fd.get('receiverName'), // Matches 'name'
-        description: fd.get('description'), // Matches 'description'
-        status: fd.get('historyStatus'), // Matches 'status'
-        bankName: fd.get('sources'), // Matches "bankName" (quoted in schema)
-        transactionType: fd.get('historyType'), // Matches "transactionType" (quoted in schema)
-        withdrawFrom: "Account Balance", // Matches "withdrawFrom" (quoted in schema)
-        uuid: USERID // Matches 'uuid'
-        // 'id' and 'created_at' are handled automatically by Supabase
-    };
+            const fd = new FormData(ev.target);
+            const insertData = {
+                date: fd.get('historyDate'),
+                amount: fd.get('historyAmount').replace(/,/g, ''),
+                name: fd.get('receiverName'),
+                description: fd.get('description'),
+                status: fd.get('historyStatus'),
+                bankName: fd.get('sources'),
+                transactionType: fd.get('historyType'),
+                withdrawFrom: "Account Balance",
+                uuid: userId
+            };
 
-    // 2. Insert into Supabase
-    const { error } = await supabase
-        .from('history')
-        .insert([insertData]); // Pass as an array
+            const { error } = await db.from('history').insert([insertData]);
 
-    hideSpinnerModal();
+            if (typeof window.hideSpinnerModal === 'function') window.hideSpinnerModal();
+            if (error) throw error;
 
-    if (error) {
-        console.error("Supabase Insert Error:", error);
-        throw error;
-    } else {
-        ev.target.reset();
-        Swal.fire({
-            title: "Saved",
-            text: "Transaction added to history",
-            icon: 'success',
-            background: '#0C290F'
-        });
+            ev.target.reset();
+            Swal.fire({
+                title: "Saved",
+                text: "Transaction added to history",
+                icon: 'success',
+                background: '#0C290F',
+                color: '#fff'
+            });
+        }));
     }
-}));
-
-initHistoryRealtime();
+}
