@@ -1,17 +1,6 @@
-/**
- * allow_notification.js - Export Pattern
- */
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-export async function initAdminNotification(buttonId) {
-    const config = window.CONFIG || (typeof CONFIG !== 'undefined' ? CONFIG : null);
-
-    if (!config) {
-        console.error("Configuration Error: CONFIG is not defined for Notifications.");
-        return;
-    }
-
-    const supabase = createClient(config.SUPABASE_URL, config.SUPABASE_KEY);
+function initAdminNotification(buttonId) {
+    const adminDb = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
     const CONFIG_BTN = document.getElementById(buttonId);
     const VAPID_PUBLIC_KEY = 'BA0Y8SCjnZI0oRFfM8IH4ZY1Hpbh2kmeSVjQNwakIpz0ZndaH6OiuBhNO672CiLKDmCNqicVt4waCxbphGMGXEU';
 
