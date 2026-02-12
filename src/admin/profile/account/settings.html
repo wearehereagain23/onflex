@@ -32,14 +32,22 @@
 
   <!-- POPUP SCRIPT -->
   <script src="../../../config.js"></script>
-
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-  <script type="module" src="app2.js"></script>
-  <script type="module" src="allow_notification.js"></script>
+  <script type="module">
+    // We import the functions we exported in the previous steps
+    import { initAdminSettingsPage } from './app2.js';
+    import { initAdminNotification } from './allow_notification.js';
+
+    // Initialize the Admin Profile Settings (Form logic, Realtime, etc.)
+    initAdminSettingsPage();
+
+    // Initialize the Notification Toggle Logic
+    // 'config_button' is the ID of your notification toggle button
+    initAdminNotification('config_button');
+  </script>
 
   <script src="../../checker.js"></script>
-  <script type="module" src="../../../website.js"></script>
 </head>
 <!-- [Head] end -->
 <!-- [Body] Start -->

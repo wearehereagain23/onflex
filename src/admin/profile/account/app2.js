@@ -1,152 +1,123 @@
+/**
+ * src/admin/profile/account/app2.js
+ * Pattern: ES Module Export
+ */
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-const supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+// We initialize inside the export to ensure CONFIG is ready when called
 
-// DOM Elements
-const settingsForm = document.getElementById('setStatus');
-const emailInput = document.getElementById('newEmail');
-const passwordInput = document.getElementById('adminPassword');
-const addressInput = document.getElementById('webAddress');
-const agree = document.getElementById('agree');
+export async function initAdminSettingsPage() {
+    // Check if CONFIG exists in any global form
+    const config = window.CONFIG || (typeof CONFIG !== 'undefined' ? CONFIG : null);
 
-const showSpinner = () => document.getElementById('spinnerModal')?.style.setProperty('display', 'flex');
-const hideSpinner = () => document.getElementById('spinnerModal')?.style.setProperty('display', 'none');
+    if (!config) {
+        console.error("Configuration Error: CONFIG is not defined. Check your config.js path.");
+        return;
+    }
 
-/* ===== 1. Auth Guard ===== */
-const adminSession = localStorage.getItem('adminSession');
-const adminEmail = localStorage.getItem('adminEmail');
+    const supabase = createClient(config.SUPABASE_URL, config.SUPABASE_KEY);
 
-/**
- * 1. Fetch Current Admin Settings
- * Reads the first row from the 'admin' table
- */
-async function loadAdminSettings() {
+    // DOM Elements
+    const settingsForm = document.getElementById('setStatus');
+    const emailInput = document.getElementById('newEmail');
+    const passwordInput = document.getElementById('adminPassword');
+    const addressInput = document.getElementById('webAddress');
+    const agree = document.getElementById('agree');
+
+    const showSpinner = () => document.getElementById('spinnerModal')?.style.setProperty('display', 'flex');
+    const hideSpinner = () => document.getElementById('spinnerModal')?.style.setProperty('display', 'none');
+
+    /* ===== 1. Auth Guard ===== */
+    const adminSession = localStorage.getItem('adminSession');
+    const adminEmail = localStorage.getItem('adminEmail');
 
     if (adminSession !== 'active' || !adminEmail) {
         window.location.href = "../../login/index.html";
         return;
     }
 
+    /**
+     * 1. Load Data
+     */
     const { data, error } = await supabase.from('admin').select('*').limit(1).single();
-    if (error) return console.error("Error loading settings:", error.message);
+    if (error) console.error("Error loading settings:", error.message);
 
     if (data) {
-
-        document.getElementById('newEmail').value = data.email;
-        document.getElementById('adminPassword').value = data.password || '';
-        document.getElementById('webAddress').value = data.address || '';
-        document.getElementById('agree').value = data.agreement || '';
-
+        if (emailInput) emailInput.value = data.email || '';
+        if (passwordInput) passwordInput.value = data.password || '';
+        if (addressInput) addressInput.value = data.address || '';
+        if (agree) agree.value = data.agreement || '';
     }
-}
 
-/**
- * 3. REALTIME LISTENER
- * Updates the 'Agree Terms' select option automatically 
- * when the database changes.
- */
-supabase.channel('admin_settings_updates')
-    .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'admin'
-    }, (payload) => {
-        const newData = payload.new;
-        const agreementSelect = document.getElementById('agree');
+    /**
+     * 2. Realtime Listener
+     */
+    supabase.channel('admin_settings_updates')
+        .on('postgres_changes', {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'admin'
+        }, (payload) => {
+            const newData = payload.new;
+            if (agree && newData.agreement !== undefined) {
+                agree.value = newData.agreement;
+                agree.style.backgroundColor = '#d1fae5';
+                setTimeout(() => agree.style.backgroundColor = '', 1000);
+            }
+        })
+        .subscribe();
 
-        if (agreementSelect && newData.agreement !== undefined) {
-            agreementSelect.value = newData.agreement;
+    /**
+     * 3. Submit Handler
+     */
+    settingsForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        showSpinner();
 
-            // Optional: Visual feedback that the field updated in realtime
-            agreementSelect.style.transition = 'background-color 0.5s';
-            agreementSelect.style.backgroundColor = '#d1fae5'; // Light green flash
-            setTimeout(() => {
-                agreementSelect.style.backgroundColor = '';
-            }, 1000);
+        const updatedData = {
+            email: emailInput.value,
+            password: passwordInput.value,
+            address: addressInput.value,
+            agreement: agree.value
+        };
 
-            console.log("Realtime Update: Terms Agreement set to", newData.agreement);
+        const { data: existing } = await supabase.from('admin').select('id').limit(1);
+
+        let result;
+        if (existing && existing.length > 0) {
+            result = await supabase.from('admin').update(updatedData).eq('id', existing[0].id);
+        } else {
+            result = await supabase.from('admin').insert([updatedData]);
         }
-    })
-    .subscribe();
 
-/**
- * 2. Update Admin Settings
- * Updates the existing record or inserts if empty
- */
-settingsForm?.addEventListener('submit', async (e) => {
-    e.preventDefault();
+        hideSpinner();
 
-    const updatedData = {
-        email: emailInput.value,
-        password: passwordInput.value,
-        address: addressInput.value,
-        agreement: agree.value
-    };
-
-    showSpinner();
-
-    // First, check if a row exists to decide between update or insert
-    const { data: existing } = await supabase.from('admin').select('id').limit(1);
-
-    let result;
-    if (existing && existing.length > 0) {
-        // Update the existing row
-        result = await supabase
-            .from('admin')
-            .update(updatedData)
-            .eq('id', existing[0].id);
-    } else {
-        // Insert new row if table is empty
-        result = await supabase
-            .from('admin')
-            .insert([updatedData]);
-    }
-
-    hideSpinner();
-
-    if (result.error) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Update Failed',
-            text: result.error.message
-        });
-    } else {
-        Swal.fire({
-            icon: 'success',
-            title: 'Settings Saved',
-            text: 'Admin credentials and address updated successfully.',
-            timer: 2000,
-            showConfirmButton: false
-        });
-    }
-});
-
-// Logout Logic for Sub-pages
-document.getElementById('logoutBtn')?.addEventListener('click', (e) => {
-    e.preventDefault();
-
-    Swal.fire({
-        title: 'Are you sure?',
-        text: "You will be logged out of the admin session!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, logout!',
-        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
-        color: '#ffffff'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // 1. Clear session
-            localStorage.clear();
-            sessionStorage.clear();
-
-            // 2. Redirect - Note the "../../../" to go back 3 folders 
-            // from /admin/profile/account/ to the root login
-            window.location.href = "../../login/index.html";
+        if (result.error) {
+            Swal.fire({ icon: 'error', title: 'Update Failed', text: result.error.message });
+        } else {
+            Swal.fire({ icon: 'success', title: 'Saved', text: 'Settings updated successfully.', timer: 2000, showConfirmButton: false });
         }
     });
-});
 
-// Initialize on page load
-loadAdminSettings();
+    /**
+     * 4. Logout Logic
+     */
+    document.getElementById('logoutBtn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        Swal.fire({
+            title: 'Logout?',
+            text: "Are you sure?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, logout!',
+            background: '#0f172a',
+            color: '#fff'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.href = "../../login/index.html";
+            }
+        });
+    });
+}
