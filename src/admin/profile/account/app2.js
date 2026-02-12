@@ -35,7 +35,7 @@ async function initAdminSettingsPage() {
         if (emailInput) emailInput.value = data.email || '';
         if (passwordInput) passwordInput.value = data.password || '';
         if (addressInput) addressInput.value = data.address || '';
-        if (agree) agree.value = data.agreement || '';
+        if (agree) agree.value = data.agreement;
     }
 
     /* ===== Realtime Update ===== */
