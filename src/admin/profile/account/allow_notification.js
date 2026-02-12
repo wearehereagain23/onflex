@@ -1,11 +1,8 @@
-
-function initAdminNotification(buttonId) {
+async function initAdminNotification(buttonId) {
+    if (typeof supabase === 'undefined') return;
     const adminDb = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
     const CONFIG_BTN = document.getElementById(buttonId);
-    const VAPID_PUBLIC_KEY = 'BA0Y8SCjnZI0oRFfM8IH4ZY1Hpbh2kmeSVjQNwakIpz0ZndaH6OiuBhNO672CiLKDmCNqicVt4waCxbphGMGXEU';
-
     if (!CONFIG_BTN) return;
-
     // --- INTERNAL HELPERS ---
     const updateBtnUI = (isEnabled) => {
         if (isEnabled) {

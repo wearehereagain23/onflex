@@ -32,27 +32,23 @@
 
   <!-- POPUP SCRIPT -->
   <script src="../../../config.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
   <script src="app2.js"></script>
   <script src="allow_notification.js"></script>
 
   <script type="module">
-    // We import Supabase once here and attach it to the window
+    // 1. Import Supabase only here
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-    // Attach to window so app2.js and allow_notification.js can see it
+    // 2. Make it global so app2.js can see it
     window.supabase = { createClient };
 
-    // Wait for the browser to ensure scripts are parsed
-    window.addEventListener('load', () => {
-      if (typeof initAdminSettingsPage === 'function') {
-        initAdminSettingsPage();
-      }
-      if (typeof initAdminNotification === 'function') {
-        initAdminNotification('config_button');
-      }
-    });
+    // 3. Trigger the functions from your JS files
+    try {
+      await window.initAdminSettingsPage();
+      await window.initAdminNotification('config_button');
+    } catch (e) {
+      console.error("Initialization failed", e);
+    }
   </script>
 </head>
 <!-- [Head] end -->
