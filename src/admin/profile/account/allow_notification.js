@@ -1,28 +1,34 @@
 /**
  * src/admin/profile/account/allow_notification.js
- * No-Import Style
+ * FINAL REWRITE: Chronological logic flow using global Supabase instance
  */
 async function initAdminNotification(buttonId) {
-    // Check if the HTML-loaded Supabase exists
-    if (typeof window.supabase === 'undefined' || typeof window.supabase.createClient !== 'function') {
-        console.error("Supabase library not found. Ensure the HTML script is correct.");
+    // 1. Reference Global Supabase
+    const adminDb = window.supabase;
+
+    if (!adminDb) {
+        console.error("Supabase global instance not found. Initialization aborted.");
         return;
     }
 
-    const adminDb = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
     const CONFIG_BTN = document.getElementById(buttonId);
     const VAPID_PUBLIC_KEY = 'BA0Y8SCjnZI0oRFfM8IH4ZY1Hpbh2kmeSVjQNwakIpz0ZndaH6OiuBhNO672CiLKDmCNqicVt4waCxbphGMGXEU';
 
-    if (!CONFIG_BTN) return;
+    if (!CONFIG_BTN) {
+        console.error(`Button with ID "${buttonId}" not found in HTML.`);
+        return;
+    }
 
-    // --- INTERNAL HELPERS ---
+    /**
+     * --- INTERNAL HELPERS ---
+     */
     const updateBtnUI = (isEnabled) => {
         if (isEnabled) {
             CONFIG_BTN.innerHTML = "Disable Admin Notification 🔕";
-            CONFIG_BTN.className = "btn btn-danger mb-4";
+            CONFIG_BTN.className = "btn btn-danger mb-4 w-100";
         } else {
             CONFIG_BTN.innerHTML = "Enable Admin Notification 🔔";
-            CONFIG_BTN.className = "btn btn-primary mb-4";
+            CONFIG_BTN.className = "btn btn-primary mb-4 w-100";
         }
     };
 
@@ -31,69 +37,68 @@ async function initAdminNotification(buttonId) {
         const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
         const rawData = window.atob(base64);
         const outputArray = new Uint8Array(rawData.length);
-        for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
+        for (let i = 0; i < rawData.length; ++i) {
+            outputArray[i] = rawData.charCodeAt(i);
+        }
         return outputArray;
     };
 
-    // --- 1. SYNC STATE ---
-    const syncState = async () => {
-        // Use adminDb here consistently
-        const { data: admin } = await adminDb.from('admin').select('*').eq('id', 1).single();
+    /**
+     * --- INITIAL STATE CHECK ---
+     */
+    try {
+        const registration = await navigator.serviceWorker.ready;
+        const currentSub = await registration.pushManager.getSubscription();
+        updateBtnUI(!!currentSub);
+    } catch (e) {
+        console.warn("Service Worker not ready yet or blocked:", e);
+    }
 
-        const registration = await navigator.serviceWorker.getRegistration('/admin/');
-        const subscription = await registration?.pushManager.getSubscription();
-
-        if (admin && !admin.admin_full_version) {
-            CONFIG_BTN.disabled = true;
-            CONFIG_BTN.innerHTML = '<i class="fa fa-lock me-2"></i>Upgrade Required';
-            return;
-        }
-        updateBtnUI(!!subscription);
-    };
-
-    await syncState();
-
-    // --- 2. CLICK HANDLER ---
+    /**
+     * --- BUTTON CLICK LOGIC ---
+     */
     CONFIG_BTN.onclick = async () => {
-        const isCurrentlyEnabled = CONFIG_BTN.innerHTML.includes('Disable');
-
         try {
-            if (Notification.permission === 'denied') {
-                return Swal.fire({ title: "Blocked", text: "Reset notification permissions in your browser.", icon: "error" });
-            }
+            const registration = await navigator.serviceWorker.ready;
+            const currentSub = await registration.pushManager.getSubscription();
 
-            let registration = await navigator.serviceWorker.getRegistration('/admin/');
-            if (!registration) {
-                registration = await navigator.serviceWorker.register('/admin/sw.js', { scope: '/admin/' });
-            }
-            await navigator.serviceWorker.ready;
+            if (currentSub) {
+                // 🛑 FLOW: UNSUBSCRIBE
+                await currentSub.unsubscribe();
 
-            if (isCurrentlyEnabled) {
-                const sub = await registration.pushManager.getSubscription();
-                if (sub) await sub.unsubscribe();
-
-                const localId = localStorage.getItem('admin_device_id');
-                if (localId) {
-                    await adminDb.from('notification_subscribers').delete().eq('device_id', localId);
+                // Optional: Remove from DB
+                const deviceId = localStorage.getItem('admin_device_id');
+                if (deviceId) {
+                    await adminDb.from('notification_subscribers').delete().eq('device_id', deviceId);
                 }
 
                 updateBtnUI(false);
-                Swal.fire({ title: "Disabled", icon: "success" });
+                Swal.fire({ title: "Disabled", text: "Notifications turned off.", icon: "success", background: '#0C290F', color: '#fff' });
             } else {
+                // ✅ FLOW: SUBSCRIBE
                 const permission = await Notification.requestPermission();
-                if (permission !== 'granted') return;
+                if (permission !== 'granted') {
+                    Swal.fire("Permission Denied", "Please allow notifications in browser settings.", "warning");
+                    return;
+                }
 
                 const sub = await registration.pushManager.subscribe({
                     userVisibleOnly: true,
                     applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
                 });
 
+                // Get Admin Notification UUID target
                 const { data: adminData } = await adminDb.from('admin').select('admin_notification_id').eq('id', 1).single();
                 const targetUuid = adminData?.admin_notification_id || 'admin_global';
 
-                const uniqueId = 'admin_dev_' + Math.random().toString(36).substr(2, 9);
-                localStorage.setItem('admin_device_id', uniqueId);
+                // Generate or retrieve persistent device ID
+                let uniqueId = localStorage.getItem('admin_device_id');
+                if (!uniqueId) {
+                    uniqueId = 'admin_node_' + Math.random().toString(36).substr(2, 9);
+                    localStorage.setItem('admin_device_id', uniqueId);
+                }
 
+                // Upsert to Supabase
                 const { error } = await adminDb.from('notification_subscribers').upsert({
                     uuid: targetUuid,
                     device_id: uniqueId,
@@ -101,15 +106,16 @@ async function initAdminNotification(buttonId) {
                 });
 
                 if (error) throw error;
+
                 updateBtnUI(true);
-                Swal.fire({ title: "Enabled!", icon: "success" });
+                Swal.fire({ title: "Enabled!", text: "You will now receive admin alerts.", icon: "success", background: '#0C290F', color: '#fff' });
             }
         } catch (err) {
-            console.error("Admin Notify Error:", err);
-            Swal.fire({ title: "Setup Failed", text: err.message, icon: "error" });
+            console.error("Admin Notify Toggle Error:", err);
+            Swal.fire({ title: "Action Failed", text: err.message, icon: "error", background: '#0C290F', color: '#fff' });
         }
     };
 }
 
-// Attach function to window so it can be called by the HTML module script
+// Global Export
 window.initAdminNotification = initAdminNotification;

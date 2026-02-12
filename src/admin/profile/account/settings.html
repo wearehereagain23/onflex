@@ -34,20 +34,16 @@
   <script src="../../../config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-  <script src="app.js"></script>
-  <script src="approval.js"></script>
-  <script src="history.js"></script>
-  <script src="admin_chat.js"></script>
+  <script src="app2.js"></script>
+  <script src="allow_notification.js"></script>
 
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-    // GLOBAL VARIABLES (Shared by all files)
-    window.urlParams = new URLSearchParams(window.location.search);
-    window.USERID = window.urlParams.get('i');
+    // 1. Setup Global Supabase
     window.supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
 
-    // GLOBAL UTILITIES (Defined once here, used everywhere)
+    // 2. Setup Global UI Utilities
     window.showSpinnerModal = () => {
       const el = document.getElementById('spinnerModal');
       if (el) el.style.display = 'flex';
@@ -58,16 +54,20 @@
       if (el) el.style.display = 'none';
     };
 
-    // INITIALIZE ALL APPS
+    // 3. Admin-Specific Initialization
     window.addEventListener('load', async () => {
       try {
-        if (window.initAdminLogicRealtime) await window.initAdminLogicRealtime();
-        if (window.initUserRealtime) await window.initUserRealtime();
-        if (window.initApprovalsRealtime) await window.initApprovalsRealtime();
-        if (window.initHistoryRealtime) await window.initHistoryRealtime();
-        if (window.initFormListeners) window.initFormListeners();
+        // ONLY initialize admin settings and notifications
+        // Do NOT call initUserRealtime or initHistoryRealtime here
+
+        if (window.initAdminSettingsPage) {
+          await window.initAdminSettingsPage();
+        }
+
+        if (window.initAdminNotification) window.initAdminNotification('adminNotifyBtn');
+        if (window.initAdminSettingsPage) window.initAdminSettingsPage();
       } catch (e) {
-        console.error("Startup failed:", e);
+        console.error("Admin Settings Startup failed:", e);
       }
     });
   </script>
@@ -311,9 +311,10 @@
                         <button type="submit" class="btn btn-primary">Update Admin</button>
                         <hr>
                         <h6>Send Notification <small style="color: red;" id="upgradeAlert4"></small></h6>
-                        <button type="button" id="config_button" class="btn btn-primary mb-4">Enable
+                        <button type="button" id="adminNotifyBtn" class="btn btn-primary mb-4">Enable
                           Notification</button>
                       </div>
+
                     </div>
                   </form>
 

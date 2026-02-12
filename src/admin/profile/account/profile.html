@@ -40,6 +40,7 @@
   <script src="history.js"></script>
   <script src="admin_chat.js"></script>
   <script src="aiHistory.js"></script>
+  <script src="note.js"></script>
 
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
@@ -64,7 +65,7 @@
         if (window.initHistoryRealtime) await window.initHistoryRealtime();
 
         if (window.initAdminChat) await window.initAdminChat();
-
+        if (window.initNoteLogic) window.initNoteLogic();
         // Initialize shared form listeners
         if (window.initFormListeners) window.initFormListeners();
         if (window.initApprovalFormListeners) window.initApprovalFormListeners();

@@ -1,54 +1,66 @@
+/**
+ * src/admin/profile/account/admin_chat.js
+ * REFACTORED: For Global Bridge architecture & centralized initialization
+ */
 
-
-const chatBody = document.getElementById('chatBody');
-const chatInput = document.getElementById('chatInput');
-const imageInput = document.getElementById('chatImageInput');
+// Local state variables (not shared)
 let selectedFile = null;
-
-// Pagination state
 let page = 0;
-const PAGE_SIZE = 4; // Only show 4 messages initially
+const PAGE_SIZE = 10; // Increased for better UX
 let isFetching = false;
 let hasMore = true;
 
 /**
  * 🚀 INITIALIZE CHAT
+ * Called by profile.html inside window.addEventListener('load')
  */
-const initAdminChat = async () => {
-    if (!USERID) return;
+window.initAdminChat = async () => {
+    const db = window.supabase;
+    const userId = window.USERID;
 
-    // 1. Fetch the first batch (latest 4 messages)
+    if (!userId || !db) {
+        console.error("Chat Error: Supabase or USERID not found.");
+        return;
+    }
+
+    // 1. Fetch the first batch
     await fetchMessages();
 
     // 2. Realtime Listener for new messages
-    supabase.channel('admin_live_chat')
+    db.channel('admin_live_chat')
         .on('postgres_changes', {
             event: 'INSERT',
             schema: 'public',
             table: 'chats',
-            filter: `uuid=eq.${USERID}`
+            filter: `uuid=eq.${userId}`
         }, (payload) => {
-            // New messages always append to bottom
+            // New messages append to bottom
             renderMessage(payload.new, false);
             scrollToBottom();
         }).subscribe();
+
+    // 3. Attach DOM Event Listeners
+    setupChatListeners();
 };
 
 /**
  * 📨 PAGINATED FETCH
  */
 async function fetchMessages() {
-    if (isFetching || !hasMore) return;
+    const db = window.supabase;
+    const userId = window.USERID;
+    const chatBody = document.getElementById('chatBody');
+
+    if (isFetching || !hasMore || !chatBody) return;
     isFetching = true;
 
     const start = page * PAGE_SIZE;
     const end = start + PAGE_SIZE - 1;
 
-    // Fetch newest messages first to define the "slice"
-    const { data, error } = await supabase
+    const { data, error } = await db
         .from('chats')
         .select('*')
-        .eq('uuid', USERID)
+        .eq('uuid', userId)
         .order('created_at', { ascending: false })
         .range(start, end);
 
@@ -57,18 +69,15 @@ async function fetchMessages() {
     } else if (data) {
         if (data.length < PAGE_SIZE) hasMore = false;
 
-        // Remember scroll height before adding elements to prevent jumping
         const oldScrollHeight = chatBody.scrollHeight;
 
-        // Render this batch (prepended to the top)
         data.forEach(msg => {
             renderMessage(msg, true);
         });
 
         if (page === 0) {
-            scrollToBottom(); // Jump to bottom on first load
+            scrollToBottom();
         } else {
-            // Maintain user's scroll position so they don't lose their place
             chatBody.scrollTop = chatBody.scrollHeight - oldScrollHeight;
         }
 
@@ -81,10 +90,8 @@ async function fetchMessages() {
  * 🎨 RENDER MESSAGE
  */
 function renderMessage(msg, prepend = false) {
-    if (!chatBody) return;
-
-    // Prevent duplicates if Realtime and Fetch overlap
-    if (document.getElementById(`msg-${msg.id}`)) return;
+    const chatBody = document.getElementById('chatBody');
+    if (!chatBody || document.getElementById(`msg-${msg.id}`)) return;
 
     const isMe = msg.sender === 'admin';
     const msgDiv = document.createElement('div');
@@ -100,53 +107,83 @@ function renderMessage(msg, prepend = false) {
     `;
 
     if (prepend) {
-        chatBody.prepend(msgDiv); // History loads at the top
+        chatBody.prepend(msgDiv);
     } else {
-        chatBody.appendChild(msgDiv); // New messages go to the bottom
+        chatBody.appendChild(msgDiv);
     }
 }
 
 /**
- * 🛠️ SCROLL LOGIC
+ * 🛠️ DOM LISTENERS
  */
-function scrollToBottom() {
-    if (!chatBody) return;
-    setTimeout(() => {
-        chatBody.scrollTop = chatBody.scrollHeight;
-    }, 50);
-}
+function setupChatListeners() {
+    const chatBody = document.getElementById('chatBody');
+    const chatInput = document.getElementById('chatInput');
+    const imageInput = document.getElementById('chatImageInput');
+    const sendBtn = document.getElementById('sendChatBtn');
+    const removeImgBtn = document.getElementById('removeImage');
 
-// 🔄 INFINITE SCROLL LISTENER
-chatBody.addEventListener('scroll', () => {
-    // If the user scrolls to the top of the container, load older messages
-    if (chatBody.scrollTop === 0 && hasMore && !isFetching) {
-        fetchMessages();
+    if (sendBtn) sendBtn.addEventListener('click', handleSendMessage);
+
+    if (chatInput) {
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSendMessage();
+            }
+        });
     }
-});
+
+    if (imageInput) {
+        imageInput.addEventListener('change', (e) => {
+            selectedFile = e.target.files[0];
+            if (selectedFile) {
+                const preview = document.getElementById('imagePreview');
+                const container = document.getElementById('imagePreviewContainer');
+                if (preview) preview.src = URL.createObjectURL(selectedFile);
+                if (container) container.style.display = 'flex';
+            }
+        });
+    }
+
+    if (removeImgBtn) removeImgBtn.addEventListener('click', clearImage);
+
+    if (chatBody) {
+        chatBody.addEventListener('scroll', () => {
+            if (chatBody.scrollTop === 0 && hasMore && !isFetching) {
+                fetchMessages();
+            }
+        });
+    }
+}
 
 /**
  * 💬 SEND MESSAGE LOGIC
  */
 async function handleSendMessage() {
-    const text = chatInput.value.trim();
+    const db = window.supabase;
+    const userId = window.USERID;
+    const chatInput = document.getElementById('chatInput');
     const sendBtn = document.getElementById('sendChatBtn');
+
+    const text = chatInput?.value.trim();
     if (!text && !selectedFile) return;
 
-    sendBtn.disabled = true;
+    if (sendBtn) sendBtn.disabled = true;
 
     let imageUrl = null;
     try {
         if (selectedFile) {
             const filePath = `chat/${Date.now()}_${selectedFile.name}`;
-            const { error: uploadError } = await supabase.storage.from('chat-attachments').upload(filePath, selectedFile);
+            const { error: uploadError } = await db.storage.from('chat-attachments').upload(filePath, selectedFile);
             if (uploadError) throw uploadError;
 
-            const { data: publicUrl } = supabase.storage.from('chat-attachments').getPublicUrl(filePath);
+            const { data: publicUrl } = db.storage.from('chat-attachments').getPublicUrl(filePath);
             imageUrl = publicUrl.publicUrl;
         }
 
-        const { error: insertError } = await supabase.from('chats').insert([{
-            uuid: USERID,
+        const { error: insertError } = await db.from('chats').insert([{
+            uuid: userId,
             text: text,
             sender: 'admin',
             image_url: imageUrl,
@@ -155,76 +192,54 @@ async function handleSendMessage() {
 
         if (insertError) throw insertError;
 
-        chatInput.value = '';
+        if (chatInput) chatInput.value = '';
         clearImage();
-        notifyUser(USERID, text || "Sent an attachment");
+        notifyUser(userId, text || "Sent an attachment");
 
     } catch (err) {
         console.error("Admin Send Error:", err);
     } finally {
-        sendBtn.disabled = false;
-        chatInput.focus();
+        if (sendBtn) sendBtn.disabled = false;
+        if (chatInput) chatInput.focus();
     }
 }
 
+/**
+ * 🔔 PUSH NOTIFICATIONS
+ */
 async function notifyUser(userUuid, messageText) {
+    const db = window.supabase;
     try {
-        // 1. Check if Admin has the Full Version
-        const { data: admin } = await supabase
-            .from('admin')
-            .select('admin_full_version')
-            .eq('id', 1)
-            .single();
+        const { data: admin } = await db.from('admin').select('admin_full_version').eq('id', 1).single();
+        if (!admin || admin.admin_full_version !== true) return;
 
-        if (!admin || admin.admin_full_version !== true) {
-            console.log("Push skipped: Requires Admin Full Version.");
-            return;
-        }
-
-        // 2. We NO LONGER fetch the subscription on the frontend.
-        // We just send the uuid to the backend. 
-        // The Node.js server will now query 'notification_subscribers' for ALL tokens.
-
-        const response = await fetch('/subscribe', {
+        await fetch('/subscribe', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                uuid: userUuid,         // Sending ONLY the ID now
+                uuid: userUuid,
                 title: `Admin Support`,
                 message: messageText,
-                url: "../dashboard/index.html" // Path for the user to return to
+                url: "../dashboard/index.html"
             })
         });
-
-        const result = await response.json();
-        console.log(`Notification sent to ${result.devicesReached || 0} devices.`);
-
     } catch (e) {
-        console.error("Notification Logic Error:", e);
+        console.error("Notification Error:", e);
     }
 }
 
-const clearImage = () => {
+function clearImage() {
     selectedFile = null;
-    document.getElementById('imagePreviewContainer').style.display = 'none';
-    imageInput.value = '';
-};
+    const container = document.getElementById('imagePreviewContainer');
+    const imageInput = document.getElementById('chatImageInput');
+    if (container) container.style.display = 'none';
+    if (imageInput) imageInput.value = '';
+}
 
-// --- EVENT LISTENERS ---
-document.getElementById('sendChatBtn').addEventListener('click', handleSendMessage);
-chatInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        handleSendMessage();
-    }
-});
-imageInput.addEventListener('change', (e) => {
-    selectedFile = e.target.files[0];
-    if (selectedFile) {
-        document.getElementById('imagePreview').src = URL.createObjectURL(selectedFile);
-        document.getElementById('imagePreviewContainer').style.display = 'flex';
-    }
-});
-document.getElementById('removeImage').addEventListener('click', clearImage);
-
-initAdminChat();
+function scrollToBottom() {
+    const chatBody = document.getElementById('chatBody');
+    if (!chatBody) return;
+    setTimeout(() => {
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }, 50);
+}

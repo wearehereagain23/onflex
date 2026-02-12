@@ -1,13 +1,12 @@
-/**
- * src/admin/profile/account/app2.js
- */
-async function initAdminSettingsPage() {
-    // We expect 'supabase' and 'CONFIG' to be available globally from HTML
-    if (typeof supabase === 'undefined' || typeof CONFIG === 'undefined') {
-        return console.error("Supabase or CONFIG not found");
-    }
 
-    const db = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+async function initAdminSettingsPage() {
+    // 🔥 FIX: Use the global window.supabase directly. 
+    // It is already a "Client", so we don't call createClient again.
+    const db = window.supabase;
+
+    if (!db) {
+        return console.error("Global Supabase instance not found");
+    }
 
     // DOM Elements
     const settingsForm = document.getElementById('setStatus');
@@ -16,8 +15,9 @@ async function initAdminSettingsPage() {
     const addressInput = document.getElementById('webAddress');
     const agree = document.getElementById('agree');
 
-    const showSpinner = () => document.getElementById('spinnerModal')?.style.setProperty('display', 'flex');
-    const hideSpinner = () => document.getElementById('spinnerModal')?.style.setProperty('display', 'none');
+    // Use the global helpers defined in your HTML
+    const showSpinner = window.showSpinnerModal;
+    const hideSpinner = window.hideSpinnerModal;
 
     /* ===== Auth Guard ===== */
     const adminSession = localStorage.getItem('adminSession');
@@ -35,7 +35,7 @@ async function initAdminSettingsPage() {
         if (emailInput) emailInput.value = data.email || '';
         if (passwordInput) passwordInput.value = data.password || '';
         if (addressInput) addressInput.value = data.address || '';
-        if (agree) agree.value = data.agreement;
+        if (agree) agree.value = data.agreement || '';
     }
 
     /* ===== Realtime Update ===== */
@@ -51,19 +51,22 @@ async function initAdminSettingsPage() {
     /* ===== Submit Handler ===== */
     settingsForm?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        showSpinner();
+        if (showSpinner) showSpinner();
+
         const updatedData = {
             email: emailInput.value,
             password: passwordInput.value,
             address: addressInput.value,
             agreement: agree.value
         };
+
         const { data: existing } = await db.from('admin').select('id').limit(1);
         let result = (existing && existing.length > 0)
             ? await db.from('admin').update(updatedData).eq('id', existing[0].id)
             : await db.from('admin').insert([updatedData]);
 
-        hideSpinner();
+        if (hideSpinner) hideSpinner();
+
         if (result.error) {
             Swal.fire({ icon: 'error', title: 'Update Failed', text: result.error.message });
         } else {
@@ -71,6 +74,8 @@ async function initAdminSettingsPage() {
         }
     });
 }
+
+window.initAdminSettingsPage = initAdminSettingsPage;
 
 // Attach to window so HTML can call it
 window.initAdminSettingsPage = initAdminSettingsPage;
