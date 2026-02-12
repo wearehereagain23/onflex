@@ -1,21 +1,31 @@
-/* Force Light Mode / Ignore System Theme */
 :root {
+    /* This forces the browser to render the page in light mode regardless of device settings */
     color-scheme: light !important;
 }
 
-/* Force standard text color globally to prevent system override */
-body,
-html {
+/* Override any potential system-driven text colors */
+body {
     color: #000000;
-    /* Or your preferred default text color */
+    /* Or your preferred static text color */
     background-color: #ffffff;
-    /* Or your preferred background */
 }
 
-/* Specifically target PWAs on iOS/Android to prevent auto-dark-mode */
+/* This targets the 'prefers-color-scheme' media query which mobile devices use */
 @media (prefers-color-scheme: dark) {
-    :root {
-        color-scheme: light !important;
+
+    body,
+    p,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    span,
+    label,
+    input {
+        color: inherit !important;
+        /* Forces it to stay what you defined in light mode */
     }
 }
 
