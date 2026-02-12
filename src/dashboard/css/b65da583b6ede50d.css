@@ -34,8 +34,6 @@ th {
 input,
 select,
 textarea {
-    background-color: #081a0a !important;
-    border: 1px solid #1a4d1a !important;
     color: #ffffff !important;
 }
 

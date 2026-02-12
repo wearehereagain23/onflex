@@ -69,6 +69,11 @@ app.get('/manifest.json', (req, res) => {
 });
 
 
+app.get('/manifest.json', (req, res) => {
+  res.sendFile(path.join(__dirname, 'src/admin/manifest.json'));
+});
+
+
 
 app.post("/subscribe", async (req, res) => {
   const { uuid, title, message, url } = req.body;
