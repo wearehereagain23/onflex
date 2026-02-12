@@ -1,17 +1,15 @@
 {
-    "name": "OnFlex",
-    "short_name": "OnFlex Admin",
+    "name": "OnFlex Admin",
+    "short_name": "AdminFlex",
     "start_url": "/admin/login/index.html",
+    "scope": "/admin/",
     "display": "standalone",
+    "theme_color": "#0C290F",
+    "background_color": "#0C290F",
     "icons": [
         {
-            "src": "/src/admin/icon-192.png",
+            "src": "/admin/icon-192.png",
             "sizes": "192x192",
-            "type": "image/png"
-        },
-        {
-            "src": "/src/admin/icon-512.png",
-            "sizes": "512x512",
             "type": "image/png"
         }
     ]

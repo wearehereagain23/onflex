@@ -60,26 +60,21 @@ app.get("/proxy", async (req, res) => {
   });
 
 
+// --- USER PWA ROUTES ---
 app.get('/sw.js', (req, res) => {
   res.sendFile(path.join(__dirname, 'src/sw.js'));
 });
-
 app.get('/manifest.json', (req, res) => {
   res.sendFile(path.join(__dirname, 'src/manifest.json'));
 });
 
-
-//  admin side PWA
-
-app.get('/sw.js', (req, res) => {
+// --- ADMIN PWA ROUTES (Change the URL paths!) ---
+app.get('/admin/sw.js', (req, res) => {
   res.sendFile(path.join(__dirname, 'src/admin/sw.js'));
 });
-
-
-app.get('/manifest.json', (req, res) => {
+app.get('/admin/manifest.json', (req, res) => {
   res.sendFile(path.join(__dirname, 'src/admin/manifest.json'));
 });
-
 
 
 app.post("/subscribe", async (req, res) => {

@@ -94,78 +94,120 @@ function updateBtnUI(isEnabled) {
 /**
  * ⚡ TOGGLE HANDLER
  */
+/**
+ * ⚡ TOGGLE HANDLER - ADMIN MULTI-DEVICE EDITION
+ */
 async function handleToggle(isCurrentlyEnabled) {
+    // 1. Check for blocked permissions
     if (Notification.permission === 'denied') {
         return Swal.fire({
             title: "Access Blocked",
-            text: "Please reset notification permissions in your browser settings.",
+            text: "Please reset notification permissions in your browser settings to enable alerts.",
             icon: "error",
-            background: '#0C290F', color: '#fff'
+            background: '#0c1d29ff',
+            color: '#fff'
+        });
+    }
+
+    // 2. Locate the Admin-specific Service Worker
+    // We use the specific scope to ensure we don't grab the user-side worker
+    const registration = await navigator.serviceWorker.getRegistration('/admin/');
+
+    if (!registration) {
+        return Swal.fire({
+            title: "PWA Error",
+            text: "Admin Service Worker not detected. Please ensure you have added this app to your home screen.",
+            icon: "warning",
+            background: '#0c1d29ff',
+            color: '#fff'
         });
     }
 
     if (isCurrentlyEnabled) {
-        // --- DISABLE PROCESS ---
+        // --- 🔕 DISABLE PROCESS ---
         const localId = localStorage.getItem('admin_notification_id');
 
         try {
-            // Unsubscribe from Push Server
-            const registration = await navigator.serviceWorker.getRegistration('/');
-            const sub = await registration?.pushManager.getSubscription();
+            // Unsubscribe from the Push Server via the browser
+            const sub = await registration.pushManager.getSubscription();
             if (sub) await sub.unsubscribe();
         } catch (e) {
             console.warn("Browser unsubscription failed, proceeding with DB cleanup.", e);
         }
 
-        // Wipe Database and LocalStorage
+        // Wipe Database and LocalStorage traces
         await cleanupAdminSubscription(localId);
 
         updateBtnUI(false);
         Swal.fire({
             title: "Disabled",
-            text: "Subscription data has been deleted.",
+            text: "This device will no longer receive admin alerts.",
             icon: "success",
-            background: '#0C290F', color: '#fff'
+            background: '#0c1d29ff',
+            color: '#fff'
         });
 
     } else {
-        // --- ENABLE PROCESS ---
+        // --- 🔔 ENABLE PROCESS ---
         try {
+            // Request permission
             const permission = await Notification.requestPermission();
             if (permission !== 'granted') return syncAdminState();
 
-            const registration = await navigator.serviceWorker.ready;
+            // Fetch VAPID Key from your Node.js backend
             const res = await fetch('/vapidPublicKey');
             const { key } = await res.json();
 
+            // Subscribe the current device to the Push Server
             const sub = await registration.pushManager.subscribe({
                 userVisibleOnly: true,
                 applicationServerKey: urlBase64ToUint8Array(key)
             });
 
-            const newId = 'admin_' + Math.random().toString(36).substr(2, 9);
-            localStorage.setItem('admin_notification_id', newId);
+            /**
+             * 🔗 MULTI-DEVICE LOGIC:
+             * We fetch the 'admin_notification_id' from the admin table (e.g., 'admin_1').
+             * This 'uuid' is shared by all admin devices, while 'device_id' remains unique.
+             */
+            const { data: adminData } = await supabase
+                .from('admin')
+                .select('admin_notification_id')
+                .eq('id', 1)
+                .single();
 
-            // Link Admin to ID
-            await supabase.from('admin').update({ admin_notification_id: newId }).eq('id', 1);
+            const targetUuid = adminData?.admin_notification_id || 'admin_global_id';
 
-            // Save to Subscribers
+            // Create a unique ID for THIS specific browser/phone
+            const uniqueDeviceId = 'dev_' + Math.random().toString(36).substr(2, 9);
+
+            localStorage.setItem('admin_notification_id', uniqueDeviceId);
+
+            // Save to 'notification_subscribers'
+            // Using UPSERT with device_id ensures we don't create duplicates for the same browser
             await supabase.from('notification_subscribers').upsert({
-                uuid: newId,
-                device_id: newId,
-                subscribers: sub
+                uuid: targetUuid,        // The person (Admin)
+                device_id: uniqueDeviceId, // The specific device (iPhone/Chrome)
+                subscribers: sub         // The push token
             });
 
             updateBtnUI(true);
             Swal.fire({
                 title: "Enabled",
-                text: "Admin alerts are now active!",
+                text: "This device is now registered for Admin alerts!",
                 icon: "success",
-                background: '#0C290F', color: '#fff'
+                background: '#0c1d29ff',
+                color: '#fff'
             });
+
         } catch (err) {
-            console.error(err);
-            Swal.fire("Error", "Could not enable notifications.", "error");
+            console.error("Subscription Error:", err);
+            Swal.fire({
+                title: "Error",
+                text: "Could not establish connection to the push server.",
+                icon: "error",
+                background: '#0c1f29ff',
+                color: '#fff'
+            });
         }
     }
 }

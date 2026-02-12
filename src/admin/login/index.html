@@ -11,7 +11,7 @@
     <link data-next-font="size-adjust" rel="preconnect" href="/" crossorigin="anonymous">
     <link rel="preload" href="css/69de85e1c8b0bbe0.css" as="style">
     <link rel="stylesheet" href="css/69de85e1c8b0bbe0.css" data-n-g=""><noscript data-n-css=""></noscript>
-    <link rel="manifest" href="../manifest.json" />
+    <link rel="manifest" href="/admin/manifest.json" />
     <meta name="theme-color" content="#000000" />
     <link rel="icon" href="icon-192.png" type="image/x-icon">
     <link rel="apple-touch-icon" href="icon-192.png" />
@@ -225,7 +225,7 @@
                     // SUCCESS: Save a local session indicator and redirect
                     localStorage.setItem('adminSession', 'active');
                     localStorage.setItem('adminEmail', data.email);
-
+                    hideSpinnerModal();
                     window.location.href = "../users/dashboard/users.html";
                 }
 
