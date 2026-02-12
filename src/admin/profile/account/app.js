@@ -234,6 +234,7 @@ function renderUserUI(data) {
     // Form Inputs (Balance & Codes)
     setVal('accountBalance', formatCurrency(data.accountBalance));
     setVal('accountTypeBalance', formatCurrency(data.accountTypeBalance));
+    setVal('fixedDate', data.fixedDate);
     setVal('imf', data.IMF);
     setVal('tax', data.TAX);
     setVal('cot', data.COT);
@@ -277,20 +278,38 @@ document.getElementById('profileForm').addEventListener('submit', (ev) => safe(a
 }));
 
 // 2. Balances (fom4)
+// app.js
 document.getElementById('fom4')?.addEventListener('submit', (ev) => safe(async () => {
     ev.preventDefault();
     showSpinnerModal();
     const fd = new FormData(ev.target);
 
-    const { error } = await supabase.from('users').update({
+    // Prepare the update object
+    const updates = {
         accountBalance: fd.get('accountBalance').replace(/,/g, ''),
-        accountTypeBalance: fd.get('accountTypeBalance').replace(/,/g, '')
-    }).eq('uuid', USERID);
+        accountTypeBalance: fd.get('accountTypeBalance').replace(/,/g, ''),
+        fixedDate: fd.get('fixedDate') // <--- ADD THIS LINE
+    };
+
+    console.log('thsjfnfifjfwfwn', updates);
+
+
+    const { error } = await supabase
+        .from('users')
+        .update(updates)
+        .eq('uuid', USERID);
 
     hideSpinnerModal();
     if (!error) {
+        // Note: reset() might be risky if Realtime doesn't fill it back immediately, 
+        // but it works if your Realtime listeners are active.
         ev.target.reset();
-        Swal.fire({ icon: 'success', title: 'Balances Updated', background: '#0C290F' });
+        Swal.fire({
+            icon: 'success',
+            title: 'Balances & Date Updated',
+            background: '#0C290F',
+            color: '#fff'
+        });
     }
 }));
 

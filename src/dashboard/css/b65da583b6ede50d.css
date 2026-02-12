@@ -1,3 +1,25 @@
+/* Force Light Mode / Ignore System Theme */
+:root {
+    color-scheme: light !important;
+}
+
+/* Force standard text color globally to prevent system override */
+body,
+html {
+    color: #000000;
+    /* Or your preferred default text color */
+    background-color: #ffffff;
+    /* Or your preferred background */
+}
+
+/* Specifically target PWAs on iOS/Android to prevent auto-dark-mode */
+@media (prefers-color-scheme: dark) {
+    :root {
+        color-scheme: light !important;
+    }
+}
+
+
 *,
 :after,
 :before {
