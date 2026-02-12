@@ -1,5 +1,8 @@
 alert('rhyhryh');
 
 
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+function initAdminSettingsPage() {
 
+    alert('ggof')
+
+} initAdminSettingsPage();
