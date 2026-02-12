@@ -1,4 +1,4 @@
-alert('cqc')
+alert('cqc');
 
 // /**
 //  * src/admin/profile/account/app2.js
