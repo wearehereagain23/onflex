@@ -1,29 +1,53 @@
+/* Force the root to dark mode only */
 :root {
-    /* This forces the browser to render the page in light mode regardless of device settings */
-    color-scheme: light !important;
+    color-scheme: dark !important;
 }
 
-/* Override any potential system-driven text colors */
+/* Force colors regardless of system theme */
+html,
 body {
-    color: #ffffff;
+    /* Your dark green bg */
+    color: #ffffff !important;
+    /* Always white text */
 }
 
-/* This targets the 'prefers-color-scheme' media query which mobile devices use */
-@media (prefers-color-scheme: dark) {
+/* Target every text element to ensure no 'black' text leaks in */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+span,
+div,
+label,
+input,
+td,
+th {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    /* Forces Safari/PWA to stay white */
+}
+
+/* Force inputs to stay dark even in white mode */
+input,
+select,
+textarea {
+    background-color: #081a0a !important;
+    border: 1px solid #1a4d1a !important;
+    color: #ffffff !important;
+}
+
+/* Disable the system's ability to override with Light Mode */
+@media (prefers-color-scheme: light) {
 
     body,
-    p,
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6,
-    span,
-    label,
-    input {
-        color: white;
-        /* Forces it to stay what you defined in light mode */
+    * {
+        background-color: inherit;
+        /* Don't let it turn white */
+        color: #ffffff !important;
+        /* Keep text white */
     }
 }
 

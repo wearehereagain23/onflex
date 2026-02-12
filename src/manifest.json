@@ -3,6 +3,9 @@
     "short_name": "OnFlex",
     "start_url": "/app.html",
     "display": "standalone",
+    "theme_color": "#0C290F",
+    "background_color": "#0C290F",
+    "description": "OnFlex Finance Banking App",
     "icons": [
         {
             "src": "icon-192.png",
