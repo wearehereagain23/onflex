@@ -29,30 +29,23 @@
   <link rel="stylesheet" href="../assets/css/style.css" id="main-style-link">
   <link rel="stylesheet" href="../assets/css/style-preset.css">
 
-  <script type="module" src="./app2.js"></script>
 
+  <!-- POPUP SCRIPT -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+  <script src="../../../config.js"></script>
 
-  <!-- <script type="module">
-    // Using cache-busting query strings (?v=1) forces Vercel to load the NEW code
-    import { initAdminSettingsPage } from './app2.js?v=1';
-    import { initAdminNotification } from './allow_notification.js?v=1';
+  <script type="module">
+    // The '?v=2' is a cache-buster. It forces Vercel to fetch the NEWEST version of your code.
+    import { initAdminSettingsPage } from './app2.js?v=2';
+    import { initAdminNotification } from './allow_notification.js?v=2';
 
-    async function startApp() {
-      // Wait for Config to be ready
-      const config = window.CONFIG || (typeof CONFIG !== 'undefined' ? CONFIG : null);
-
-      if (config) {
-        console.log("Config loaded, starting modules...");
-        await initAdminSettingsPage();
-        await initAdminNotification('config_button');
-      } else {
-        console.error("Critical: CONFIG.js not found at the path provided.");
-      }
+    // Start the logic
+    if (window.CONFIG) {
+      initAdminSettingsPage();
+      initAdminNotification('config_button');
     }
-
-    startApp();
-  </script> -->
+  </script>
 
   <!-- <script src="../../checker.js"></script> -->
 </head>
