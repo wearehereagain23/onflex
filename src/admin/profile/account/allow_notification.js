@@ -111,7 +111,10 @@ async function handleToggle(isCurrentlyEnabled) {
 
     // 2. Locate the Admin-specific Service Worker
     // We use the specific scope to ensure we don't grab the user-side worker
-    const registration = await navigator.serviceWorker.getRegistration('/admin/');
+    if ('serviceWorker' in navigator) {
+        await navigator.serviceWorker.register('/admin/sw.js', { scope: '/admin/' });
+    }
+    const registration = await navigator.serviceWorker.ready;
 
     if (!registration) {
         return Swal.fire({
