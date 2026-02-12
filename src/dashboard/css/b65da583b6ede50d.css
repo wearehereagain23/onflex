@@ -5,9 +5,7 @@
 
 /* Override any potential system-driven text colors */
 body {
-    color: #000000;
-    /* Or your preferred static text color */
-    background-color: #ffffff;
+    color: #ffffff;
 }
 
 /* This targets the 'prefers-color-scheme' media query which mobile devices use */
@@ -24,7 +22,7 @@ body {
     span,
     label,
     input {
-        color: inherit !important;
+        color: white;
         /* Forces it to stay what you defined in light mode */
     }
 }
