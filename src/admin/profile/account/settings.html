@@ -35,17 +35,7 @@
 
   <script src="../../../config.js"></script>
 
-  <script type="module">
-    // The '?v=2' is a cache-buster. It forces Vercel to fetch the NEWEST version of your code.
-    import { initAdminSettingsPage } from './app2.js?v=2';
-    import { initAdminNotification } from './allow_notification.js?v=2';
-
-    // Start the logic
-    if (window.CONFIG) {
-      initAdminSettingsPage();
-      initAdminNotification('config_button');
-    }
-  </script>
+  <script type="module" src="app2.js"></script>
 
   <!-- <script src="../../checker.js"></script> -->
 </head>
