@@ -78,24 +78,48 @@ window.initUserRealtime = async () => {
         .subscribe();
 };
 
-function applyAdminPermissions(admin) {
-    const upgradeIds = ['upgradeAlert', 'upgradeAlert2', 'upgradeAlert3', 'upgradeAlert4'];
-    const isFull = admin.admin_full_version;
+/**
+ * src/admin/profile/account/app.js
+ * Enhanced Lock for iOS Date Pickers
+ */
+function applyAdminPermissions(adminData) {
+    const isFull = adminData.admin_full_version === true;
 
-    upgradeIds.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.innerHTML = isFull ? "" : "Upgrade Required";
-    });
+    // Select the Fixed Date input specifically
+    const fixedDateInput = document.querySelector('input[name="fixedDate"]');
 
-    const accountLevel = document.getElementById("accountLevel");
-    const fixedDate = document.getElementById("fixedDate");
+    if (fixedDateInput) {
+        if (!isFull) {
+            // 1. Standard locks
+            fixedDateInput.readOnly = true;
+            fixedDateInput.setAttribute('disabled', 'true');
 
-    if (isFull) {
-        accountLevel?.removeAttribute("disabled");
-        fixedDate?.removeAttribute("readonly");
-    } else {
-        accountLevel?.setAttribute("disabled", "true");
-        fixedDate?.setAttribute("readonly", "true");
+            // 2. iOS Specific Force-Lock (CSS + Attribute)
+            fixedDateInput.style.pointerEvents = 'none'; // Prevents taps entirely
+            fixedDateInput.style.opacity = '0.6';
+            fixedDateInput.style.filter = 'grayscale(1)';
+
+            // 3. Prevent Focus Fallback
+            fixedDateInput.onfocus = (e) => e.target.blur();
+
+            // 4. Change placeholder logic if needed
+            fixedDateInput.value = "";
+            fixedDateInput.placeholder = "Upgrade Required 🔒";
+        } else {
+            // Unlock
+            fixedDateInput.readOnly = false;
+            fixedDateInput.removeAttribute('disabled');
+            fixedDateInput.style.pointerEvents = 'auto';
+            fixedDateInput.style.opacity = '1';
+            fixedDateInput.style.filter = 'none';
+            fixedDateInput.onfocus = null;
+        }
+    }
+
+    // Lock the submit buttons for Balances (fom4) if not full version
+    const balanceBtn = document.querySelector('#fom4 button[type="submit"]');
+    if (balanceBtn) {
+        balanceBtn.disabled = !isFull;
     }
 }
 

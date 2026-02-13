@@ -1,6 +1,6 @@
 /**
  * src/admin/profile/account/allow_notification.js
- * iOS Optimized: Direct Execution Flow
+ * Cleaned Logic: SW handled by login, Version Lock added.
  */
 async function initAdminNotification(buttonId) {
     const adminDb = window.supabase;
@@ -26,29 +26,45 @@ async function initAdminNotification(buttonId) {
         return Uint8Array.from([...rawData].map((char) => char.charCodeAt(0)));
     };
 
-    // Initial Sync
+    // Sync UI on load
     updateBtnUI(getLocalStatus());
 
     CONFIG_BTN.onclick = async () => {
-        // 🔥 iOS REQUIREMENT: Immediate Permission Request
-        // Do not put this behind an 'await navigator.serviceWorker.ready' if possible
         try {
-            const permission = await Notification.requestPermission();
-            if (permission !== 'granted') {
-                Swal.fire("Permission Denied", "iOS requires you to allow notifications in the prompt.", "warning");
-                return;
+            // 1. VERSION CHECK: Is admin_full_version enabled?
+            const { data: admin, error: vError } = await adminDb
+                .from('admin')
+                .select('admin_full_version')
+                .eq('id', 1)
+                .single();
+
+            if (vError || !admin?.admin_full_version) {
+                return Swal.fire({
+                    title: "Access Denied",
+                    text: "Admin Full Version is required to enable Push Notifications.",
+                    icon: "lock",
+                    background: '#0C290F',
+                    color: '#fff',
+                    confirmButtonColor: '#24a0a0'
+                });
             }
 
+            // 2. iOS GESTURE: Request permission first
+            const permission = await Notification.requestPermission();
+            if (permission !== 'granted') {
+                return Swal.fire("Permission Denied", "Please allow notifications in browser settings.", "warning");
+            }
+
+            // 3. GET REGISTRATION (Assumes SW was registered in login)
             const registration = await navigator.serviceWorker.getRegistration();
             if (!registration) {
-                Swal.fire("Error", "Service Worker not found. Please refresh.", "error");
-                return;
+                throw new Error("Service Worker is not active. Please log out and log back in.");
             }
 
             const currentSub = await registration.pushManager.getSubscription();
 
             if (currentSub) {
-                // UNSUBSCRIBE
+                // --- UNSUBSCRIBE ---
                 await currentSub.unsubscribe();
                 const dId = localStorage.getItem('admin_device_id');
                 if (dId) await adminDb.from('notification_subscribers').delete().eq('device_id', dId);
@@ -57,8 +73,7 @@ async function initAdminNotification(buttonId) {
                 updateBtnUI(false);
                 Swal.fire({ title: "Disabled", icon: "success", background: '#0C290F', color: '#fff' });
             } else {
-                // SUBSCRIBE
-                // 🔥 iOS TIP: Ensure the options are exactly like this
+                // --- SUBSCRIBE ---
                 const sub = await registration.pushManager.subscribe({
                     userVisibleOnly: true,
                     applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
@@ -81,8 +96,14 @@ async function initAdminNotification(buttonId) {
                 Swal.fire({ title: "Enabled!", icon: "success", background: '#0C290F', color: '#fff' });
             }
         } catch (err) {
-            console.error("iOS Subscription Error:", err);
-            Swal.fire({ title: "Failed", text: "Ensure you are using 'Add to Home Screen' version.", icon: "error" });
+            console.error("Subscription Error:", err);
+            Swal.fire({
+                title: "Error",
+                text: err.message || "Failed to process request.",
+                icon: "error",
+                background: '#0C290F',
+                color: '#fff'
+            });
         }
     };
 }

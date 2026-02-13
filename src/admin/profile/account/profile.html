@@ -1487,6 +1487,25 @@
     }
   </style>
 
+  <style>
+    /* Force lock for iOS date inputs when locked */
+    input[disabled],
+    input[readonly] {
+      -webkit-user-select: none;
+      /* Prevents selection/copy */
+      user-select: none;
+      pointer-events: none !important;
+      /* Prevents tap to trigger date picker */
+      cursor: not-allowed;
+    }
+
+    /* Specifically target the native date picker icons */
+    input[disabled]::-webkit-calendar-picker-indicator {
+      display: none !important;
+      appearance: none !important;
+    }
+  </style>
+
   <!-- chat css -->
 
   <style>
