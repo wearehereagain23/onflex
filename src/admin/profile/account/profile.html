@@ -48,14 +48,15 @@
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
     // 1. Initialize Globals immediately
+    // This MUST happen first so approval.js can see window.USERID
     window.urlParams = new URLSearchParams(window.location.search);
     window.USERID = window.urlParams.get('i');
 
-    // Create the client and attach to window
+    // Create the client and attach to window for all other JS files to use
     const supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
     window.supabase = supabase;
 
-    // 2. Define Utilities
+    // 2. Define Global Utilities
     window.showSpinnerModal = () => {
       const el = document.getElementById('spinnerModal');
       if (el) el.style.display = 'flex';
@@ -65,28 +66,47 @@
       if (el) el.style.display = 'none';
     };
 
-    // 3. Run Initializers
+    // 3. Main Initialization Sequence
     document.addEventListener('DOMContentLoaded', async () => {
+      console.log("🛠️ Initializing Admin Profile for User ID:", window.USERID);
+
       try {
-        // Check session/site status first (from website.js)
+        // A. Check session/site status first (security check)
         if (window.checkSiteAndAccountStatus) await window.checkSiteAndAccountStatus();
 
-        // Initialize standard logic
+
+        if (window.initHistoryRealtime) await window.initHistoryRealtime();
+
+        if (window.initAIHistoryLogic) {
+          await window.initAIHistoryLogic();
+        }
+
+        // B. 🔥 NEW: START APPROVALS REALTIME ENGINE
+        // This populates the KYC, Loan, and Card forms and listens for live updates
+        if (typeof window.initApprovalsRealtime === 'function') {
+          await window.initApprovalsRealtime();
+        } else {
+          console.warn("⏳ initApprovalsRealtime not found. Ensure approval.js is loaded.");
+        }
+
+        // C. Initialize standard logic modules
         if (window.initAdminLogicRealtime) await window.initAdminLogicRealtime();
         if (window.initUserRealtime) await window.initUserRealtime();
 
-        // 🔥 CALL DELETE LOGIC HERE (Now that window.supabase is active)
+        // D. Initialize Delete Logic (Using the window.supabase created above)
         if (window.initDeleteUserLogic) window.initDeleteUserLogic();
 
-        // Initialize remaining UI components
+        // E. Initialize Chat, Notes, and general Form Listeners
         if (window.initAdminChat) await window.initAdminChat();
         if (window.initNoteLogic) window.initNoteLogic();
+
+        // This handles general input listeners (like currency formatting)
         if (window.initFormListeners) window.initFormListeners();
 
-        console.log("🚀 Profile Dashboard Fully Loaded");
+        console.log("🚀 Profile Dashboard Fully Loaded & Realtime Active");
 
       } catch (err) {
-        console.error("Startup Error:", err);
+        console.error("❌ Critical Startup Error:", err);
       }
     });
   </script>

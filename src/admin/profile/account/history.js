@@ -33,28 +33,21 @@ window.initHistoryRealtime = async () => {
     const db = window.supabase;
     const userId = window.USERID;
 
-    if (!userId || !db) {
-        console.error("History init failed: Supabase or USERID missing.");
-        return;
-    }
+    if (!userId || !db) return;
 
-    // Listen for ALL changes (* includes DELETE)
+    // Corrected filter syntax in the channel config
     db.channel('history-realtime')
         .on('postgres_changes', {
             event: '*',
             schema: 'public',
             table: 'history',
-            filter: `uuid=eq.${userId}`
+            filter: `uuid=eq.${userId}` // Realtime filters DO use this string format
         }, (payload) => {
-            console.log("⚡ History Change detected:", payload.eventType);
             fetchHistoryPage(currentPage);
         })
         .subscribe();
 
-    // Initial load
     fetchHistoryPage(0);
-
-    // Initialize the "Add New" form listener
     initHistoryFormListener();
 };
 
@@ -69,19 +62,24 @@ async function fetchHistoryPage(page) {
     const db = window.supabase;
     const userId = window.USERID;
 
+    if (!userId) return;
+
     currentPage = page;
     const start = page * pageSize;
     const end = start + pageSize - 1;
 
-    // We change .order('date') to .order('id')
+    // Corrected filter syntax: .eq('column', value)
     const { data, count, error } = await db
         .from('history')
         .select('*', { count: 'exact' })
         .eq('uuid', userId)
-        .order('id', { ascending: false }) // Higher ID = Newer entry
+        .order('id', { ascending: false })
         .range(start, end);
 
-    if (error) return console.error("Fetch Error:", error);
+    if (error) {
+        console.error("Fetch Error:", error);
+        return;
+    }
 
     renderHistoryTable(data);
     renderPaginationControls(count);

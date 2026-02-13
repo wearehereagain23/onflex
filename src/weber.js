@@ -152,7 +152,7 @@
         localStorage.removeItem(SESSION_KEY);
         localStorage.removeItem('last_active_time');
         alert(message);
-        window.location.href = window.location.origin + '/admin/login/index.html';
+        window.location.href = window.location.origin + '/login/index.html';
     }
 
     // Global Listeners for activity
