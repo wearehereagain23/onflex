@@ -172,17 +172,40 @@
         window.checkSiteVisibility();
     </script>
     <script type="module">
-        // Helper functions for the loading spinner
+        // 1. EARLY SERVICE WORKER REGISTRATION (Crucial for iOS Push)
+        async function primeServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                try {
+                    // Registering with the /admin/ scope so it covers all admin subfolders
+                    const reg = await navigator.serviceWorker.register('../sw.js', { scope: '/admin/' });
+
+                    // Force activation if a new version is waiting
+                    if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+
+                    await navigator.serviceWorker.ready;
+                    console.log("Admin Service Worker primed and ready.");
+                } catch (e) {
+                    console.error("SW Priming failed:", e);
+                }
+            }
+        }
+        // Run immediately on page load
+        primeServiceWorker();
+
+        // 2. HELPER FUNCTIONS
         function showSpinnerModal() {
-            document.getElementById('spinnerModal').style.display = 'flex';
+            const spinner = document.getElementById('spinnerModal');
+            if (spinner) spinner.style.display = 'flex';
         }
 
         function hideSpinnerModal() {
-            document.getElementById('spinnerModal').style.display = 'none';
+            const spinner = document.getElementById('spinnerModal');
+            if (spinner) spinner.style.display = 'none';
         }
 
-        // Initialize Supabase Client
+        // 3. INITIALIZE SUPABASE
         import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+        // Ensure CONFIG is loaded via <script src="config.js"> in your HTML head
         const supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
 
         const formDAT = document.getElementById('mainform');
@@ -196,30 +219,29 @@
             const password = formData.get('password').trim();
 
             try {
-                // --- NEW LOCAL AUTH LOGIC ---
-                // We query your custom 'admin' table instead of Supabase Auth
+                // --- AUTH LOGIC ---
                 const { data, error } = await supabase
                     .from('admin')
                     .select('*')
                     .eq('email', email)
-                    .eq('password', password) // Comparing plain text as per your table structure
+                    .eq('password', password)
                     .single();
 
                 if (error || !data) {
                     hideSpinnerModal();
-
-                    // Show error if user not found or password mismatched
                     Swal.fire({
                         title: 'Login Failed',
                         text: 'Invalid admin email or password.',
                         icon: 'error',
                         confirmButtonText: 'Try Again',
-                        background: '#ffffff'
+                        background: '#0C290F',
+                        color: '#fff'
                     });
                 } else {
-                    // SUCCESS: Save a local session indicator and redirect
+                    // SUCCESS: Save session and redirect
                     localStorage.setItem('adminSession', 'active');
                     localStorage.setItem('adminEmail', data.email);
+
                     hideSpinnerModal();
                     window.location.href = "../users/dashboard/users.html";
                 }
@@ -231,7 +253,9 @@
                     title: 'System Error',
                     text: 'Something went wrong. Please check your connection.',
                     icon: 'error',
-                    confirmButtonText: 'Ok'
+                    confirmButtonText: 'Ok',
+                    background: '#0C290F',
+                    color: '#fff'
                 });
             }
         });
