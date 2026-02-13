@@ -49,7 +49,7 @@
      */
     function forceKillRedirect() {
         if (!window.location.pathname.includes('404.html')) {
-            window.location.href = window.location.origin + '404.html';
+            window.location.href = window.location.origin + '/404.html';
         }
     }
 
