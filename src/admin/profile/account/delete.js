@@ -1,4 +1,3 @@
-
 const deleteBtn = document.getElementById('deleteUser');
 
 // Helper functions
@@ -12,41 +11,53 @@ deleteBtn?.addEventListener('click', async (e) => {
         return Swal.fire("Error", "No user ID found.", "error");
     }
 
-    const result = await Swal.fire({
-        title: 'Final Warning!',
-        text: "This will wipe all user history, chats, and account data permanently.",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Yes, Delete All',
-        background: '#0C290F',
-        color: '#fff'
-    });
+    try {
+        // 1. VERSION CHECK: Lock deletion if not Full Version
+        const { data: admin } = await supabase.from('admin').select('admin_full_version').eq('id', 1).single();
 
-    if (result.isConfirmed) {
-        showSpinner();
+        if (!admin?.admin_full_version) {
+            return Swal.fire({
+                title: "Action Locked",
+                text: "Upgrade to Full Version to delete users.",
+                icon: "lock",
+                background: '#0C290F',
+                color: '#fff'
+            });
+        }
 
-        try {
+        // 2. CONFIRMATION
+        const result = await Swal.fire({
+            title: 'Final Warning!',
+            text: "This will wipe all user history, chats, and account data permanently.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, Delete All',
+            background: '#0C290F',
+            color: '#fff'
+        });
+
+        if (result.isConfirmed) {
+            showSpinner();
+
             const tables = [
                 'chats',
                 'notifications',
                 'notification_subscribers',
                 'history',
                 'devices',
-                'users' // Deleted last to avoid foreign key errors
+                'users'
             ];
 
-            // Execute deletions
+            // Execute deletions sequentially
             for (const table of tables) {
                 const { error } = await supabase.from(table).delete().eq('uuid', USERID);
                 if (error) console.warn(`Note: Could not delete from ${table}:`, error.message);
             }
 
-            // 🚀 CRITICAL FIX: Hide spinner BEFORE showing the success alert
             hideSpinner();
 
-            // 🚀 CRITICAL FIX: Use a timer + .then() for redirect
             Swal.fire({
                 title: 'User Deleted',
                 text: 'Redirecting to user list...',
@@ -58,17 +69,16 @@ deleteBtn?.addEventListener('click', async (e) => {
             }).then(() => {
                 window.location.href = "../../users/dashboard/users.html";
             });
-
-        } catch (err) {
-            hideSpinner(); // Ensure spinner hides on error
-            console.error("Deletion Error:", err);
-            Swal.fire({
-                title: 'Error',
-                text: 'Operation failed: ' + err.message,
-                icon: 'error',
-                background: '#0C290F',
-                color: '#fff'
-            });
         }
+    } catch (err) {
+        hideSpinner();
+        console.error("Deletion Error:", err);
+        Swal.fire({
+            title: 'Error',
+            text: err.message,
+            icon: 'error',
+            background: '#0C290F',
+            color: '#fff'
+        });
     }
 });

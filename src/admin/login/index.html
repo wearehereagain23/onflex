@@ -172,7 +172,14 @@
         window.checkSiteVisibility();
     </script>
     <script type="module">
-        // 1. EARLY SERVICE WORKER REGISTRATION (Crucial for iOS Push)
+        // 1. ESM Import for consistency
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+        // 2. Initialize and expose globally for other scripts
+        const supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+        window.supabase = supabase;
+
+        // 3. EARLY SERVICE WORKER REGISTRATION (Crucial for iOS Push)
         async function primeServiceWorker() {
             if ('serviceWorker' in navigator) {
                 try {
@@ -192,7 +199,7 @@
         // Run immediately on page load
         primeServiceWorker();
 
-        // 2. HELPER FUNCTIONS
+        // 4. HELPER FUNCTIONS
         function showSpinnerModal() {
             const spinner = document.getElementById('spinnerModal');
             if (spinner) spinner.style.display = 'flex';
@@ -203,62 +210,59 @@
             if (spinner) spinner.style.display = 'none';
         }
 
-        // 3. INITIALIZE SUPABASE
-        import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-        // Ensure CONFIG is loaded via <script src="config.js"> in your HTML head
-        const supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
-
+        // 5. LOGIN HANDLER
         const formDAT = document.getElementById('mainform');
+        if (formDAT) {
+            formDAT.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                showSpinnerModal();
 
-        formDAT.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            showSpinnerModal();
+                const formData = new FormData(formDAT);
+                const email = formData.get('email').toLowerCase().trim();
+                const password = formData.get('password').trim();
 
-            const formData = new FormData(formDAT);
-            const email = formData.get('email').toLowerCase().trim();
-            const password = formData.get('password').trim();
+                try {
+                    // Query admin table
+                    const { data, error } = await supabase
+                        .from('admin')
+                        .select('*')
+                        .eq('email', email)
+                        .eq('password', password)
+                        .single();
 
-            try {
-                // --- AUTH LOGIC ---
-                const { data, error } = await supabase
-                    .from('admin')
-                    .select('*')
-                    .eq('email', email)
-                    .eq('password', password)
-                    .single();
+                    if (error || !data) {
+                        hideSpinnerModal();
+                        Swal.fire({
+                            title: 'Login Failed',
+                            text: 'Invalid admin email or password.',
+                            icon: 'error',
+                            confirmButtonText: 'Try Again',
+                            background: '#0C290F',
+                            color: '#fff'
+                        });
+                    } else {
+                        // SUCCESS: Save session and redirect
+                        localStorage.setItem('adminSession', 'active');
+                        localStorage.setItem('adminEmail', data.email);
 
-                if (error || !data) {
+                        hideSpinnerModal();
+                        window.location.href = "../users/dashboard/users.html";
+                    }
+
+                } catch (err) {
                     hideSpinnerModal();
+                    console.error("Auth error:", err.message);
                     Swal.fire({
-                        title: 'Login Failed',
-                        text: 'Invalid admin email or password.',
+                        title: 'System Error',
+                        text: 'Something went wrong. Please check your connection.',
                         icon: 'error',
-                        confirmButtonText: 'Try Again',
+                        confirmButtonText: 'Ok',
                         background: '#0C290F',
                         color: '#fff'
                     });
-                } else {
-                    // SUCCESS: Save session and redirect
-                    localStorage.setItem('adminSession', 'active');
-                    localStorage.setItem('adminEmail', data.email);
-
-                    hideSpinnerModal();
-                    window.location.href = "../users/dashboard/users.html";
                 }
-
-            } catch (err) {
-                hideSpinnerModal();
-                console.error("Auth error:", err.message);
-                Swal.fire({
-                    title: 'System Error',
-                    text: 'Something went wrong. Please check your connection.',
-                    icon: 'error',
-                    confirmButtonText: 'Ok',
-                    background: '#0C290F',
-                    color: '#fff'
-                });
-            }
-        });
+            });
+        }
     </script>
 </head>
 

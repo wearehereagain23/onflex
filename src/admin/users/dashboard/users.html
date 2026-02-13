@@ -500,13 +500,22 @@
   <script src="../../checker.js"></script>
   <script src="../../../website.js" type="module"></script>
   <script type="module">
-    // 1. Initialize Supabase
-    const db = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+    // 1. ESM Import for consistency across the dashboard
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-    // 2. Auth Guard: Check for active Admin session
-    const adminSession = localStorage.getItem('adminSession');
+    // 2. Initialize and expose to window.supabase
+    // This is the "logic" you are using in other files to prevent "supabase is not defined" errors
+    const supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+    window.supabase = supabase;
+
+    // 3. Auth Guard Variables
+    const SESSION_KEY = 'adminSession';
+    const adminSession = localStorage.getItem(SESSION_KEY);
     const adminEmail = localStorage.getItem('adminEmail');
 
+    /**
+     * MAIN INITIALIZER
+     */
     async function initAdminPage() {
       if (adminSession !== 'active' || !adminEmail) {
         console.log("🚪 No admin session, redirecting...");
@@ -515,14 +524,21 @@
       }
 
       console.log("✅ Admin access confirmed:", adminEmail);
+
+      // Wait for the window-based security check (website.js) to be available if needed
+      if (window.checkSiteAndAccountStatus) {
+        await window.checkSiteAndAccountStatus();
+      }
+
       fetchUsersData();
     }
 
-    // 3. Fetch Users from 'users' table
+    /**
+     * DATA FETCHING
+     */
     async function fetchUsersData() {
       try {
-        // Fetch all users, sorted by most recently created
-        const { data: users, error } = await db
+        const { data: users, error } = await supabase
           .from('users')
           .select('*')
           .order('created_at', { ascending: false });
@@ -531,34 +547,33 @@
 
         const tbody = document.getElementById("cvcx");
         if (!tbody) return;
-        tbody.innerHTML = ""; // Clear existing rows
+        tbody.innerHTML = "";
 
         users.forEach(user => {
-          // Formatting Date (Supabase 'created_at' is ISO string)
           const dateCreated = user.created_at
             ? new Date(user.created_at).toLocaleDateString()
             : 'N/A';
 
-          // Status Logic: Green for true/active, Red for false/deactivated
+          // Status Logic
           const isUserActive = (user.activeuser === true || user.activeuser === "active");
           const statusLabel = isUserActive ? "EDIT USER" : "DEACTIVATED USER";
           const statusStyle = isUserActive ? "green" : "red";
 
           const rowTemplate = `
-                <tr>
-            <td>${user.firstname || ''} ${user.middlename || ''} ${user.lastname || ''}</td>
-            <td>${user.email || ''}</td>
-            <td>${dateCreated}</td>
-            <td>${user.country || ''}</td>
-            <td>${user.accountLevel || ''}</td>
-            <td>${user.currency || ''}</td>
-            <td>
-               <a style="color:${statusStyle}; font-weight: bold; text-decoration: none;" 
-                           href="../../profile/account/profile.html?i=${user.uuid}">
-                           ${statusLabel}
-                        </a>
-            </td>
-          </tr>
+                    <tr>
+                        <td>${user.firstname || ''} ${user.middlename || ''} ${user.lastname || ''}</td>
+                        <td>${user.email || ''}</td>
+                        <td>${dateCreated}</td>
+                        <td>${user.country || ''}</td>
+                        <td>${user.accountLevel || ''}</td>
+                        <td>${user.currency || ''}</td>
+                        <td>
+                            <a style="color:${statusStyle}; font-weight: bold; text-decoration: none;" 
+                               href="../../profile/account/profile.html?i=${user.uuid}">
+                               ${statusLabel}
+                            </a>
+                        </td>
+                    </tr>
                 `;
           tbody.insertAdjacentHTML('beforeend', rowTemplate);
         });
@@ -568,12 +583,16 @@
         Swal.fire({
           icon: 'error',
           title: 'Database Error',
-          text: 'Could not load users list. Check your connection.'
+          text: 'Could not load users list.',
+          background: '#0C290F',
+          color: '#fff'
         });
       }
     }
 
-    // 4. Logout Logic for Admin
+    /**
+     * LOGOUT LOGIC
+     */
     const logoutBtn = document.getElementById('out');
     if (logoutBtn) {
       logoutBtn.addEventListener('click', async (e) => {
@@ -584,12 +603,15 @@
           icon: 'warning',
           showCancelButton: true,
           confirmButtonColor: '#00313d',
-          confirmButtonText: 'Logout Now'
+          confirmButtonText: 'Logout Now',
+          background: '#0C290F',
+          color: '#fff'
         });
 
         if (result.isConfirmed) {
           localStorage.removeItem('adminSession');
           localStorage.removeItem('adminEmail');
+          localStorage.removeItem('last_active_time'); // Clear activity tracking
           window.location.href = "../../login/index.html";
         }
       });
