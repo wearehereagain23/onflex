@@ -1010,6 +1010,13 @@
     <script src="lock.js"></script>
     <script src="../website.js"></script>
 
+    <script type="module" src="">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+        // Create the client and attach to window
+        const supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+        window.supabase = supabase;
+    </script>
 
 
 
