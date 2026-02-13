@@ -43,36 +43,47 @@
   <script src="note.js"></script>
   <script src="delete.js"></script>
 
+
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-    // Define Globals on window so every file can see them without re-declaring
+    // 1. Initialize Globals immediately
     window.urlParams = new URLSearchParams(window.location.search);
     window.USERID = window.urlParams.get('i');
-    window.supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
 
-    // Define Utilities ONCE
-    window.showSpinnerModal = () => document.getElementById('spinnerModal').style.display = 'flex';
-    window.hideSpinnerModal = () => document.getElementById('spinnerModal').style.display = 'none';
+    // Create the client and attach to window
+    const supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+    window.supabase = supabase;
 
-    // Run all initializers ONLY after the DOM is fully loaded
+    // 2. Define Utilities
+    window.showSpinnerModal = () => {
+      const el = document.getElementById('spinnerModal');
+      if (el) el.style.display = 'flex';
+    };
+    window.hideSpinnerModal = () => {
+      const el = document.getElementById('spinnerModal');
+      if (el) el.style.display = 'none';
+    };
+
+    // 3. Run Initializers
     document.addEventListener('DOMContentLoaded', async () => {
       try {
+        // Check session/site status first (from website.js)
+        if (window.checkSiteAndAccountStatus) await window.checkSiteAndAccountStatus();
+
+        // Initialize standard logic
         if (window.initAdminLogicRealtime) await window.initAdminLogicRealtime();
         if (window.initUserRealtime) await window.initUserRealtime();
-        if (window.initApprovalsRealtime) await window.initApprovalsRealtime();
-        if (window.initAIHistoryLogic) await window.initAIHistoryLogic();
-        // THIS LINE ALREADY CALLS THE FORM LISTENER INTERNALLY
-        if (window.initHistoryRealtime) await window.initHistoryRealtime();
 
+        // 🔥 CALL DELETE LOGIC HERE (Now that window.supabase is active)
+        if (window.initDeleteUserLogic) window.initDeleteUserLogic();
+
+        // Initialize remaining UI components
         if (window.initAdminChat) await window.initAdminChat();
         if (window.initNoteLogic) window.initNoteLogic();
-        // Initialize shared form listeners
         if (window.initFormListeners) window.initFormListeners();
-        if (window.initApprovalFormListeners) window.initApprovalFormListeners();
 
-        // REMOVE OR COMMENT OUT THIS LINE:
-        // if (window.initHistoryFormListener) window.initHistoryFormListener();
+        console.log("🚀 Profile Dashboard Fully Loaded");
 
       } catch (err) {
         console.error("Startup Error:", err);
