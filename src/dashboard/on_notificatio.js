@@ -66,55 +66,84 @@ NOTIF_BTN.addEventListener('click', async () => {
     }
 });
 
-async function handleEnable(user) {
+/**
+ * src/admin/profile/account/on_notification.js
+ * Updated with Version Lock check
+ */
+
+async function handleEnable() {
+    // 1. VERSION LOCK CHECK
     try {
         if (typeof showSpinnerModal === 'function') showSpinnerModal();
 
-        // 1. iOS Standalone check (Leave as is)
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-        const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+        const { data: admin, error: adminErr } = await window.supabase
+            .from('admin')
+            .select('admin_full_version')
+            .eq('id', 1)
+            .single();
 
-        if (isMobile && !isStandalone) {
+        if (adminErr || !admin?.admin_full_version) {
             if (typeof hideSpinnerModal === 'function') hideSpinnerModal();
-            return Swal.fire({ icon: 'info', title: 'PWA Required', text: 'Please add to Home Screen.' });
+            return Swal.fire({
+                title: 'Upgrade Required',
+                text: 'Notifications are not available at the moment. Please upgrade to the full version.',
+                icon: 'warning',
+                background: '#0c1e29ff',
+                color: '#fff',
+                confirmButtonColor: '#1067b9ff'
+            });
         }
+    } catch (e) {
+        console.error("Version check failed:", e);
+    }
 
-        // 2. THE KICKSTART: Get registration manually if .ready is stuck
-        let registration = await navigator.serviceWorker.getRegistration();
+    // 2. PROCEED WITH REGISTRATION IF FULL VERSION
+    try {
+        const registration = await navigator.serviceWorker.ready;
 
-        if (!registration) {
-            // Re-register if it somehow vanished
-            registration = await navigator.serviceWorker.register('/sw.js');
-        }
-
-        // 3. Request Permission (iOS MUST have this before subscription)
+        // Check for existing permission
         const permission = await Notification.requestPermission();
         if (permission !== 'granted') {
             if (typeof hideSpinnerModal === 'function') hideSpinnerModal();
-            return Swal.fire("Permission Denied", "Enable notifications in iOS Settings.", "error");
+            Swal.fire({
+                title: "Permission Denied",
+                text: "Please enable notifications in your browser settings.",
+                icon: "error",
+                background: '#0c1f29ff', color: '#fff'
+            });
+            return;
         }
 
-        // 4. Subscribe with a slight delay to let iOS UI catch up
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        const subscription = await registration.pushManager.subscribe({
+        const sub = await registration.pushManager.subscribe({
             userVisibleOnly: true,
             applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
         });
 
-        // 5. Database Sync
-        const deviceId = window.getOrCreateDeviceId ? window.getOrCreateDeviceId() : localStorage.getItem('device_id');
-        const { error } = await supabase.from('notification_subscribers').upsert({
-            uuid: user.uuid,
-            device_id: deviceId,
-            subscribers: JSON.parse(JSON.stringify(subscription))
+        // Use the global USERID established in profile.html
+        const targetUuid = window.USERID;
+        let deviceID = localStorage.getItem('device_id');
+        if (!deviceID) {
+            deviceID = 'dev_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('device_id', deviceID);
+        }
+
+        const { error } = await window.supabase.from('notification_subscribers').upsert({
+            uuid: targetUuid,
+            device_id: deviceID,
+            subscribers: JSON.parse(JSON.stringify(sub))
         });
 
         if (error) throw error;
 
         updateButtonUI(true);
         if (typeof hideSpinnerModal === 'function') hideSpinnerModal();
-        Swal.fire({ icon: 'success', title: 'Enabled!' });
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Notifications Enabled!',
+            background: '#0c2029ff',
+            color: '#fff'
+        });
 
     } catch (err) {
         if (typeof hideSpinnerModal === 'function') hideSpinnerModal();
@@ -150,7 +179,7 @@ async function handleDisable(silent = false) {
                 icon: 'success',
                 title: 'Disabled',
                 text: 'Notifications turned off for this device.',
-                background: '#0C290F', color: '#fff'
+                background: '#0c2129ff', color: '#fff'
             });
         }
     } catch (err) {
