@@ -20,43 +20,6 @@
 
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-</head>
-
-<body>
-    <!-- Loader -->
-    <div class="loader"></div>
-    <div class="text">OnFlex</div>
-
-    <script>
-        (function authGuard() {
-            // 1. Attempt to retrieve the local session
-            const sessionRaw = localStorage.getItem('user_session');
-
-            if (sessionRaw) {
-                try {
-                    const sessionData = JSON.parse(sessionRaw);
-
-                    // 2. Validate session structure (ensuring it's not empty or corrupted)
-                    if (sessionData && sessionData.uuid) {
-                        console.log("Active session found for:", sessionData.fullName);
-
-                        // Redirect to dashboard immediately
-                        window.location.replace("./dashboard/index.html");
-                        return;
-                    }
-                } catch (e) {
-                    console.error("Session corrupted, clearing storage.");
-                    localStorage.removeItem('user_session');
-                }
-            }
-
-            // 3. No session or invalid session: Redirect to login after a tiny splash delay
-            // You can adjust the 1500ms to match your splash animation length
-            setTimeout(() => {
-                window.location.replace("./login/index.html");
-            }, 1500);
-        })();
-    </script>
 
     <style>
         /* Loader & background */
@@ -175,6 +138,45 @@
             background-color: #00313d;
         }
     </style>
+</head>
+
+<body>
+    <!-- Loader -->
+    <div class="loader"></div>
+    <div class="text">OnFlex</div>
+
+    <script>
+        (function authGuard() {
+            // 1. Attempt to retrieve the local session
+            const sessionRaw = localStorage.getItem('user_session');
+
+            if (sessionRaw) {
+                try {
+                    const sessionData = JSON.parse(sessionRaw);
+
+                    // 2. Validate session structure (ensuring it's not empty or corrupted)
+                    if (sessionData && sessionData.uuid) {
+                        console.log("Active session found for:", sessionData.fullName);
+
+                        // Redirect to dashboard immediately
+                        window.location.replace("./dashboard/index.html");
+                        return;
+                    }
+                } catch (e) {
+                    console.error("Session corrupted, clearing storage.");
+                    localStorage.removeItem('user_session');
+                }
+            }
+
+            // 3. No session or invalid session: Redirect to login after a tiny splash delay
+            // You can adjust the 1500ms to match your splash animation length
+            setTimeout(() => {
+                window.location.replace("./login/index.html");
+            }, 1500);
+        })();
+    </script>
+
+
 </body>
 
 </html>
