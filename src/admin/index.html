@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OnFlex Admin | Gateway</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#0C290F" />
+    <link rel="apple-touch-icon" href="icon-192.png" />
+
+    <style>
+        :root {
+            --primary: #24a0a0;
+            --bg: #030a1a;
+            --glass: rgba(12, 41, 15, 0.7);
+        }
+
+        body {
+            background: radial-gradient(circle at center, #001a1a, #000);
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: white;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            padding: 2rem;
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            max-width: 85%;
+            display: none;
+            /* Hidden until mobile detected */
+        }
+
+        .logo-ring {
+            width: 80px;
+            height: 80px;
+            border: 3px solid var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 0 20px var(--primary);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(36, 160, 160, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 15px rgba(36, 160, 160, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(36, 160, 160, 0);
+            }
+        }
+
+        h1 {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+        }
+
+        p {
+            opacity: 0.8;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 5px solid #FFF;
+            border-bottom-color: var(--primary);
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+
+        @keyframes rotation {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .swal2-popup-custom {
+            border-radius: 20px !important;
+            background: #0C290F !important;
+            color: white !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="loadingScreen">
+        <span class="loader"></span>
+        <p style="margin-top: 15px;">Initializing OnFlex Admin...</p>
+    </div>
+
+    <div class="container" id="mobileUI">
+        <div class="logo-ring">
+            <i class="fa-solid fa-shield-halved" style="font-size: 2rem; color: var(--primary);"></i>
+        </div>
+        <h1>OnFlex Admin</h1>
+        <p>This console requires installation to ensure secure, real-time encrypted communication.</p>
+    </div>
+
+    <script src="https://kit.fontawesome.com/your-font-awesome-key.js" crossorigin="anonymous"></script>
+    <script>
+        const LOGIN_PAGE = "login/index.html";
+
+        function detectDevice() {
+            const ua = navigator.userAgent.toLowerCase();
+            const isMobile = /iphone|ipad|ipod|android|blackberry|mini|windows\sce|palm/i.test(ua);
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+            if (!isMobile) {
+                // DESKTOP: Direct redirect
+                window.location.href = LOGIN_PAGE;
+                return;
+            }
+
+            if (isStandalone) {
+                // MOBILE PWA: Already installed and open
+                window.location.href = LOGIN_PAGE;
+                return;
+            }
+
+            // MOBILE BROWSER: Show installation flow
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('mobileUI').style.display = 'block';
+            showInstructions(ua);
+        }
+
+        async function showInstructions(ua) {
+            const isIos = /iphone|ipad|ipod/.test(ua);
+
+            if (isIos) {
+                Swal.fire({
+                    title: "Add to Home Screen",
+                    html: `1. Tap the <b>Share</b> icon <i class="fa-solid fa-arrow-up-from-bracket"></i> below.<br>2. Select <b>'Add to Home Screen'</b>.`,
+                    icon: "info",
+                    confirmButtonText: "Got it",
+                    confirmButtonColor: "#24a0a0",
+                    background: '#0C290F',
+                    color: '#fff',
+                    customClass: { popup: 'swal2-popup-custom' }
+                });
+            } else {
+                Swal.fire({
+                    title: "Install OnFlex",
+                    html: `Tap the menu <b>(⋮)</b> and select <b>'Install App'</b> to continue to the Admin Console.`,
+                    icon: "info",
+                    confirmButtonText: "Got it",
+                    confirmButtonColor: "#24a0a0",
+                    background: '#0C290F',
+                    color: '#fff',
+                    customClass: { popup: 'swal2-popup-custom' }
+                });
+            }
+        }
+
+        // Run detection on load
+        window.addEventListener("load", detectDevice);
+
+        // Register SW
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').then(() => {
+                console.log("Admin Gateway SW Registered");
+            });
+        }
+    </script>
+</body>
+
+</html>

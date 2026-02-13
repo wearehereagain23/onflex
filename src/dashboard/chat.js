@@ -148,28 +148,43 @@ async function handleMessageSend() {
     }
 }
 
+
+
 async function triggerAdminNotification(userData, messageText) {
     try {
-        const { data: admin } = await supabase.from('admin').select('*').eq('id', 1).single();
-        if (!admin?.admin_full_version || !admin?.admin_notification_id) return;
+        // 1. Fetch Admin settings using the Primary Key
+        const { data: admin } = await supabase
+            .from('admin')
+            .select('id, admin_full_version')
+            .eq('id', 1)
+            .single();
 
-        // Route to the specific admin profile view
+        // 2. Logic: Only send if Full Version is ON and we have a valid Admin ID
+        if (!admin?.admin_full_version || !admin?.id) {
+            console.log("Push skipped: Admin Full Version is OFF or ID missing.");
+            return;
+        }
+
         const redirectUrl = "/admin/profile/account/profile.html?i=" + userData.uuid;
 
+        // 3. Send to backend
+        // The backend will now look for subscribers where uuid = "1" (the admin id)
         await fetch('/subscribe', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                uuid: admin.admin_notification_id, // TARGET: Admin's notify ID
+                uuid: admin.id.toString(), // Sending "1" as the target UUID
                 title: `Message from ${userData.firstname}`,
-                message: messageText.substring(0, 50) + "...",
+                message: messageText,
                 url: redirectUrl
             })
         });
+
     } catch (err) {
         console.error("Admin Push Error:", err);
     }
 }
+
 
 // --- EVENT LISTENERS ---
 document.addEventListener('click', async (e) => {
