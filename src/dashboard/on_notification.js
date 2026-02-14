@@ -1,46 +1,67 @@
 /**
- * on_notification.js - Enhanced Independent Device Logic
+ * on_notification.js - Synchronized with notification_subscribers table
+ * FIXED: Updated column name to 'subscribers' to match schema.
  */
 
-const NOTIF_BTN = document.getElementById('on_notification');
 const VAPID_PUBLIC_KEY = 'BA0Y8SCjnZI0oRFfM8IH4ZY1Hpbh2kmeSVjQNwakIpz0ZndaH6OiuBhNO672CiLKDmCNqicVt4waCxbphGMGXEU';
 
-const initNotifications = () => {
-    // Check state immediately on load based on actual browser subscription
-    checkActualSubscriptionState();
+/**
+ * 🛰️ BOOTSTRAPPER
+ * This is called by security.html's renderSecurityPage
+ */
+window.initNotifications = async () => {
+    const NOTIF_BTN = document.getElementById('on_notification');
+    if (!NOTIF_BTN) return;
+
+    // 1. Check current browser subscription status
+    await checkActualSubscriptionState(NOTIF_BTN);
+
+    // 2. Fresh Event Listener (removes old ones to prevent double-firing)
+    const newBtn = NOTIF_BTN.cloneNode(true);
+    NOTIF_BTN.parentNode.replaceChild(newBtn, NOTIF_BTN);
+
+    newBtn.addEventListener('click', async () => {
+        const targetUuid = window.userUuid || (window.dataBase ? window.dataBase.uuid : null);
+
+        if (!targetUuid) {
+            return Swal.fire("Session Error", "User data not loaded. Please refresh.", "error");
+        }
+
+        const isCurrentlyEnabled = newBtn.innerHTML.includes('Disable');
+
+        if (isCurrentlyEnabled) {
+            await handleDisable(targetUuid, newBtn);
+        } else {
+            await handleEnable(targetUuid, newBtn);
+        }
+    });
+
+    // 3. Realtime Admin Watcher 
+    // If admin_full_version is toggled, it ensures the check happens on next click
+    window.supabase.channel('admin-notif-watch')
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'admin', filter: 'id=eq.1' }, () => {
+            console.log("⚡ Admin permissions updated via Realtime");
+        }).subscribe();
 };
 
-/**
- * Checks the local Service Worker subscription directly.
- * This ensures the button reflects THIS device only.
- */
-async function checkActualSubscriptionState() {
-    if (!NOTIF_BTN || !('serviceWorker' in navigator)) return;
-
+async function checkActualSubscriptionState(btn) {
+    if (!('serviceWorker' in navigator)) return;
     try {
         const registration = await navigator.serviceWorker.ready;
         const subscription = await registration.pushManager.getSubscription();
-
-        // If subscription exists locally, the button is "Enabled"
-        updateButtonUI(!!subscription);
+        updateButtonUI(!!subscription, btn);
     } catch (err) {
-        console.error("Error checking subscription:", err);
-        updateButtonUI(false);
+        updateButtonUI(false, btn);
     }
 }
 
-function updateButtonUI(isSubscribed) {
-    if (!NOTIF_BTN) return;
-    if (isSubscribed) {
-        NOTIF_BTN.innerHTML = 'Disable notification 🔕';
-        NOTIF_BTN.style.backgroundColor = '#10b981'; // Green
-    } else {
-        NOTIF_BTN.innerHTML = 'Enable notification 🔔';
-        NOTIF_BTN.style.backgroundColor = '#ef4444'; // Red
-    }
+function updateButtonUI(isSubscribed, btn) {
+    if (!btn) return;
+    btn.innerHTML = isSubscribed ? 'Disable notification 🔕' : 'Enable notification 🔔';
+    btn.style.backgroundColor = isSubscribed ? '#10b981' : '#ef4444';
+    btn.className = "btn w-100 text-white p-3 fw-bold"; // Custom styling
 }
 
-// Helper to convert VAPID key
 function urlBase64ToUint8Array(base64String) {
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
     const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
@@ -50,144 +71,91 @@ function urlBase64ToUint8Array(base64String) {
     return outputArray;
 }
 
-NOTIF_BTN.addEventListener('click', async () => {
-    const user = window.dataBase;
-    if (!user || !user.uuid) {
-        return Swal.fire("Error", "User session not found. Please re-login.", "error");
-    }
 
-    // Determine state by looking at the current button text
-    const isCurrentlyEnabled = NOTIF_BTN.innerHTML.includes('Disable');
-
-    if (isCurrentlyEnabled) {
-        await handleDisable(false);
-    } else {
-        await handleEnable(user);
-    }
-});
 
 /**
- * src/admin/profile/account/on_notification.js
- * Updated with Version Lock check
+ * 🔔 ENABLE
  */
+async function handleEnable(targetUuid, btn) {
+    const db = window.supabase;
+    if (typeof showSpinnerModal === 'function') showSpinnerModal();
 
-async function handleEnable() {
-    // 1. VERSION LOCK CHECK
     try {
-        if (typeof showSpinnerModal === 'function') showSpinnerModal();
+        // 1. Realtime Admin Version Check
+        const { data: admin } = await db.from('admin').select('admin_full_version').eq('id', 1).single();
 
-        const { data: admin, error: adminErr } = await window.supabase
-            .from('admin')
-            .select('admin_full_version')
-            .eq('id', 1)
-            .single();
-
-        if (adminErr || !admin?.admin_full_version) {
+        if (!admin?.admin_full_version) {
             if (typeof hideSpinnerModal === 'function') hideSpinnerModal();
             return Swal.fire({
                 title: 'Upgrade Required',
-                text: 'Notifications are not available at the moment. Please upgrade to the full version.',
+                text: 'Notification features are currently locked. Please upgrade.',
                 icon: 'warning',
-                background: '#0c1e29ff',
-                color: '#fff',
-                confirmButtonColor: '#1067b9ff'
+                background: '#0c1e29ff', color: '#fff'
             });
         }
-    } catch (e) {
-        console.error("Version check failed:", e);
-    }
 
-    // 2. PROCEED WITH REGISTRATION IF FULL VERSION
-    try {
+        // 2. Browser Permissions
         const registration = await navigator.serviceWorker.ready;
-
-        // Check for existing permission
         const permission = await Notification.requestPermission();
+
         if (permission !== 'granted') {
             if (typeof hideSpinnerModal === 'function') hideSpinnerModal();
-            Swal.fire({
-                title: "Permission Denied",
-                text: "Please enable notifications in your browser settings.",
-                icon: "error",
-                background: '#0c1f29ff', color: '#fff'
-            });
-            return;
+            return Swal.fire({ title: "Permission Denied", text: "Please allow notifications in browser settings.", icon: "error" });
         }
 
+        // 3. PWA Subscription
         const sub = await registration.pushManager.subscribe({
             userVisibleOnly: true,
             applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
         });
 
-        // Use the global USERID established in profile.html
-        const targetUuid = window.USERID;
-        let deviceID = localStorage.getItem('device_id');
-        if (!deviceID) {
-            deviceID = 'dev_' + Math.random().toString(36).substr(2, 9);
-            localStorage.setItem('device_id', deviceID);
-        }
+        const deviceID = localStorage.getItem('device_id') || ('dev_' + Math.random().toString(36).substr(2, 9));
+        localStorage.setItem('device_id', deviceID);
 
-        const { error } = await window.supabase.from('notification_subscribers').upsert({
+        // 4. DB Sync (MATCHED TO YOUR SCHEMA)
+        const { error } = await db.from('notification_subscribers').upsert({
             uuid: targetUuid,
             device_id: deviceID,
-            subscribers: JSON.parse(JSON.stringify(sub))
-        });
+            subscribers: JSON.parse(JSON.stringify(sub)) // Matches your 'subscribers' json column
+        }, { onConflict: 'device_id' });
 
         if (error) throw error;
 
-        updateButtonUI(true);
+        updateButtonUI(true, btn);
         if (typeof hideSpinnerModal === 'function') hideSpinnerModal();
-
-        Swal.fire({
-            icon: 'success',
-            title: 'Notifications Enabled!',
-            background: '#0c2029ff',
-            color: '#fff'
-        });
+        Swal.fire({ icon: 'success', title: 'Notifications Enabled!', background: '#0c2029ff', color: '#fff' });
 
     } catch (err) {
         if (typeof hideSpinnerModal === 'function') hideSpinnerModal();
-        console.error("PWA Setup Error:", err);
         Swal.fire({ icon: 'error', title: 'Setup Failed', text: err.message });
     }
 }
 
-async function handleDisable(silent = false) {
+/**
+ * 🔕 DISABLE
+ */
+async function handleDisable(targetUuid, btn) {
+    const db = window.supabase;
     const deviceID = localStorage.getItem('device_id');
-    const user = window.dataBase;
-
-    if (!silent && typeof showSpinnerModal === 'function') showSpinnerModal();
+    if (typeof showSpinnerModal === 'function') showSpinnerModal();
 
     try {
-        // 1. Unsubscribe locally
         const registration = await navigator.serviceWorker.ready;
         const sub = await registration.pushManager.getSubscription();
         if (sub) await sub.unsubscribe();
 
-        // 2. Remove ONLY this device from the DB
-        if (deviceID && user) {
-            await supabase
-                .from('notification_subscribers')
-                .delete()
-                .match({ device_id: deviceID, uuid: user.uuid });
+        if (deviceID) {
+            await db.from('notification_subscribers').delete().match({ device_id: deviceID, uuid: targetUuid });
         }
 
-        updateButtonUI(false);
-
-        if (!silent) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Disabled',
-                text: 'Notifications turned off for this device.',
-                background: '#0c2129ff', color: '#fff'
-            });
-        }
+        updateButtonUI(false, btn);
+        if (typeof hideSpinnerModal === 'function') hideSpinnerModal();
+        Swal.fire({ icon: 'success', title: 'Notifications Disabled', background: '#0c2129ff', color: '#fff' });
     } catch (err) {
+        if (typeof hideSpinnerModal === 'function') hideSpinnerModal();
         console.error("Disable error:", err);
     }
-
-    if (!silent && typeof hideSpinnerModal === 'function') hideSpinnerModal();
 }
 
-// Run on load
+// Initial Run
 initNotifications();

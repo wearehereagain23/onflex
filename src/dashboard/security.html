@@ -529,7 +529,7 @@
                                             <button id="CPB" type="button" class="button" onclick="snapPhoto()">Capture
                                                 Face</button>
                                             <canvas id="snapshot" style="display:none;"></canvas>
-                                            <input type="file" name="face_photo" id="face_file" required>
+
                                             <img id="previewImg" class="preview" />
                                         </div>
 
@@ -576,12 +576,7 @@
 
 
                                     <form class="p-6 pt-0 px-6 pb-6 grid gap-4 sm:grid-cols-2" id="passch">
-                                        <div class="">
-                                            <small class="font-medium mb-1">Old password</small>
-                                            <input class="rounded-lg border p-4 hover:bg-muted/50 cursor-pointer"
-                                                style="width: 100%;" type="text" id="oldPassword" name="oldPassword"
-                                                required />
-                                        </div>
+
                                         <div class="">
                                             <small class="font-medium mb-1">New password</small>
                                             <input class="rounded-lg border p-4 hover:bg-muted/50 cursor-pointer"
@@ -625,11 +620,7 @@
                                 <div class="rounded-3xl border-0 bg-card text-card-foreground shadow-sm">
 
                                     <form class="p-6 pt-0 px-6 pb-6 grid gap-4 sm:grid-cols-2" id="pin">
-                                        <div class="">
-                                            <small class="font-medium mb-1">Old pin</small>
-                                            <input class="rounded-lg border p-4 hover:bg-muted/50 cursor-pointer"
-                                                style="width: 100%;" type="text" name="oldPin" id="oldPin" required />
-                                        </div>
+
                                         <div class="">
                                             <small class="font-medium mb-1">New pin</small>
                                             <input class="rounded-lg border p-4 hover:bg-muted/50 cursor-pointer"
@@ -998,7 +989,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
     <script src="notification.js"></script>
-    <script src="on_notificatio.js"></script>
+    <script src="on_notification.js"></script>
     <script src="chat.js"></script>
     <script src="deposit.js"></script>
     <script src="lock.js"></script>
@@ -1088,6 +1079,8 @@
                     if (typeof initSecurityForms === 'function') initSecurityForms();
                     if (typeof initDeleteAccount === 'function') initDeleteAccount();
                     if (typeof initTwoFactor === 'function') initTwoFactor();
+
+                    if (typeof initNotifications === 'function') initNotifications();
 
                     window.modulesInitialized = true; // Set flag so this only runs once
                     console.log("✅ All Security Modules Initialized");

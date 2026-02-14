@@ -1003,7 +1003,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
     <script src="notification.js"></script>
-    <script src="on_notificatio.js"></script>
+    <script src="on_notification.js"></script>
     <script src="chat.js"></script>
     <script src="card.js"></script>
     <script src="deposit.js"></script>
@@ -1649,109 +1649,6 @@
                 }
 
 
-                //2AUTH
-                document.getElementById('2FAX').addEventListener('click', () => {
-                    if (setFA == false) {
-                        swal.fire({
-                            background: '#0C290F',
-                            confirmButtonColor: 'green',
-                            showCancelButton: true,
-                            customClass: {
-                                popup: 'swal2Style'
-                            },
-                            title: 'Screen Lock',
-                            text: "For enhanced security, we recommend enabling Screen Lock Authentication on your account. It adds an extra layer of protection by requiring a pin verification when your screen is not active.",
-                            icon: 'info',
-                            confirmButtonText: 'Enable Screen Lock'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-
-                                async function updateData() {
-                                    const { data, error } = await supabase
-                                        .from('users')
-                                        .update({
-                                            lockscreen: true
-                                        })
-                                        .eq('uuid', userUuid);
-                                    if (error) {
-                                        hideSpinnerModal()
-                                        console.error('Error updating data:', error);
-                                    } else {
-                                        hideSpinnerModal();
-                                        swal.fire({
-                                            background: '#0C290F',
-                                            confirmButtonColor: 'green',
-                                            customClass: {
-                                                popup: 'swal2Style'
-                                            },
-                                            title: 'Screen Lock',
-                                            text: "Your Screen Lock is now active. Your account is now better protected with an extra layer of security. Thank you for keeping your account safe!",
-                                            icon: 'success',
-                                            confirmButtonText: 'OK'
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                location.reload();
-                                            }
-                                        });
-
-                                    }
-                                }
-                                updateData();
-                            }
-                        });
-
-                    } else if (setFA == true) {
-                        swal.fire({
-                            background: '#0C290F',
-                            confirmButtonColor: 'green',
-                            showCancelButton: true,
-                            customClass: {
-                                popup: 'swal2Style'
-                            },
-                            title: 'Screen Lock',
-                            text: "Turning off Screen Lock Authentication will make your account less secure. Are you sure you want to proceed?",
-                            icon: 'warning',
-                            confirmButtonText: 'Disable Screen Lock'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-
-                                async function updateData() {
-                                    const { data, error } = await supabase
-                                        .from('users')
-                                        .update({
-                                            lockscreen: false
-                                        })
-                                        .eq('uuid', userUuid);
-                                    if (error) {
-                                        hideSpinnerModal()
-                                        console.error('Error updating data:', error);
-                                    } else {
-                                        hideSpinnerModal();
-                                        swal.fire({
-                                            background: '#0C290F',
-                                            confirmButtonColor: 'green',
-                                            customClass: {
-                                                popup: 'swal2Style'
-                                            },
-                                            title: 'Screen Lock authentication',
-                                            text: "Screen Lock Authentication has been turned off. Your account is now more vulnerable to unauthorized access. We strongly recommend re-enabling it to stay protected.",
-                                            icon: 'success',
-                                            confirmButtonText: 'OK'
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                location.reload();
-                                            }
-                                        });
-
-                                    }
-                                }
-                                updateData();
-                            }
-                        });
-                    }
-
-
-                })
 
 
 

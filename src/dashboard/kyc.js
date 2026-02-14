@@ -1,33 +1,46 @@
 /**
- * kyc.js - Realtime Integrated Camera, Modal, and Upload Logic
+ * kyc.js - Final Matched Logic
  */
-var fi = null; // Global variable to store the captured face image file
+var fi = null;
 
 window.initKYC = function () {
     const modal = document.getElementById('kycModal');
     const steps = document.querySelectorAll('.step');
     const indicators = document.querySelectorAll('.progress-step');
-    const buttons = document.querySelectorAll('.buttons .button');
+    const KYCForm = document.getElementById('KYCForm');
     const video = document.getElementById('camera');
     const canvas = document.getElementById('snapshot');
     const previewImg = document.getElementById('previewImg');
-    const faceFile = document.getElementById('face_file');
+    const sspContainer = document.getElementById('ssp');
+
+    // Identify navigation buttons
+    const btnNext = document.querySelector('button[onclick="nextStep()"]');
+    const btnPrev = document.querySelector('button[onclick="prevStep()"]');
 
     let stream = null;
     let currentStep = 0;
 
-    // --- STEP NAVIGATION ---
+    // --- 1. EXPOSE NAVIGATION TO WINDOW ---
     window.showStep = (index) => {
-        if (!steps.length) return;
         steps.forEach((step, i) => step.classList.toggle('active', i === index));
         indicators.forEach((el, i) => el.classList.toggle('active', i === index));
-
-        if (buttons.length >= 3) {
-            buttons[0].style.display = index === 0 ? 'none' : 'inline-block';
-            buttons[1].style.display = index < steps.length - 1 ? 'inline-block' : 'none';
-            buttons[2].style.display = index === steps.length - 1 ? 'inline-block' : 'none';
-        }
         currentStep = index;
+
+        // --- BUTTON VISIBILITY LOGIC ---
+        // Hide Previous on first step
+        if (btnPrev) btnPrev.style.display = (index === 0) ? 'none' : 'inline-block';
+
+        // HIDE NEXT ON LAST STEP (Step 2)
+        if (btnNext) {
+            btnNext.style.display = (index === steps.length - 1) ? 'none' : 'inline-block';
+        }
+
+        // Camera trigger for Step 2
+        if (index === 2) {
+            window.startCamera();
+        } else {
+            window.stopCamera();
+        }
     };
 
     window.nextStep = () => {
@@ -35,23 +48,17 @@ window.initKYC = function () {
         for (const input of inputs) {
             if (!input.checkValidity()) return input.reportValidity();
         }
-
         if (currentStep < steps.length - 1) {
-            currentStep++;
-            window.showStep(currentStep);
-            if (currentStep === 2) window.startCamera();
+            window.showStep(currentStep + 1);
         }
     };
 
     window.prevStep = () => {
         if (currentStep > 0) {
-            currentStep--;
-            window.showStep(currentStep);
-            if (currentStep !== 2) window.stopCamera();
+            window.showStep(currentStep - 1);
         }
     };
 
-    // --- MODAL CONTROLS ---
     window.openModal = () => {
         if (modal) {
             modal.style.display = 'flex';
@@ -66,13 +73,13 @@ window.initKYC = function () {
         }
     };
 
-    // --- CAMERA LOGIC ---
+    // --- 2. CAMERA & PHOTO ---
     window.startCamera = async () => {
         try {
             stream = await navigator.mediaDevices.getUserMedia({ video: true });
             if (video) video.srcObject = stream;
         } catch (err) {
-            alert("Camera access denied: " + err);
+            console.error("Camera access denied", err);
         }
     };
 
@@ -88,95 +95,76 @@ window.initKYC = function () {
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         canvas.getContext('2d').drawImage(video, 0, 0);
+
         canvas.toBlob(blob => {
             fi = new File([blob], 'face_snapshot.png', { type: 'image/png' });
-            if (previewImg) previewImg.src = URL.createObjectURL(blob);
-            const cpb = document.getElementById('CPB');
-            if (cpb) cpb.innerHTML = "Re-Capture Face";
-            document.getElementById('ssp')?.classList.remove('hider');
-        });
+            if (previewImg) {
+                previewImg.src = URL.createObjectURL(blob);
+                previewImg.style.display = 'block';
+            }
+            document.getElementById('CPB').innerText = "Re-Capture Face";
+
+            // Show the hidden submit button container
+            if (sspContainer) {
+                sspContainer.style.display = 'block';
+                const subBtn = sspContainer.querySelector('button[type="submit"]');
+                if (subBtn) subBtn.style.display = 'inline-block';
+            }
+        }, 'image/png');
     };
 
-    // --- SUBMISSION LOGIC (REALTIME) ---
-    const KYCForm = document.getElementById('KYCForm');
-    KYCForm?.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        if (typeof showSpinnerModal === 'function') showSpinnerModal();
+    // --- 3. SUBMISSION ---
+    KYCForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!fi) return Swal.fire("Required", "Please capture your face photo.", "warning");
 
+        if (typeof showSpinnerModal === 'function') showSpinnerModal();
         const db = window.supabase;
         const userUuid = window.userUuid;
         const formData = new FormData(KYCForm);
 
         try {
-            // 1. Prepare Data for Update
-            const updatePayload = {
+            const upload = async (file, name) => {
+                const path = `kyc/${userUuid}_${name}_${Date.now()}.png`;
+                await db.storage.from('profileimages').upload(path, file);
+                return db.storage.from('profileimages').getPublicUrl(path).data.publicUrl;
+            };
+
+            const [url1, url2, url3] = await Promise.all([
+                upload(formData.get('imageUpload'), 'id'),
+                upload(formData.get('imageUpload2'), 'bill'),
+                upload(fi, 'face')
+            ]);
+
+            const payload = {
                 occupation: formData.get('occupation'),
                 phone: formData.get('phoneNumber'),
                 marital_status: formData.get('marital_status'),
                 zipcode: formData.get('postal_code'),
                 address: formData.get('home_address'),
-                kin_email: formData.get('kin_email'),
                 kinname: formData.get('kin'),
-                kyc: 'pending', // Update status to pending instantly
+                kin_email: formData.get('kin_email'),
+                kyc: 'pending',
+                KYC_image1: url1, KYC_image2: url2, KYC_image3: url3
             };
 
-            // 2. Perform Supabase Update
-            const { error: updateError } = await db.from('users')
-                .update(updatePayload)
-                .eq('uuid', userUuid);
+            await db.from('users').update(payload).eq('uuid', userUuid);
 
-            if (updateError) throw updateError;
-
-            // 3. Handle File Upload if exists
-            let finalImageUrl = window.dataBase.KYC_image3;
-            if (fi) {
-                const filePath = `kyc/${userUuid}_${Date.now()}.png`;
-                const { error: uploadError } = await db.storage
-                    .from('profileimages')
-                    .upload(filePath, fi);
-
-                if (uploadError) throw uploadError;
-
-                const { data: urlData } = db.storage.from('profileimages').getPublicUrl(filePath);
-                finalImageUrl = urlData.publicUrl;
-
-                await db.from('users')
-                    .update({ KYC_image3: finalImageUrl })
-                    .eq('uuid', userUuid);
-            }
-
-            // 4. REALTIME STATE UPDATE
-            // Instead of reloading, we merge the new data into the global object
             if (window.dataBase) {
-                Object.assign(window.dataBase, updatePayload);
-                window.dataBase.KYC_image3 = finalImageUrl;
-
-                // 5. BROADCAST THE UPDATE
-                // This triggers renderSecurityPage() in security.html instantly
+                Object.assign(window.dataBase, payload);
                 window.dispatchEvent(new CustomEvent('userDataUpdated'));
             }
 
             if (typeof hideSpinnerModal === 'function') hideSpinnerModal();
             window.closeModal();
-
-            Swal.fire({
-                icon: 'success',
-                title: 'KYC Submitted',
-                text: 'Your information is being reviewed.',
-                background: '#0C290F',
-                color: '#fff'
-            });
+            Swal.fire({ icon: 'success', title: 'Submitted', background: '#0c1e29ff', color: '#fff' });
 
         } catch (err) {
-            console.error("KYC Error:", err);
             if (typeof hideSpinnerModal === 'function') hideSpinnerModal();
-            Swal.fire({
-                icon: 'error',
-                title: 'Submission Failed',
-                text: err.message,
-                background: '#0C290F',
-                color: '#fff'
-            });
+            Swal.fire("Error", err.message, "error");
         }
     });
 };
+
+// Initialize
+initKYC();

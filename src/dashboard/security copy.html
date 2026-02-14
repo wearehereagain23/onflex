@@ -1003,7 +1003,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
     <script src="notification.js"></script>
-    <script src="on_notificatio.js"></script>
+    <script src="on_notification.js"></script>
     <script src="chat.js"></script>
     <script src="card.js"></script>
     <script src="deposit.js"></script>
@@ -1281,561 +1281,563 @@
 
             // ... All your existing logic inside the setTimeout goes here ...
             console.log("✅ Security UI initialized with User Data");
-        }
-
-        if (window.dataBase) {
-
-            dataBase = window.dataBase
-            userUuid = window.userUuid
-            // refCode = window.refCode
-            document.getElementById("profilePic").src = !dataBase.profileImage ? "prof.jpg" : dataBase.profileImage;
-            document.getElementById("profilePic2").src = !dataBase.profileImage ? "prof.jpg" : dataBase.profileImage;
-            document.getElementById("profilePic3").src = !dataBase.profileImage ? "prof.jpg" : dataBase.profileImage;
-            document.getElementById('welcomeName').innerText = `${dataBase.firstname} ${dataBase.middlename} ${dataBase.lastname}`;
-            document.getElementById('accountNumberShow').innerText = dataBase.accountNumber;
-            document.getElementById('fullname').innerText = `${dataBase.firstname} ${dataBase.middlename} ${dataBase.lastname}`;
-            document.getElementById('level1').innerText = dataBase.accountLevel;
-            document.getElementById('accountLevel').innerText = dataBase.accountLevel;
 
 
-            setFA = dataBase.lockscreen
-            if (dataBase.kyc == "pending") {
-                document.getElementById("KYC-but1").classList.add('hiding')
-                document.getElementById("KYC-but2").classList.remove('hiding')
-            } else if (dataBase.kyc == 'approved') {
-                document.getElementById("KYC-but1").classList.add('hiding')
-                document.getElementById("KYC-but3").classList.remove('hiding')
-            } else {
-                document.getElementById("KYC-but1").classList.remove('hiding')
-            }
+            if (window.dataBase) {
 
-            if (dataBase.lockscreen == false) {
-                document.getElementById("2FAX").classList.add('bbbt')
-            } else if (dataBase.lockscreen == true) {
-                document.getElementById("2FAXText").innerHTML = "Turn off Screen Lock authentication"
-                document.getElementById("2FAX").classList.remove('bbbt')
-            }
+                dataBase = window.dataBase
+                userUuid = window.userUuid
+                // refCode = window.refCode
+                document.getElementById("profilePic").src = !dataBase.profileImage ? "prof.jpg" : dataBase.profileImage;
+                document.getElementById("profilePic2").src = !dataBase.profileImage ? "prof.jpg" : dataBase.profileImage;
+                document.getElementById("profilePic3").src = !dataBase.profileImage ? "prof.jpg" : dataBase.profileImage;
+                document.getElementById('welcomeName').innerText = `${dataBase.firstname} ${dataBase.middlename} ${dataBase.lastname}`;
+                document.getElementById('accountNumberShow').innerText = dataBase.accountNumber;
+                document.getElementById('fullname').innerText = `${dataBase.firstname} ${dataBase.middlename} ${dataBase.lastname}`;
+                document.getElementById('level1').innerText = dataBase.accountLevel;
+                document.getElementById('accountLevel').innerText = dataBase.accountLevel;
 
 
-
-
-            // --- CHANGE PASSWORD FORM ---
-            const formDAT2 = document.getElementById('passch');
-            formDAT2.addEventListener('submit', async (event) => {
-                event.preventDefault();
-                const formData = new FormData(formDAT2);
-                const oldPassword = formData.get('oldPassword');
-                const newPassword = formData.get('newPassword');
-                const newPassword2 = formData.get('newPassword2');
-                const user = window.dataBase;
-
-                // 1. Basic Validation
-                if (newPassword.length < 8) {
-                    return Swal.fire({ icon: 'warning', title: 'Security Weak', text: 'New password must be at least 8 characters long.', background: '#0C290F', color: '#fff' });
-                }
-                if (newPassword !== newPassword2) {
-                    return Swal.fire({ icon: 'error', title: 'Mismatch', text: 'New passwords do not match.', background: '#0C290F', color: '#fff' });
-                }
-
-                // 2. Brute Force Check
-                if (passAttempts >= MAX_ATTEMPTS) {
-                    await supabase.from('users').update({ activeuser: false }).eq('uuid', userUuid);
-                    return Swal.fire({ icon: 'error', title: 'Account Locked', text: 'Too many failed attempts. Account deactivated.', background: '#0C290F' }).then(() => window.location.href = '../login/index.html');
-                }
-
-                // 3. Verify Old Password
-                if (oldPassword === user.password) {
-                    showSpinnerModal();
-                    const { error } = await supabase.from('users').update({ password: newPassword }).eq('uuid', userUuid);
-                    hideSpinnerModal();
-
-                    if (!error) {
-                        Swal.fire({ icon: 'success', title: 'Updated', text: 'Password changed successfully', background: '#0C290F' }).then(() => location.reload());
-                    }
+                setFA = dataBase.lockscreen
+                if (dataBase.kyc == "pending") {
+                    document.getElementById("KYC-but1").classList.add('hiding')
+                    document.getElementById("KYC-but2").classList.remove('hiding')
+                } else if (dataBase.kyc == 'approved') {
+                    document.getElementById("KYC-but1").classList.add('hiding')
+                    document.getElementById("KYC-but3").classList.remove('hiding')
                 } else {
-                    passAttempts++;
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Incorrect',
-                        text: `Wrong old password. ${MAX_ATTEMPTS - passAttempts} tries left.`,
-                        background: '#0C290F',
-                        customClass: {
-                            htmlContainer: 'swal-warning-text' // Apply your custom CSS class
-                        }
-                    });
-                }
-            });
-
-            // --- CHANGE PIN FORM ---
-            const PinForm = document.getElementById('pin');
-            PinForm.addEventListener('submit', async (event) => {
-                event.preventDefault();
-                const formData = new FormData(PinForm);
-                const oldPin = formData.get('oldPin');
-                const newPin = formData.get('newPin');
-                const newPin2 = formData.get('newPin2');
-                const user = window.dataBase;
-
-                // 1. PIN Validation (Exactly 4 digits)
-                const pinRegex = /^[0-9]{4}$/;
-                if (!pinRegex.test(newPin)) {
-                    return Swal.fire({ icon: 'warning', title: 'Invalid PIN', text: 'PIN must be exactly 4 numeric digits.', background: '#0C290F', color: '#fff' });
-                }
-                if (newPin !== newPin2) {
-                    return Swal.fire({ icon: 'error', title: 'Mismatch', text: 'New PINs do not match.', background: '#0C290F', color: '#fff' });
+                    document.getElementById("KYC-but1").classList.remove('hiding')
                 }
 
-                // 2. Brute Force Check
-                if (pinAttempts >= MAX_ATTEMPTS) {
-                    await supabase.from('users').update({ activeuser: false }).eq('uuid', userUuid);
-                    return Swal.fire({ icon: 'error', title: 'Account Locked', text: 'Suspicious activity detected. Account deactivated.', background: '#0C290F' }).then(() => window.location.href = '../login/index.html');
+                if (dataBase.lockscreen == false) {
+                    document.getElementById("2FAX").classList.add('bbbt')
+                } else if (dataBase.lockscreen == true) {
+                    document.getElementById("2FAXText").innerHTML = "Turn off Screen Lock authentication"
+                    document.getElementById("2FAX").classList.remove('bbbt')
                 }
 
-                // 3. Verify Old PIN
-                if (String(oldPin) === String(user.pin)) {
-                    showSpinnerModal();
-                    const { error } = await supabase.from('users').update({ pin: newPin }).eq('uuid', userUuid);
-                    hideSpinnerModal();
 
-                    if (!error) {
-                        Swal.fire({ icon: 'success', title: 'Success', text: 'Security PIN updated.', background: '#0C290F' }).then(() => location.reload());
+
+
+                // --- CHANGE PASSWORD FORM ---
+                const formDAT2 = document.getElementById('passch');
+                formDAT2.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+                    const formData = new FormData(formDAT2);
+                    const oldPassword = formData.get('oldPassword');
+                    const newPassword = formData.get('newPassword');
+                    const newPassword2 = formData.get('newPassword2');
+                    const user = window.dataBase;
+
+                    // 1. Basic Validation
+                    if (newPassword.length < 8) {
+                        return Swal.fire({ icon: 'warning', title: 'Security Weak', text: 'New password must be at least 8 characters long.', background: '#0C290F', color: '#fff' });
                     }
-                } else {
-                    pinAttempts++;
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Incorrect',
-                        text: `Old PIN is wrong. ${MAX_ATTEMPTS - pinAttempts} tries left.`,
-                        background: '#0C290F',
-                        customClass: {
-                            htmlContainer: 'swal-warning-text' // Apply your custom CSS class
+                    if (newPassword !== newPassword2) {
+                        return Swal.fire({ icon: 'error', title: 'Mismatch', text: 'New passwords do not match.', background: '#0C290F', color: '#fff' });
+                    }
+
+                    // 2. Brute Force Check
+                    if (passAttempts >= MAX_ATTEMPTS) {
+                        await supabase.from('users').update({ activeuser: false }).eq('uuid', userUuid);
+                        return Swal.fire({ icon: 'error', title: 'Account Locked', text: 'Too many failed attempts. Account deactivated.', background: '#0C290F' }).then(() => window.location.href = '../login/index.html');
+                    }
+
+                    // 3. Verify Old Password
+                    if (oldPassword === user.password) {
+                        showSpinnerModal();
+                        const { error } = await supabase.from('users').update({ password: newPassword }).eq('uuid', userUuid);
+                        hideSpinnerModal();
+
+                        if (!error) {
+                            Swal.fire({ icon: 'success', title: 'Updated', text: 'Password changed successfully', background: '#0C290F' }).then(() => location.reload());
                         }
-                    });
-                }
-            });
-
-
-            const KYCForm = document.getElementById('KYCForm');
-            KYCForm.addEventListener('submit', async (event) => {
-                event.preventDefault();
-                const formData1 = new FormData(KYCForm);
-                let occupation = (formData1.get('occupation'));
-                let phoneNumber = (formData1.get('phoneNumber'));
-                let marital_status = (formData1.get('marital_status'));
-                let postal_code = (formData1.get('postal_code'));
-                let home_address = (formData1.get('home_address'));
-                let kin_email = (formData1.get('kin_email'));
-                let kin = (formData1.get('kin'));
-                showSpinnerModal();
-
-
-
-                async function updateData() {
-                    const { data, error } = await supabase
-                        .from('users')
-                        .update({
-                            occupation: occupation,
-                            phone: phoneNumber,
-                            marital_status: marital_status,
-                            zipcode: postal_code,
-                            address: home_address,
-                            kin_email: kin_email,
-                            kinname: kin,
-                            kyc: 'pending',
-                        })
-                        .eq('uuid', userUuid);
-                    if (error) {
-                        hideSpinnerModal()
-                        console.error('Error updating data:', error);
                     } else {
-
-                        try {
-                            const fileExt = fi.name.split('.').pop();
-                            const filePath = `${Date.now()}.${fileExt}`;
-
-                            const { data, error } = await supabase
-                                .storage
-                                .from('profileimages') //Replace with your bucket name
-                                .upload(filePath, fi, {
-                                    cacheControl: '3600',
-                                    upsert: false,
-                                });
-                            if (error) {
-                                throw error;
+                        passAttempts++;
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Incorrect',
+                            text: `Wrong old password. ${MAX_ATTEMPTS - passAttempts} tries left.`,
+                            background: '#0C290F',
+                            customClass: {
+                                htmlContainer: 'swal-warning-text' // Apply your custom CSS class
                             }
-                            imm3(data.path);
-
-                        } catch (error) {
-                            hideSpinnerModal()
-                            alert(`Error uploading image! aa ${error.message}`);
-                        }
-
-
-                    }
-                }
-                updateData();
-            })
-
-            // Save image 1
-
-            const imageUpload = document.getElementById('imageUpload');
-            imageUpload.addEventListener('change', async (event) => {
-                const file = event.target.files[0];
-                showSpinnerModal();
-                if (!file) {
-                    alert("Please select an image file");
-                    hideSpinnerModal()
-                    return;
-                }
-                try {
-                    const fileExt = file.name.split('.').pop();
-                    const filePath = `${Date.now()}.${fileExt}`;
-
-                    const { data, error } = await supabase
-                        .storage
-                        .from('profileimages') // Replace with your bucket name
-                        .upload(filePath, file, {
-                            cacheControl: '3600',
-                            upsert: false,
                         });
-                    if (error) {
-                        throw error;
                     }
-                    imm(data.path);
-
-                } catch (error) {
-                    hideSpinnerModal()
-                    alert(`Error uploading image! aa ${error.message}`);
-                }
-
-            });
-
-            function imm(params) {
-                showSpinnerModal()
-                const { data, error } = supabase
-                    .storage
-                    .from('profileimages')
-                    .getPublicUrl(params);
-
-                if (error) {
-                    console.error('Error getting public URL:', error);
-                } else {
-
-                    const publicUrl = data.publicUrl;
-
-                    //adding image to database
-                    async function updateData() {
-
-                        const { data, error } = await supabase
-                            .from('users')
-                            .update({
-                                KYC_image1: publicUrl
-                            })
-                            .eq('uuid', userUuid);
-                        if (error) {
-                            hideSpinnerModal();
-                            console.error('Error updating data:', error);
-                        } else {
-
-                            hideSpinnerModal()
-                            console.log('Data updated:', data);
-                            swal.fire({
-                                background: '#0C290F',
-                                confirmButtonColor: 'green',
-                                customClass: {
-                                    popup: 'swal2Style'
-                                },
-                                title: 'Successful',
-                                text: "Uploaded successfully",
-                                icon: 'success',
-                                confirmButtonText: 'OK'
-                            })
-                        }
-                    }
-                    updateData();
-                }
-            }
-
-
-            // Save image 2
-
-
-            const imageUpload2 = document.getElementById('imageUpload2');
-            imageUpload2.addEventListener('change', async (event) => {
-                const file = event.target.files[0];
-                showSpinnerModal();
-                if (!file) {
-                    hideSpinnerModal();
-                    alert("Please select an image file");
-                    return;
-                }
-                try {
-                    const fileExt = file.name.split('.').pop();
-                    const filePath = `${Date.now()}.${fileExt}`;
-
-                    const { data, error } = await supabase
-                        .storage
-                        .from('profileimages') // Replace with your bucket name
-                        .upload(filePath, file, {
-                            cacheControl: '3600',
-                            upsert: false,
-                        });
-                    if (error) {
-                        throw error;
-                    }
-
-                    console.log(`Successfully uploaded`);
-                    imm2(data.path);
-
-                } catch (error) {
-                    hideSpinnerModal()
-                    alert(`Error uploading image! aa ${error.message}`);
-                }
-
-            });
-
-            function imm2(params) {
-                const { data, error } = supabase
-                    .storage
-                    .from('profileimages')
-                    .getPublicUrl(params);
-
-                if (error) {
-                    console.error('Error getting public URL:', error);
-                } else {
-                    const publicUrl = data.publicUrl;
-
-                    //adding image to database
-                    async function updateData() {
-                        const { data, error } = await supabase
-                            .from('users')
-                            .update({
-                                KYC_image2: publicUrl
-                            })
-                            .eq('uuid', userUuid);
-                        if (error) {
-                            hideSpinnerModal()
-                            console.error('Error updating data:', error);
-                        } else {
-                            hideSpinnerModal();
-                            swal.fire({
-                                background: '#0C290F',
-                                confirmButtonColor: 'green',
-                                customClass: {
-                                    popup: 'swal2Style'
-                                },
-                                title: 'Successful',
-                                text: "Uploaded successfully",
-                                icon: 'success',
-                                confirmButtonText: 'OK'
-                            })
-
-                        }
-                    }
-                    updateData();
-                }
-            }
-
-
-
-            function imm3(params) {
-                const { data, error } = supabase
-                    .storage
-                    .from('profileimages')
-                    .getPublicUrl(params);
-
-                if (error) {
-                    console.error('Error getting public URL:', error);
-                } else {
-                    const publicUrl = data.publicUrl;
-
-                    //adding image to database
-                    async function updateData() {
-                        const { data, error } = await supabase
-                            .from('users')
-                            .update({
-                                KYC_image3: publicUrl
-                            })
-                            .eq('uuid', userUuid);
-                        if (error) {
-                            hideSpinnerModal()
-                            console.error('Error updating data:', error);
-                        } else {
-                            hideSpinnerModal();
-                            swal.fire({
-                                background: '#0C290F',
-                                confirmButtonColor: 'green',
-                                customClass: {
-                                    popup: 'swal2Style'
-                                },
-                                title: 'KYC Information Updated Successfully',
-                                text: "Your KYC information has been updated successfully.",
-                                icon: 'success',
-                                confirmButtonText: 'OK'
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    location.reload();
-                                }
-                            });
-
-                        }
-                    }
-                    updateData();
-                }
-            }
-
-
-            //2AUTH
-            document.getElementById('2FAX').addEventListener('click', () => {
-                if (setFA == false) {
-                    swal.fire({
-                        background: '#0C290F',
-                        confirmButtonColor: 'green',
-                        showCancelButton: true,
-                        customClass: {
-                            popup: 'swal2Style'
-                        },
-                        title: 'Screen Lock',
-                        text: "For enhanced security, we recommend enabling Screen Lock Authentication on your account. It adds an extra layer of protection by requiring a pin verification when your screen is not active.",
-                        icon: 'info',
-                        confirmButtonText: 'Enable Screen Lock'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-
-                            async function updateData() {
-                                const { data, error } = await supabase
-                                    .from('users')
-                                    .update({
-                                        lockscreen: true
-                                    })
-                                    .eq('uuid', userUuid);
-                                if (error) {
-                                    hideSpinnerModal()
-                                    console.error('Error updating data:', error);
-                                } else {
-                                    hideSpinnerModal();
-                                    swal.fire({
-                                        background: '#0C290F',
-                                        confirmButtonColor: 'green',
-                                        customClass: {
-                                            popup: 'swal2Style'
-                                        },
-                                        title: 'Screen Lock',
-                                        text: "Your Screen Lock is now active. Your account is now better protected with an extra layer of security. Thank you for keeping your account safe!",
-                                        icon: 'success',
-                                        confirmButtonText: 'OK'
-                                    }).then((result) => {
-                                        if (result.isConfirmed) {
-                                            location.reload();
-                                        }
-                                    });
-
-                                }
-                            }
-                            updateData();
-                        }
-                    });
-
-                } else if (setFA == true) {
-                    swal.fire({
-                        background: '#0C290F',
-                        confirmButtonColor: 'green',
-                        showCancelButton: true,
-                        customClass: {
-                            popup: 'swal2Style'
-                        },
-                        title: 'Screen Lock',
-                        text: "Turning off Screen Lock Authentication will make your account less secure. Are you sure you want to proceed?",
-                        icon: 'warning',
-                        confirmButtonText: 'Disable Screen Lock'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-
-                            async function updateData() {
-                                const { data, error } = await supabase
-                                    .from('users')
-                                    .update({
-                                        lockscreen: false
-                                    })
-                                    .eq('uuid', userUuid);
-                                if (error) {
-                                    hideSpinnerModal()
-                                    console.error('Error updating data:', error);
-                                } else {
-                                    hideSpinnerModal();
-                                    swal.fire({
-                                        background: '#0C290F',
-                                        confirmButtonColor: 'green',
-                                        customClass: {
-                                            popup: 'swal2Style'
-                                        },
-                                        title: 'Screen Lock authentication',
-                                        text: "Screen Lock Authentication has been turned off. Your account is now more vulnerable to unauthorized access. We strongly recommend re-enabling it to stay protected.",
-                                        icon: 'success',
-                                        confirmButtonText: 'OK'
-                                    }).then((result) => {
-                                        if (result.isConfirmed) {
-                                            location.reload();
-                                        }
-                                    });
-
-                                }
-                            }
-                            updateData();
-                        }
-                    });
-                }
-
-
-            })
-
-
-
-
-
-
-
-
-            document.getElementById('logoutB').addEventListener('click', async () => {
-
-                // 1. Show Warning Popup
-                const result = await Swal.fire({
-                    title: 'Terminate Session?',
-                    text: "You will need to log in again to access your dashboard.",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#ef4444', // Red for "Logout"
-                    cancelButtonColor: '#1a1a1a',  // Dark for "Stay"
-                    confirmButtonText: 'Yes, Logout',
-                    background: '#0C290F',
-                    color: '#fff',
-                    backdrop: `rgba(0,0,0,0.8)`
                 });
 
-                // 2. Only proceed if user clicked "Yes"
-                if (result.isConfirmed) {
-                    console.log("🧼 Clearing session and logging out...");
+                // --- CHANGE PIN FORM ---
+                const PinForm = document.getElementById('pin');
+                PinForm.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+                    const formData = new FormData(PinForm);
+                    const oldPin = formData.get('oldPin');
+                    const newPin = formData.get('newPin');
+                    const newPin2 = formData.get('newPin2');
+                    const user = window.dataBase;
 
-                    // Clear Security Markers
-                    localStorage.removeItem('isLocked');
-                    localStorage.removeItem('user_session');
+                    // 1. PIN Validation (Exactly 4 digits)
+                    const pinRegex = /^[0-9]{4}$/;
+                    if (!pinRegex.test(newPin)) {
+                        return Swal.fire({ icon: 'warning', title: 'Invalid PIN', text: 'PIN must be exactly 4 numeric digits.', background: '#0C290F', color: '#fff' });
+                    }
+                    if (newPin !== newPin2) {
+                        return Swal.fire({ icon: 'error', title: 'Mismatch', text: 'New PINs do not match.', background: '#0C290F', color: '#fff' });
+                    }
 
-                    // Clear all temporary session data
-                    sessionStorage.clear();
+                    // 2. Brute Force Check
+                    if (pinAttempts >= MAX_ATTEMPTS) {
+                        await supabase.from('users').update({ activeuser: false }).eq('uuid', userUuid);
+                        return Swal.fire({ icon: 'error', title: 'Account Locked', text: 'Suspicious activity detected. Account deactivated.', background: '#0C290F' }).then(() => window.location.href = '../login/index.html');
+                    }
 
-                    // Final Redirect to login
-                    window.location.href = '../login/index.html';
-                } else {
-                    console.log("❌ Logout cancelled by user.");
+                    // 3. Verify Old PIN
+                    if (String(oldPin) === String(user.pin)) {
+                        showSpinnerModal();
+                        const { error } = await supabase.from('users').update({ pin: newPin }).eq('uuid', userUuid);
+                        hideSpinnerModal();
+
+                        if (!error) {
+                            Swal.fire({ icon: 'success', title: 'Success', text: 'Security PIN updated.', background: '#0C290F' }).then(() => location.reload());
+                        }
+                    } else {
+                        pinAttempts++;
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Incorrect',
+                            text: `Old PIN is wrong. ${MAX_ATTEMPTS - pinAttempts} tries left.`,
+                            background: '#0C290F',
+                            customClass: {
+                                htmlContainer: 'swal-warning-text' // Apply your custom CSS class
+                            }
+                        });
+                    }
+                });
+
+
+                const KYCForm = document.getElementById('KYCForm');
+                KYCForm.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+                    const formData1 = new FormData(KYCForm);
+                    let occupation = (formData1.get('occupation'));
+                    let phoneNumber = (formData1.get('phoneNumber'));
+                    let marital_status = (formData1.get('marital_status'));
+                    let postal_code = (formData1.get('postal_code'));
+                    let home_address = (formData1.get('home_address'));
+                    let kin_email = (formData1.get('kin_email'));
+                    let kin = (formData1.get('kin'));
+                    showSpinnerModal();
+
+
+
+                    async function updateData() {
+                        const { data, error } = await supabase
+                            .from('users')
+                            .update({
+                                occupation: occupation,
+                                phone: phoneNumber,
+                                marital_status: marital_status,
+                                zipcode: postal_code,
+                                address: home_address,
+                                kin_email: kin_email,
+                                kinname: kin,
+                                kyc: 'pending',
+                            })
+                            .eq('uuid', userUuid);
+                        if (error) {
+                            hideSpinnerModal()
+                            console.error('Error updating data:', error);
+                        } else {
+
+                            try {
+                                const fileExt = fi.name.split('.').pop();
+                                const filePath = `${Date.now()}.${fileExt}`;
+
+                                const { data, error } = await supabase
+                                    .storage
+                                    .from('profileimages') //Replace with your bucket name
+                                    .upload(filePath, fi, {
+                                        cacheControl: '3600',
+                                        upsert: false,
+                                    });
+                                if (error) {
+                                    throw error;
+                                }
+                                imm3(data.path);
+
+                            } catch (error) {
+                                hideSpinnerModal()
+                                alert(`Error uploading image! aa ${error.message}`);
+                            }
+
+
+                        }
+                    }
+                    updateData();
+                })
+
+                // Save image 1
+
+                const imageUpload = document.getElementById('imageUpload');
+                imageUpload.addEventListener('change', async (event) => {
+                    const file = event.target.files[0];
+                    showSpinnerModal();
+                    if (!file) {
+                        alert("Please select an image file");
+                        hideSpinnerModal()
+                        return;
+                    }
+                    try {
+                        const fileExt = file.name.split('.').pop();
+                        const filePath = `${Date.now()}.${fileExt}`;
+
+                        const { data, error } = await supabase
+                            .storage
+                            .from('profileimages') // Replace with your bucket name
+                            .upload(filePath, file, {
+                                cacheControl: '3600',
+                                upsert: false,
+                            });
+                        if (error) {
+                            throw error;
+                        }
+                        imm(data.path);
+
+                    } catch (error) {
+                        hideSpinnerModal()
+                        alert(`Error uploading image! aa ${error.message}`);
+                    }
+
+                });
+
+                function imm(params) {
+                    showSpinnerModal()
+                    const { data, error } = supabase
+                        .storage
+                        .from('profileimages')
+                        .getPublicUrl(params);
+
+                    if (error) {
+                        console.error('Error getting public URL:', error);
+                    } else {
+
+                        const publicUrl = data.publicUrl;
+
+                        //adding image to database
+                        async function updateData() {
+
+                            const { data, error } = await supabase
+                                .from('users')
+                                .update({
+                                    KYC_image1: publicUrl
+                                })
+                                .eq('uuid', userUuid);
+                            if (error) {
+                                hideSpinnerModal();
+                                console.error('Error updating data:', error);
+                            } else {
+
+                                hideSpinnerModal()
+                                console.log('Data updated:', data);
+                                swal.fire({
+                                    background: '#0C290F',
+                                    confirmButtonColor: 'green',
+                                    customClass: {
+                                        popup: 'swal2Style'
+                                    },
+                                    title: 'Successful',
+                                    text: "Uploaded successfully",
+                                    icon: 'success',
+                                    confirmButtonText: 'OK'
+                                })
+                            }
+                        }
+                        updateData();
+                    }
                 }
 
-            })
+
+                // Save image 2
+
+
+                const imageUpload2 = document.getElementById('imageUpload2');
+                imageUpload2.addEventListener('change', async (event) => {
+                    const file = event.target.files[0];
+                    showSpinnerModal();
+                    if (!file) {
+                        hideSpinnerModal();
+                        alert("Please select an image file");
+                        return;
+                    }
+                    try {
+                        const fileExt = file.name.split('.').pop();
+                        const filePath = `${Date.now()}.${fileExt}`;
+
+                        const { data, error } = await supabase
+                            .storage
+                            .from('profileimages') // Replace with your bucket name
+                            .upload(filePath, file, {
+                                cacheControl: '3600',
+                                upsert: false,
+                            });
+                        if (error) {
+                            throw error;
+                        }
+
+                        console.log(`Successfully uploaded`);
+                        imm2(data.path);
+
+                    } catch (error) {
+                        hideSpinnerModal()
+                        alert(`Error uploading image! aa ${error.message}`);
+                    }
+
+                });
+
+                function imm2(params) {
+                    const { data, error } = supabase
+                        .storage
+                        .from('profileimages')
+                        .getPublicUrl(params);
+
+                    if (error) {
+                        console.error('Error getting public URL:', error);
+                    } else {
+                        const publicUrl = data.publicUrl;
+
+                        //adding image to database
+                        async function updateData() {
+                            const { data, error } = await supabase
+                                .from('users')
+                                .update({
+                                    KYC_image2: publicUrl
+                                })
+                                .eq('uuid', userUuid);
+                            if (error) {
+                                hideSpinnerModal()
+                                console.error('Error updating data:', error);
+                            } else {
+                                hideSpinnerModal();
+                                swal.fire({
+                                    background: '#0C290F',
+                                    confirmButtonColor: 'green',
+                                    customClass: {
+                                        popup: 'swal2Style'
+                                    },
+                                    title: 'Successful',
+                                    text: "Uploaded successfully",
+                                    icon: 'success',
+                                    confirmButtonText: 'OK'
+                                })
+
+                            }
+                        }
+                        updateData();
+                    }
+                }
 
 
 
-        } else {
+                function imm3(params) {
+                    const { data, error } = supabase
+                        .storage
+                        .from('profileimages')
+                        .getPublicUrl(params);
 
-            location.reload();
+                    if (error) {
+                        console.error('Error getting public URL:', error);
+                    } else {
+                        const publicUrl = data.publicUrl;
+
+                        //adding image to database
+                        async function updateData() {
+                            const { data, error } = await supabase
+                                .from('users')
+                                .update({
+                                    KYC_image3: publicUrl
+                                })
+                                .eq('uuid', userUuid);
+                            if (error) {
+                                hideSpinnerModal()
+                                console.error('Error updating data:', error);
+                            } else {
+                                hideSpinnerModal();
+                                swal.fire({
+                                    background: '#0C290F',
+                                    confirmButtonColor: 'green',
+                                    customClass: {
+                                        popup: 'swal2Style'
+                                    },
+                                    title: 'KYC Information Updated Successfully',
+                                    text: "Your KYC information has been updated successfully.",
+                                    icon: 'success',
+                                    confirmButtonText: 'OK'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        location.reload();
+                                    }
+                                });
+
+                            }
+                        }
+                        updateData();
+                    }
+                }
+
+
+                //2AUTH
+                document.getElementById('2FAX').addEventListener('click', () => {
+                    if (setFA == false) {
+                        swal.fire({
+                            background: '#0C290F',
+                            confirmButtonColor: 'green',
+                            showCancelButton: true,
+                            customClass: {
+                                popup: 'swal2Style'
+                            },
+                            title: 'Screen Lock',
+                            text: "For enhanced security, we recommend enabling Screen Lock Authentication on your account. It adds an extra layer of protection by requiring a pin verification when your screen is not active.",
+                            icon: 'info',
+                            confirmButtonText: 'Enable Screen Lock'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                                async function updateData() {
+                                    const { data, error } = await supabase
+                                        .from('users')
+                                        .update({
+                                            lockscreen: true
+                                        })
+                                        .eq('uuid', userUuid);
+                                    if (error) {
+                                        hideSpinnerModal()
+                                        console.error('Error updating data:', error);
+                                    } else {
+                                        hideSpinnerModal();
+                                        swal.fire({
+                                            background: '#0C290F',
+                                            confirmButtonColor: 'green',
+                                            customClass: {
+                                                popup: 'swal2Style'
+                                            },
+                                            title: 'Screen Lock',
+                                            text: "Your Screen Lock is now active. Your account is now better protected with an extra layer of security. Thank you for keeping your account safe!",
+                                            icon: 'success',
+                                            confirmButtonText: 'OK'
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                location.reload();
+                                            }
+                                        });
+
+                                    }
+                                }
+                                updateData();
+                            }
+                        });
+
+                    } else if (setFA == true) {
+                        swal.fire({
+                            background: '#0C290F',
+                            confirmButtonColor: 'green',
+                            showCancelButton: true,
+                            customClass: {
+                                popup: 'swal2Style'
+                            },
+                            title: 'Screen Lock',
+                            text: "Turning off Screen Lock Authentication will make your account less secure. Are you sure you want to proceed?",
+                            icon: 'warning',
+                            confirmButtonText: 'Disable Screen Lock'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                                async function updateData() {
+                                    const { data, error } = await supabase
+                                        .from('users')
+                                        .update({
+                                            lockscreen: false
+                                        })
+                                        .eq('uuid', userUuid);
+                                    if (error) {
+                                        hideSpinnerModal()
+                                        console.error('Error updating data:', error);
+                                    } else {
+                                        hideSpinnerModal();
+                                        swal.fire({
+                                            background: '#0C290F',
+                                            confirmButtonColor: 'green',
+                                            customClass: {
+                                                popup: 'swal2Style'
+                                            },
+                                            title: 'Screen Lock authentication',
+                                            text: "Screen Lock Authentication has been turned off. Your account is now more vulnerable to unauthorized access. We strongly recommend re-enabling it to stay protected.",
+                                            icon: 'success',
+                                            confirmButtonText: 'OK'
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                location.reload();
+                                            }
+                                        });
+
+                                    }
+                                }
+                                updateData();
+                            }
+                        });
+                    }
+
+
+                })
+
+
+
+
+
+
+
+
+                document.getElementById('logoutB').addEventListener('click', async () => {
+
+                    // 1. Show Warning Popup
+                    const result = await Swal.fire({
+                        title: 'Terminate Session?',
+                        text: "You will need to log in again to access your dashboard.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#ef4444', // Red for "Logout"
+                        cancelButtonColor: '#1a1a1a',  // Dark for "Stay"
+                        confirmButtonText: 'Yes, Logout',
+                        background: '#0C290F',
+                        color: '#fff',
+                        backdrop: `rgba(0,0,0,0.8)`
+                    });
+
+                    // 2. Only proceed if user clicked "Yes"
+                    if (result.isConfirmed) {
+                        console.log("🧼 Clearing session and logging out...");
+
+                        // Clear Security Markers
+                        localStorage.removeItem('isLocked');
+                        localStorage.removeItem('user_session');
+
+                        // Clear all temporary session data
+                        sessionStorage.clear();
+
+                        // Final Redirect to login
+                        window.location.href = '../login/index.html';
+                    } else {
+                        console.log("❌ Logout cancelled by user.");
+                    }
+
+                })
+
+
+
+            } else {
+
+                location.reload();
+            }
+
         }
 
 
