@@ -61,18 +61,17 @@
             Swal.fire({
                 title: 'Terms of Service & Disclaimer',
                 html: `
-                    <div style="text-align: left; font-size: 14px; color: #fff; line-height: 1.6;">
-                        <p>Before proceeding, you must acknowledge these administrative terms:</p>
-                        <ul style="padding-left: 20px;">
-                            <li style="margin-bottom: 10px;"><b>Non-Abuse Policy:</b> Administrative tools must not be used for illegal activity or harm.</li>
-                            <li style="margin-bottom: 10px;"><b>Developer Indemnification:</b> The developer is not liable for actions taken by the administrator.</li>
-                        </ul>
-                        <p style="font-size: 12px; color: #94a3b8;">Clicking "I Agree" accepts full legal responsibility.</p>
-                    </div>
+                    <div style="text-align: left; font-size: 14px; color: #1e293b; line-height: 1.6;">
+                    <p>Before proceeding to the administrative dashboard, you must acknowledge the following legal terms:</p>
+                    <ul style="padding-left: 20px;">
+                        <li style="margin-bottom: 10px;"><b>Non-Abuse Policy:</b> This website and its administrative tools are not designed for, and must not be used for, any form of harm, illegal activity, or abuse.</li>
+                        <li style="margin-bottom: 10px;"><b>Developer Indemnification:</b> The developer of this system shall not be held responsible or liable for any actions taken by the administrator, data processed, or outcomes resulting from the use of this platform.</li>
+                    </ul>
+                    <p style="font-size: 12px; color: #64748b;">By clicking "I Agree", you accept full legal responsibility for the management of this system.</p>
+                </div>
                 `,
                 icon: 'info',
-                background: '#0C290F',
-                color: '#fff',
+                color: '#000000ff',
                 allowOutsideClick: false,
                 allowEscapeKey: false,
                 showConfirmButton: true,
