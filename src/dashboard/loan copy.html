@@ -28,6 +28,10 @@
     <script src="../config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
+    <!-- EMAIL.JS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 </head>
 
 <body class="__className_528a31">
@@ -1054,12 +1058,16 @@
     <script src="card.js"></script>
     <script src="deposit.js"></script>
     <script src="lock.js"></script>
-    <script src="loanUI.js"></script>
-    <script src="loanForm.js"></script>
 
     <script type="module" src="../weber.js"></script>
 
+    <script type="module" src="">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
+        // Create the client and attach to window
+        const supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+        window.supabase = supabase;
+    </script>
 
 
     <script>
@@ -1072,260 +1080,478 @@
 
 
     <script>
-        // 1. GLOBAL UI RENDERER
-        // This function maps the database values to your HTML IDs and handles the 5-step state logic
-        window.renderLoanUI = function (db) {
-            if (!db) return;
+        // Wait a bit before accessing the global data
+        let receiverInfo = null
+        let index = null
 
-            const currency = db.currency || '$';
-            const status = db.loanApprovalStatus;
-            const type = db.loanType;
-            const isApproved = status === 'Approved';
-
-            // A. Update Balances and Static Text
-            const uiMap = {
-                "loanBalanace": `${currency}${formatCurrency(isApproved ? db.loanAmount : 0)}`,
-                "unsettledLoan": `${currency}${formatCurrency(db.unsettledLoan)}`,
-                "unsettledLoan2": `${currency}${formatCurrency(db.unsettledLoan)}`,
-                "unsettledLoan3": `${currency}${formatCurrency(db.unsettledLoan)}`,
-                "unsettledLoan4": `${currency}${formatCurrency(db.unsettledLoan)}`,
-                "accountBalance": `${currency}${formatCurrency(db.accountBalance)}`,
-                "accountTypeBalance": `${currency}${formatCurrency(db.accountTypeBalance)}`,
-                "fullname": `${db.firstname} ${db.middlename ? db.middlename + ' ' : ''}${db.lastname}`,
-                "accountNumberShow": db.accountNumber,
-                "accountLevel": db.accountLevel,
-                "accounttype": `${db.accttype} Account`,
-                "loantp": type ? `${type} Loan` : "Loan",
-                "ccl": currency,
-                "ccl2": currency
-            };
-
-            Object.entries(uiMap).forEach(([id, value]) => {
-                const el = document.getElementById(id);
-                if (el) el.innerHTML = value;
-            });
-
-            // Update Profile Pictures
-            const pPic = db.profileImage || "prof.jpg";
-            if (document.getElementById("profilePic")) document.getElementById("profilePic").src = pPic;
-            if (document.getElementById("profilePic2")) document.getElementById("profilePic2").src = pPic;
-
-            // B. VISIBILITY STATE LOGIC (The Section you pasted)
-            const sections = ['hh1', 'xxx', 'pend', 'pend2', 'hh3', 'hhh3', 'hh2', 'hhh2'];
-            sections.forEach(id => document.getElementById(id)?.classList.add('hiding'));
-
-            if (status === "Pending") {
-                if (type === "Personal") {
-                    document.getElementById('getStart')?.classList.add('hiding');
-                    document.getElementById('pend')?.classList.remove('hiding');
-                    document.getElementById('hh2')?.classList.add('hiding');
-                } else if (type === "Business") {
-                    document.getElementById('getStart2')?.classList.add('hiding');
-                    document.getElementById('pend2')?.classList.remove('hiding');
-                    document.getElementById('hhh2')?.classList.add('hiding');
-                }
-            } else if (status === "Approved") {
-                if (type === "Personal") {
-                    document.getElementById('getStart')?.classList.add('hiding');
-                    document.getElementById('hh3')?.classList.remove('hiding');
-                    document.getElementById('hh2')?.classList.add('hiding');
-                } else if (type === "Business") {
-                    document.getElementById('getStart2')?.classList.add('hiding');
-                    document.getElementById('hhh3')?.classList.remove('hiding');
-                    document.getElementById('hhh2')?.classList.add('hiding');
-                }
-            } else {
-                // STEP 5: Return to normal (Status is empty/null)
-                document.getElementById('getStart')?.classList.remove('hiding');
-                document.getElementById('getStart2')?.classList.remove('hiding');
-                document.getElementById('hh2')?.classList.remove('hiding');
-                document.getElementById('hhh2')?.classList.remove('hiding');
-            }
-        };
-
-        // 2. INITIALIZATION & SUPABASE REALTIME
+        let ref1 = Math.floor(Math.random() * 1795);
+        let ref2 = Math.floor(Math.random() * 195);
+        let ref3 = Math.floor(Math.random() * 25);
+        let ref4 = Math.floor(Math.random() * 2645);
+        let ref = `r9wF${ref1}/x7gr${ref2}hl/${ref3}e3t/${ref3}y9`
         setTimeout(() => {
             if (window.dataBase) {
-                const userUuid = window.userUuid;
-                renderLoanUI(window.dataBase);
 
-                // Realtime Listener
-                window.supabase.channel('loan-realtime')
-                    .on('postgres_changes', {
-                        event: 'UPDATE',
-                        schema: 'public',
-                        table: 'users',
-                        filter: `uuid=eq.${userUuid}`
-                    }, (payload) => {
-                        window.dataBase = payload.new;
-                        renderLoanUI(window.dataBase);
-                    }).subscribe();
+                dataBase = window.dataBase
+                userUuid = window.userUuid
+                // refCode = window.refCode
+                document.getElementById("loanBalanace").innerHTML = `${dataBase.currency}${formatCurrency(dataBase.loanApprovalStatus == 'Approved' ? dataBase.loanAmount : 0)}`;
+                document.getElementById("unsettledLoan").innerHTML = `${dataBase.currency}${formatCurrency(dataBase.unsettledLoan)}`;
+                document.getElementById("unsettledLoan2").innerHTML = `${dataBase.currency}${formatCurrency(dataBase.unsettledLoan)}`;
+                document.getElementById("unsettledLoan3").innerHTML = `${dataBase.currency}${formatCurrency(dataBase.unsettledLoan)}`;
+                document.getElementById("unsettledLoan4").innerHTML = `${dataBase.currency}${formatCurrency(dataBase.unsettledLoan)}`;
+                document.getElementById("ccl").innerHTML = `${dataBase.currency}`;
+                document.getElementById("ccl2").innerHTML = `${dataBase.currency}`;
 
-                // --- EVENT LISTENERS ---
-
-                // Form Toggles (KYC Verification Gate)
-                const handleApplyClick = (formId, btnId) => {
-                    const db = window.dataBase;
-                    if (!db.loanApprovalStatus || db.loanApprovalStatus === '') {
-                        if (db.kyc === 'approved') {
-                            document.getElementById(formId).classList.remove('hiding');
-                            document.getElementById(btnId).classList.add('hiding');
-                        } else {
-                            Swal.fire({ icon: 'info', title: 'KYC Required', text: 'Before user can assess loan make sure the user have verified their kyc.', background: '#0C290F', color: '#fff' });
-                        }
-                    } else {
-                        Swal.fire({ icon: 'info', title: "Can't borrow for now!", background: '#0C290F', color: '#fff' });
-                    }
-                };
-
-                document.getElementById('getStart')?.addEventListener('click', () => handleApplyClick('hh1', 'getStart'));
-                document.getElementById('getStart2')?.addEventListener('click', () => handleApplyClick('xxx', 'getStart2'));
-
-                // Cancel Buttons
-                document.getElementById('canco')?.addEventListener('click', () => {
-                    document.getElementById('hh1').classList.add('hiding');
-                    document.getElementById('getStart').classList.remove('hiding');
-                });
-                document.getElementById('canco2')?.addEventListener('click', () => {
-                    document.getElementById('xxx').classList.add('hiding');
-                    document.getElementById('getStart2').classList.remove('hiding');
-                });
-
-                // --- LOAN SUBMISSIONS (Limits & Form Resets) ---
-                const submitLoan = async (formElement, limit, payload) => {
-                    const amount = Number(new FormData(formElement).get('amount'));
-                    if (amount <= 0) return Swal.fire({ icon: 'info', title: 'Enter a valid amount' });
-                    if (amount > limit) return Swal.fire({ icon: 'info', title: 'Limit Exceeded', text: 'user have passed borrow limit', background: '#0C290F', color: '#fff' });
-
-                    if (window.dataBase.accountLevel === "Starter") {
-                        return Swal.fire({ icon: 'info', title: 'Starter Level Restriction', text: 'Cant apply for loan on starter level' });
-                    }
-
-                    showSpinnerModal();
-                    const { error } = await window.supabase.from('users').update({
-                        ...payload,
-                        unsettledLoan: amount,
-                        loanAmount: amount,
-                        loanApprovalStatus: 'Pending'
-                    }).eq('uuid', userUuid);
-
-                    hideSpinnerModal();
-                    if (error) alert(error.message);
-                    else {
-                        formElement.reset();
-                        Swal.fire({ icon: 'info', title: 'Application Successful', text: 'Please wait for admin approval', background: '#0C290F', color: '#fff' });
-                    }
-                };
-
-                document.getElementById('loanFom')?.addEventListener('submit', function (e) {
-                    e.preventDefault();
-                    submitLoan(this, 500, { loanType: 'Personal' });
-                });
-
-
-                // Variable to store the file locally before submission
-                let selectedBusinessFile = null;
-
-                // Listen for file selection but DO NOT upload yet
-                const imageUpload = document.getElementById('profilePicture');
-                if (imageUpload) {
-                    imageUpload.addEventListener('change', (event) => {
-                        selectedBusinessFile = event.target.files[0];
-                        if (selectedBusinessFile) {
-                            console.log("File selected and ready for submission:", selectedBusinessFile.name);
-                            // Optional: You could show a "File Selected" text here if you have a span for it
-                        }
-                    });
+                //if loan or not
+                if (dataBase.loanType) {
+                    document.getElementById('loantp').innerText = `${dataBase.loanType} Loan`;
+                } else {
+                    document.getElementById('loantp').innerText = `Loan`;
                 }
 
-                // THE UPDATED BUSINESS LOAN SUBMISSION
+                //getStart button
+                document.getElementById('getStart').addEventListener('click', () => {
+                    console.log(dataBase.loanApprovalStatus);
+
+                    if (dataBase.loanApprovalStatus == '') {
+
+                        if (dataBase.kyc == 'approved') {
+                            document.getElementById('hh1').classList.remove('hiding')
+                            document.getElementById('getStart').classList.add('hiding')
+                        } else {
+                            Swal.fire({
+                                toast: true,
+                                icon: 'error',
+                                title: `Complete kyc before appling for loan`,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3500,
+                                background: '#0C290F',
+                                customClass: {
+                                    popup: 'swal2Style'
+                                },
+                            });
+                        }
+
+                    } else {
+                        Swal.fire({
+                            toast: true,
+                            icon: 'error',
+                            title: `Can't borrow for now!`,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 3500,
+                            background: '#0C290F',
+                            customClass: {
+                                popup: 'swal2Style'
+                            },
+                        });
+                    }
+                })
+
+
+                document.getElementById('getStart2').addEventListener('click', () => {
+                    if (dataBase.loanApprovalStatus == '') {
+
+                        if (dataBase.kyc == 'approved') {
+                            document.getElementById('xxx').classList.remove('hiding')
+                            document.getElementById('getStart2').classList.add('hiding')
+                        } else {
+                            Swal.fire({
+                                toast: true,
+                                icon: 'error',
+                                title: `Complete kyc before appling for loan`,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3500,
+                                background: '#0C290F',
+                                customClass: {
+                                    popup: 'swal2Style'
+                                },
+                            });
+                        }
+
+                    } else {
+                        Swal.fire({
+                            toast: true,
+                            icon: 'error',
+                            title: `Can't borrow for now!`,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 3500,
+                            background: '#0C290F',
+                            customClass: {
+                                popup: 'swal2Style'
+                            },
+                        });
+                    }
+                })
+
+                document.getElementById('canco').addEventListener('click', () => {
+                    if (dataBase.kyc == 'approved') {
+                        document.getElementById('hh1').classList.add('hiding')
+                        document.getElementById('getStart').classList.remove('hiding')
+                    } else {
+                        Swal.fire({
+                            toast: true,
+                            icon: 'error',
+                            title: `Complete kyc before appling for loan`,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 3500,
+                            background: '#0C290F',
+                            customClass: {
+                                popup: 'swal2Style'
+                            },
+                        });
+
+                    }
+                })
+
+                document.getElementById('canco2').addEventListener('click', () => {
+                    if (dataBase.kyc == 'approved') {
+                        document.getElementById('xxx').classList.add('hiding')
+                        document.getElementById('getStart2').classList.remove('hiding')
+                    } else {
+                        Swal.fire({
+                            toast: true,
+                            icon: 'error',
+                            title: `Complete kyc before appling for loan`,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 3500,
+                            background: '#0C290F',
+                            customClass: {
+                                popup: 'swal2Style'
+                            },
+                        });
+                    }
+                })
+
+                //check for outstanding loan
+                if (dataBase.loanApprovalStatus == "Pending") {
+
+                    if (dataBase.loanType == "Personal") {
+                        document.getElementById('getStart').classList.add('hiding')
+                        document.getElementById('pend').classList.remove('hiding')
+                        document.getElementById('hh2').classList.add('hiding')
+                    } else if (dataBase.loanType == "Business") {
+                        document.getElementById('getStart2').classList.add('hiding')
+                        document.getElementById('pend2').classList.remove('hiding')
+                        document.getElementById('hhh2').classList.add('hiding')
+                    }
+
+
+                } else if (dataBase.loanApprovalStatus == "Approved") {
+                    if (dataBase.loanType == "Personal") {
+                        document.getElementById('getStart').classList.add('hiding')
+                        document.getElementById('pend').classList.add('hiding')
+                        document.getElementById('hh3').classList.remove('hiding')
+                        document.getElementById('hh2').classList.add('hiding')
+
+                    } else if (dataBase.loanType == "Business") {
+                        document.getElementById('getStart2').classList.add('hiding')
+                        document.getElementById('pend2').classList.add('hiding')
+                        document.getElementById('hhh3').classList.remove('hiding')
+                        document.getElementById('hhh2').classList.add('hiding')
+                    }
+                }
+
+                //PERSONAL LOAN
+                const loanForm = document.getElementById('loanFom');
+                loanFom.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+                    const formData1 = new FormData(loanFom);
+                    let amount = (formData1.get('amount'));
+                    if (amount > 0) {
+                        if (amount < 500) {
+                            if (dataBase.accountLevel == "Starter") {
+
+                                Swal.fire({
+                                    toast: true,
+                                    icon: 'error',
+                                    title: `Cant apply for loan on starter level`,
+                                    position: 'top-end',
+                                    showConfirmButton: false,
+                                    timer: 3500,
+                                    background: '#0C290F',
+                                    customClass: {
+                                        popup: 'swal2Style'
+                                    },
+                                });
+                            } else {
+                                //start 
+                                const { data, error } = await supabase
+                                    .from('users')
+                                    .update({
+                                        unsettledLoan: Number(amount),
+                                        loanAmount: Number(amount),
+                                        loanType: 'Personal',
+                                        loanApprovalStatus: 'Pending'
+                                    })
+                                    .eq('uuid', userUuid);
+                                if (error) {
+                                    alert('Error fetching user data:', error);
+                                    hideSpinnerModal();
+                                } else {
+
+                                    Swal.fire({
+                                        toast: true,
+                                        icon: 'error',
+                                        title: `application successfull, please wait for admin approval`,
+                                        position: 'top-end',
+                                        showConfirmButton: false,
+                                        timer: 3500,
+                                        background: '#0C290F',
+                                        customClass: {
+                                            popup: 'swal2Style'
+                                        },
+                                    });
+                                }
+                            }
+                        } else {
+                            Swal.fire({
+                                toast: true,
+                                icon: 'error',
+                                title: `Can't borrow more then ${dataBase.currency}500`,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3500,
+                                background: '#0C290F',
+                                customClass: {
+                                    popup: 'swal2Style'
+                                },
+                            });
+                        }
+                    } else {
+                        Swal.fire({
+                            toast: true,
+                            icon: 'error',
+                            title: `Enter a vaild amount`,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 3500,
+                            background: '#0C290F',
+                            customClass: {
+                                popup: 'swal2Style'
+                            },
+                        });
+                    }
+
+
+
+                })
+
+
+                //BUSINESS LOAN
                 const loanFom2 = document.getElementById('loanFom2');
                 loanFom2.addEventListener('submit', async (event) => {
                     event.preventDefault();
-                    const formData = new FormData(loanFom2);
-                    let amount = Number(formData.get('amount'));
+                    const formData1 = new FormData(loanFom2);
+                    let amount = (formData1.get('amount'));
+                    let businessName = (formData1.get('businessName'));
+                    let businessAddress = (formData1.get('businessAddress'));
+                    let businessDes = (formData1.get('businessDes'));
+                    let monthlyIncome = (formData1.get('monthlyIncome'));
+                    let gurantorName = (formData1.get('gurantorName'));
+                    let gurantorContact = (formData1.get('gurantorContact'));
 
-                    // Step 1: Validation checks
-                    if (amount <= 0) return showWarning("Enter a valid amount");
-                    if (amount > 10000) return showWarning("user have passed borrow limit");
-                    if (window.dataBase.accountLevel === "Starter") return showWarning("Cant apply for loan on starter level");
-                    if (!selectedBusinessFile) return showWarning("Please upload your Business ID/Document");
 
-                    showSpinnerModal();
+                    if (amount > 0) {
+                        if (amount < 10000) {
+                            if (dataBase.accountLevel == "Starter") {
+                                Swal.fire({
+                                    toast: true,
+                                    icon: 'error',
+                                    title: `Cant apply for loan on starter level`,
+                                    position: 'top-end',
+                                    showConfirmButton: false,
+                                    timer: 3500,
+                                    background: '#0C290F',
+                                    customClass: {
+                                        popup: 'swal2Style'
+                                    },
+                                });
+                            } else {
+                                //start 
 
-                    try {
-                        // Step 2: Upload Image to Storage ONLY upon submission
-                        const fileExt = selectedBusinessFile.name.split('.').pop();
-                        const filePath = `${window.userUuid}/loan_docs_${Date.now()}.${fileExt}`;
+                                const { data, error } = await supabase
+                                    .from('users')
+                                    .update({
+                                        unsettledLoan: Number(amount),
+                                        loanAmount: Number(amount),
+                                        loanType: 'Business',
+                                        loanApprovalStatus: 'Pending',
+                                        businessName: businessName,
+                                        businessAddress: businessAddress,
+                                        businessDes: businessDes,
+                                        monthlyIncome: monthlyIncome,
+                                        gurantorName: gurantorName,
+                                        gurantorContact: gurantorContact,
+                                    })
+                                    .eq('uuid', userUuid);
+                                if (error) {
+                                    alert('Error fetching user data:', error);
+                                    hideSpinnerModal();
+                                } else {
+                                    Swal.fire({
+                                        toast: true,
+                                        icon: 'error',
+                                        title: `Application successfull, please wait for admin approval`,
+                                        position: 'top-end',
+                                        showConfirmButton: false,
+                                        timer: 3500,
+                                        background: '#0C290F',
+                                        customClass: {
+                                            popup: 'swal2Style'
+                                        },
+                                    });
 
-                        const { error: uploadError } = await window.supabase.storage
-                            .from('profileimages')
-                            .upload(filePath, selectedBusinessFile);
+                                }
 
-                        if (uploadError) throw uploadError;
-
-                        // Step 3: Get the Public URL
-                        const { data: urlData } = window.supabase.storage
-                            .from('profileimages')
-                            .getPublicUrl(filePath);
-
-                        const publicUrl = urlData.publicUrl;
-
-                        // Step 4: Save EVERYTHING to the Database at once
-                        const { error: updateError } = await window.supabase
-                            .from('users')
-                            .update({
-                                unsettledLoan: amount,
-                                loanAmount: amount,
-                                loanType: 'Business',
-                                loanApprovalStatus: 'Pending',
-                                loanPhoto: publicUrl, // The URL is saved here
-                                businessName: formData.get('businessName'),
-                                businessAddress: formData.get('businessAddress'),
-                                businessDes: formData.get('businessDes'),
-                                monthlyIncome: formData.get('monthlyIncome'),
-                                gurantorName: formData.get('gurantorName'),
-                                gurantorContact: formData.get('gurantorContact'),
-                            })
-                            .eq('uuid', window.userUuid);
-
-                        if (updateError) throw updateError;
-
-                        // Step 5: Finalize
-                        hideSpinnerModal();
-                        loanFom2.reset();
-                        selectedBusinessFile = null; // Clear the variable
-
+                            }
+                        } else {
+                            Swal.fire({
+                                toast: true,
+                                icon: 'error',
+                                title: `Can't borrow more then ${dataBase.currency}10000`,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3500,
+                                background: '#0C290F',
+                                customClass: {
+                                    popup: 'swal2Style'
+                                },
+                            });
+                        }
+                    } else {
                         Swal.fire({
-                            icon: 'info',
-                            title: 'Application Successful',
-                            text: 'Please wait for admin approval',
+                            toast: true,
+                            icon: 'error',
+                            title: `Enter a vaild amount`,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 3500,
                             background: '#0C290F',
-                            color: '#fff'
+                            customClass: {
+                                popup: 'swal2Style'
+                            },
                         });
 
-                    } catch (error) {
-                        hideSpinnerModal();
-                        console.error("Submission Error:", error);
-                        alert("An error occurred: " + error.message);
                     }
+
+
+
+                })
+
+
+                //// Business Loan ID upload
+                const imageUpload = document.getElementById('profilePicture');
+                imageUpload.addEventListener('change', async (event) => {
+                    const file = event.target.files[0];
+                    showSpinnerModal();
+                    if (!file) {
+                        Swal.fire({
+                            toast: true,
+                            icon: 'error',
+                            title: `Please select an image file`,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 3500,
+                            background: '#0C290F',
+                            customClass: {
+                                popup: 'swal2Style'
+                            },
+                        });
+
+                        return;
+                    }
+                    try {
+                        const fileExt = file.name.split('.').pop();
+                        const filePath = `${Date.now()}.${fileExt}`;
+
+                        const { data, error } = await supabase
+                            .storage
+                            .from('profileimages') // Replace with your bucket name
+                            .upload(filePath, file, {
+                                cacheControl: '3600',
+                                upsert: false,
+                            });
+                        if (error) {
+                            throw error;
+                        }
+                        hideSpinnerModal()
+                        imm(data.path);
+
+                    } catch (error) {
+                        hideSpinnerModal()
+                        alert(`Error uploading image! aa ${error.message}`);
+                    }
+
                 });
 
-                // Helper for the "Info" style warning popups
-                function showWarning(msg) {
-                    Swal.fire({
-                        icon: 'info',
-                        title: 'Notice',
-                        text: msg,
-                        background: '#0C290F',
-                        color: '#fff'
-                    });
+                function imm(params) {
+                    const { data, error } = supabase
+                        .storage
+                        .from('profileimages')
+                        .getPublicUrl(params);
+
+                    if (error) {
+                        console.error('Error getting public URL:', error);
+                    } else {
+                        const publicUrl = data.publicUrl;
+
+                        //adding image to database
+                        async function updateData() {
+                            const { data, error } = await supabase
+                                .from('users')
+                                .update({
+                                    loanPhoto: publicUrl
+                                })
+                                .eq('uuid', userUuid);
+                            if (error) {
+                                console.error('Error updating data:', error);
+                            } else {
+                                console.log('Data updated zz:', data);
+                                //page reload after uploading image
+
+                                Swal.fire({
+                                    toast: true,
+                                    icon: 'success',
+                                    title: `Uploaded`,
+                                    position: 'top-end',
+                                    showConfirmButton: false,
+                                    timer: 3500,
+                                    background: '#0C290F',
+                                    customClass: {
+                                        popup: 'swal2Style'
+                                    },
+                                });
+                            }
+                        }
+                        updateData();
+                    }
                 }
 
-            } else { location.reload(); }
-        }, 2000);
-    </script>
+                document.getElementById('accountLevel').innerText = `${dataBase.accountLevel}`;
+                document.getElementById("profilePic").src = !dataBase.profileImage ? "prof.jpg" : dataBase.profileImage;
+                document.getElementById("profilePic2").src = !dataBase.profileImage ? "prof.jpg" : dataBase.profileImage;
+                document.getElementById("accountNumberShow").innerHTML = dataBase.accountNumber;
+                document.getElementById("fullname").innerHTML = `${dataBase.firstname} ${dataBase.middlename} ${dataBase.lastname}`;
+                document.getElementById("accountBalance").innerHTML = `${dataBase.currency}${formatCurrency(dataBase.accountBalance)}`;
+                document.getElementById("accountTypeBalance").innerHTML = `${dataBase.currency}${formatCurrency(dataBase.accountTypeBalance)}`;
+                document.getElementById('accounttype').innerText = `${dataBase.accttype} Account`;
 
+                // document.getElementById('accttype22').innerText = `${dataBase.accttype} Account: ${dataBase.currency}${formatCurrency(dataBase.accountTypeBalance)}`;
+
+
+            } else {
+
+                location.reload();
+            }
+        }, 2000); // Delay to ensure async fetch is complete
+    </script>
 
     <script>
         (async function () {
@@ -1395,14 +1621,6 @@
                 console.error("Visibility System Error:", err);
             }
         })();
-    </script>
-
-    <script type="module" src="">
-        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-
-        // Create the client and attach to window
-        const supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
-        window.supabase = supabase;
     </script>
 </body>
 

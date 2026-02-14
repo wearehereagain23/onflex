@@ -660,70 +660,221 @@
 
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-	<script src="../config.js"></script>
-	<script src="register.js" type="module"></script>
 
-	<script>
-		(async function () {
-			const loadConfig = () => {
-				return new Promise((resolve) => {
-					const paths = ['./config.js', '../config.js', '../../config.js', '../../../config.js'];
-					let found = false;
-					paths.forEach(path => {
-						const script = document.createElement('script');
-						script.src = path;
-						script.onload = () => { if (typeof CONFIG !== 'undefined' && !found) { found = true; resolve(CONFIG); } };
-						document.head.appendChild(script);
-					});
-					setTimeout(() => { if (!found && typeof CONFIG !== 'undefined') resolve(CONFIG); }, 2000);
-				});
+	<script src="../config.js"></script>
+
+	<script type="module">
+		import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+		// ===== Supabase =====
+		const supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+
+		// ===== UI refs =====
+		const form = document.getElementById('signupForm');
+		const submitBtn = document.getElementById('submitBtn');
+		const spinner = document.getElementById('spinnerModal');
+
+		const els = {
+			firstname: document.getElementById('firstname'),
+			middlename: document.getElementById('middlename'),
+			lastname: document.getElementById('lastname'),
+			email: document.getElementById('email'),
+			birth: document.getElementById('birth'),
+			gender: document.getElementById('gender'),
+			city: document.getElementById('city'),
+			country: document.getElementById('country'),
+			accounttype: document.getElementById('accounttype'),
+			currency: document.getElementById('currency'),
+			password: document.getElementById('password'),
+			password2: document.getElementById('password2'),
+			pin: document.getElementById('pin'),
+		};
+
+		const errs = {
+			firstname: document.getElementById('firstnameErr'),
+			middlename: document.getElementById('middlenameErr'),
+			lastname: document.getElementById('lastnameErr'),
+			email: document.getElementById('emailErr'),
+			birth: document.getElementById('birthErr'),
+			gender: document.getElementById('genderErr'),
+			city: document.getElementById('cityErr'),
+			country: document.getElementById('countryErr'),
+			accounttype: document.getElementById('accounttypeErr'),
+			currency: document.getElementById('currencyErr'),
+			password: document.getElementById('passwordErr'),
+			password2: document.getElementById('password2Err'),
+			pin: document.getElementById('pinErr'),
+		};
+
+		// ===== Spinner helpers =====
+		const showSpinner = () => spinner.style.display = 'flex';
+		const hideSpinner = () => spinner.style.display = 'none';
+
+		// ===== Password strength =====
+		const strengthFill = document.getElementById('strengthFill');
+		const strengthLabel = document.getElementById('strengthLabel');
+
+		function passwordScore(pw) {
+			let s = 0;
+			if ((pw || '').length >= 8) s++;
+			if (/[A-Z]/.test(pw)) s++;
+			if (/[a-z]/.test(pw)) s++;
+			if (/[0-9]/.test(pw)) s++;
+			if (/[^A-Za-z0-9]/.test(pw)) s++;
+			return s; // 0–5
+		}
+
+		function updateStrengthMeter(pw) {
+			const score = passwordScore(pw);
+			const pct = (score / 5) * 100;
+			strengthFill.style.width = pct + "%";
+			strengthFill.style.background = pct < 40 ? "#ef4444" : pct < 80 ? "#f59e0b" : "#22c55e";
+			strengthLabel.textContent = pct < 40 ? "Weak" : pct < 80 ? "Medium" : "Strong";
+			return score;
+		}
+
+		updateStrengthMeter("");
+		els.password.addEventListener('input', e => updateStrengthMeter(e.target.value));
+
+		// ===== Validation =====
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
+		const required = v => String(v || '').trim().length > 0;
+		const pinOk = v => /^[0-9]{4}$/.test(String(v || '').trim());
+		const setErr = (key, msg = '') => { if (errs[key]) errs[key].textContent = msg; };
+
+		function validateAll() {
+			Object.keys(errs).forEach(k => setErr(k, ''));
+
+			let ok = true;
+			if (!required(els.firstname.value)) { setErr('firstname', 'First name is required'); ok = false; }
+			if (!required(els.lastname.value)) { setErr('lastname', 'Last name is required'); ok = false; }
+			if (!emailRegex.test(els.email.value)) { setErr('email', 'Enter a valid email'); ok = false; }
+			if (!required(els.birth.value)) { setErr('birth', 'Date of birth is required'); ok = false; }
+			if (!required(els.gender.value)) { setErr('gender', 'Please select gender'); ok = false; }
+			if (!required(els.city.value)) { setErr('city', 'City is required'); ok = false; }
+			if (!required(els.country.value)) { setErr('country', 'Country is required'); ok = false; }
+			if (!required(els.accounttype.value)) { setErr('accounttype', 'Select account type'); ok = false; }
+			if (!required(els.currency.value)) { setErr('currency', 'Select currency'); ok = false; }
+
+			const score = updateStrengthMeter(els.password.value);
+			if (score < 3) { setErr('password', 'Password too weak'); ok = false; }
+			if (els.password2.value !== els.password.value) { setErr('password2', 'Passwords do not match'); ok = false; }
+
+			if (!pinOk(els.pin.value)) { setErr('pin', 'PIN must be exactly 4 digits'); ok = false; }
+			return ok;
+		}
+
+		// live validation
+		[
+			'firstname', 'lastname', 'email', 'birth', 'gender', 'city', 'country',
+			'accounttype', 'currency', 'password', 'password2', 'pin'
+		].forEach(id => els[id].addEventListener('input', validateAll));
+
+		// ===== Generators (Metadata) =====
+		function genCodes() {
+			const accountNumber = '937' + Math.floor(1000000 + Math.random() * 9000000);
+			const r = (n) => Math.floor(Math.random() * n);
+			const IMF = `IMF${r(1795)}wOd${r(105)}HS/A${r(3725)}`;
+			const TAX = `TAX${r(170395)}-GNC${r(1905)}XW${r(378825)}`;
+			const COT = `OPL${r(1795)}/COT${r(1905)}FVM/${r(3725)}`;
+			return { accountNumber, IMF, TAX, COT };
+		}
+
+		// ===== Submit =====
+		form.addEventListener('submit', async (e) => {
+			e.preventDefault();
+
+			if (!validateAll()) {
+				Swal.fire('Fix errors', 'Please correct the highlighted fields.', 'warning');
+				return;
+			}
+
+			showSpinner();
+
+			const payload = {
+				firstname: els.firstname.value.trim(),
+				middlename: els.middlename.value.trim(),
+				lastname: els.lastname.value.trim(),
+				city: els.city.value.trim(),
+				country: els.country.value.trim(),
+				email: els.email.value.trim(),
+				dateOfBirth: els.birth.value,
+				gender: els.gender.value,
+				accttype: els.accounttype.value,
+				currency: els.currency.value,
+				pin: String(els.pin.value).trim(),
+				password: els.password.value
 			};
 
 			try {
-				const CONF = await loadConfig();
-				if (typeof supabase === 'undefined') return;
+				// 1) OBSERVER: Check if Email already exists locally/database to avoid duplicates
+				const { data: checkEmail, error: checkErr } = await supabase
+					.from('users')
+					.select('email')
+					.eq('email', payload.email)
+					.maybeSingle();
 
-				const db = supabase.createClient(CONF.SUPABASE_URL, CONF.SUPABASE_KEY);
-				const REDIRECT_URL = window.location.origin + "/404.html";
-
-				// --- REDIRECT LOGIC ---
-				const checkVisibility = (isVisible) => {
-					if (isVisible === false && !window.location.pathname.includes('404.html')) {
-						console.log("🚫 Site visibility disabled. Redirecting...");
-						window.location.href = REDIRECT_URL;
-					}
-				};
-
-				// 1. Initial Fetch
-				const { data, error } = await db
-					.from('admin')
-					.select('website_visibility')
-					.eq('id', 1)
-					.single();
-
-				if (!error && data) {
-					checkVisibility(data.website_visibility);
+				if (checkEmail) {
+					hideSpinner();
+					setErr('email', 'This email is already in use');
+					throw new Error('Account already exists with this email');
 				}
 
-				// 2. REALTIME VISIBILITY MONITOR
-				db.channel('visibility-kill-switch')
-					.on('postgres_changes', {
-						event: 'UPDATE',
-						schema: 'public',
-						table: 'admin',
-						filter: 'id=eq.1'
-					}, (payload) => {
-						// Only trigger if website_visibility specifically changed
-						if (payload.new && payload.new.hasOwnProperty('website_visibility')) {
-							checkVisibility(payload.new.website_visibility);
-						}
-					})
-					.subscribe();
+				// 2) Manual UUID Generation (No Supabase Auth)
+				const userUUID = crypto.randomUUID();
+				const codes = genCodes();
+
+				// 3) Insert Data into 'users' table
+				const { error: insertErr } = await supabase
+					.from('users')
+					.insert([{
+						uuid: userUUID,
+						firstname: payload.firstname,
+						middlename: payload.middlename || '',
+						lastname: payload.lastname,
+						email: payload.email,
+						password: payload.password, // Saving raw password as per your top code
+						dateOfBirth: payload.dateOfBirth,
+						gender: payload.gender,
+						city: payload.city,
+						country: payload.country,
+						accttype: payload.accttype,
+						currency: payload.currency,
+						pin: payload.pin,
+						accountNumber: codes.accountNumber,
+						IMF: codes.IMF,
+						TAX: codes.TAX,
+						COT: codes.COT,
+						accountBalance: '0',
+						accountLevel: 'Starter',
+						activeuser: true,
+						transferAccess: true,
+						date: new Date().toLocaleDateString()
+					}]);
+
+				if (insertErr) throw insertErr;
+
+				// 4) Create Local Session
+				localStorage.setItem('user_session', JSON.stringify({
+					uuid: userUUID,
+					email: payload.email
+				}));
+
+				Swal.fire({
+					title: 'Welcome!',
+					icon: 'success',
+					timer: 2000,
+					showConfirmButton: false
+				}).then(() => {
+					window.location.href = "../dashboard/index.html";
+				});
 
 			} catch (err) {
-				console.error("Visibility System Error:", err);
+				hideSpinner();
+				console.error(err);
+				Swal.fire('❌ Error', err.message || 'Something went wrong.', 'error');
 			}
-		})();
+		});
 	</script>
 </body>
 

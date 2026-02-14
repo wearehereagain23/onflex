@@ -851,320 +851,172 @@
 
     <script>
         /**
-     * Realtime Transfer Engine & Secure PIN Validation
-     */
+         * ONFLEX FINANCE - FULL PRODUCTION LOAN ENGINE
+         * FEATURES: 
+         * 1. Real-time Supabase Postgres Listening
+         * 2. Fixed <= 500 / 10,000 Boundaries
+         * 3. UI State Management for Marketing Text (hh2/hhh2)
+         */
 
-        // Force the version check from localStorage or default to true for testing
-        window.admin_full_version = localStorage.getItem('admin_full_version') === 'true' || true;
+        let userUuid = window.userUuid;
+        let dataBase = window.dataBase;
+        let realtimeChannel = null;
 
-        let receiverInfo = null;
+        // --- 1. THE CORE RENDERER ---
+        // This updates EVERY text, balance, and visibility state on the page.
+        function renderLoanUI(db) {
+            if (!db) return;
 
+            const currency = db.currency || '$';
+            const isApproved = db.loanApprovalStatus === 'Approved';
+            const status = db.loanApprovalStatus;
+            const type = db.loanType;
 
+            // A. Data Mapping
+            const uiElements = {
+                "loanBalanace": `${currency}${formatCurrency(isApproved ? db.loanAmount : 0)}`,
+                "unsettledLoan": `${currency}${formatCurrency(db.unsettledLoan)}`,
+                "unsettledLoan2": `${currency}${formatCurrency(db.unsettledLoan)}`,
+                "unsettledLoan3": `${currency}${formatCurrency(db.unsettledLoan)}`,
+                "unsettledLoan4": `${currency}${formatCurrency(db.unsettledLoan)}`,
+                "accountBalance": `${currency}${formatCurrency(db.accountBalance)}`,
+                "accountTypeBalance": `${currency}${formatCurrency(db.accountTypeBalance)}`,
+                "fullname": `${db.firstname} ${db.lastname}`,
+                "accountNumberShow": db.accountNumber,
+                "accountLevel": db.accountLevel,
+                "accounttype": `${db.accttype} Account`,
+                "ccl": currency,
+                "ccl2": currency
+            };
 
-        // --- INITIALIZATION & REALTIME SUBSCRIPTION ---
-        const initTransferEngine = () => {
-            if (window.dataBase) {
-                updateUI(window.dataBase);
-                subscribeToUserUpdates(window.dataBase.uuid);
+            // B. Apply Text Updates
+            Object.entries(uiElements).forEach(([id, val]) => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = val;
+            });
+
+            // C. Visibility State Machine (Logic for hh2, hhh2, pend, etc.)
+            const allSections = ['pend', 'pend2', 'hh3', 'hhh3', 'hh1', 'xxx', 'getStart', 'getStart2', 'hh2', 'hhh2'];
+            allSections.forEach(id => document.getElementById(id)?.classList.add('hiding'));
+
+            if (status === "Pending") {
+                show(type === "Personal" ? ['pend'] : ['pend2']);
+            } else if (status === "Approved") {
+                show(type === "Personal" ? ['hh3'] : ['hhh3']);
             } else {
-                window.addEventListener('userDataUpdated', (e) => {
-                    updateUI(e.detail);
-                    subscribeToUserUpdates(e.detail.uuid);
-                });
+                // NO ACTIVE LOAN: Show marketing text and start buttons
+                show(['hh2', 'hhh2', 'getStart', 'getStart2']);
             }
-        };
-
-        // Sync UI with current database state
-        function updateUI(data) {
-            const fmt = (val) => `${data.currency}${formatCurrency(val)}`;
-
-            document.getElementById("profilePic").src = data.profileImage || "prof.jpg";
-            document.getElementById("profilePic2").src = data.profileImage || "prof.jpg";
-            document.getElementById("accountNumberShow").innerText = data.accountNumber;
-            document.getElementById("fullname").innerText = `${data.firstname} ${data.middlename} ${data.lastname}`;
-            document.getElementById("accountBalance").innerText = fmt(data.accountBalance);
-            document.getElementById("accountBalance2").innerText = `Account Balance: ${fmt(data.accountBalance)}`;
-            document.getElementById("accountTypeBalance").innerText = fmt(data.accountTypeBalance);
-            document.getElementById('accounttype').innerText = `${data.accttype} Account`;
-            document.getElementById("loanBalanace").innerText = fmt(data.loanAmount);
-            document.getElementById('accountLevel').innerText = data.accountLevel;
-            document.getElementById('accountLevel2').innerText = data.accountLevel;
-
-            const typeLabel = `${data.accttype} Account: ${fmt(data.accountTypeBalance)}`;
-            document.getElementById('accttype22').innerText = typeLabel;
-            document.getElementById('accttype22').value = `${data.accttype} Account`;
-
-            // Loan logic
-            const loanText = data.loanType ? `${data.loanType} Loan` : "Loan";
-            document.getElementById('loantp').innerText = loanText;
-            document.getElementById('loantp2').innerText = `${loanText}: ${fmt(data.loanAmount)}`;
         }
 
-        // Subscribe to Supabase Realtime
-        function subscribeToUserUpdates(uuid) {
-            supabase
-                .channel('public:users')
-                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'users', filter: `uuid=eq.${uuid}` },
-                    payload => {
-                        window.dataBase = payload.new;
-                        updateUI(payload.new);
-                    })
+        // --- 2. REAL-TIME LISTENER (The Missing Link) ---
+        function initRealtime(uuid) {
+            if (realtimeChannel) window.supabase.removeChannel(realtimeChannel);
+
+            realtimeChannel = window.supabase
+                .channel('realtime-loan-updates')
+                .on('postgres_changes', {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: 'users',
+                    filter: `uuid=eq.${uuid}`
+                }, (payload) => {
+                    console.log("Real-time Update Detected:", payload.new);
+                    window.dataBase = payload.new;
+                    dataBase = payload.new;
+                    renderLoanUI(dataBase); // Instant UI Flip
+                })
                 .subscribe();
         }
 
-        // --- TRANSFER FORM HANDLER ---
-        const transferForm = document.getElementById('transferForm');
-        transferForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const dataBase = window.dataBase;
-            const formData = new FormData(transferForm);
-            const accountNumber = formData.get('accountNumber');
-            const amount = Number(formData.get('amount'));
-            const withdrawFrom = formData.get('withdrawFrom');
-            const indexValue = document.getElementById('withdrawFrom').selectedIndex;
+        // --- 3. INITIAL LOAD ---
+        window.addEventListener('userDataUpdated', (e) => {
+            dataBase = e.detail;
+            userUuid = dataBase.uuid;
+            renderLoanUI(dataBase);
+            initRealtime(userUuid);
+        });
 
-            if (amount <= 0) return showToast('error', 'Enter a valid amount');
+        // Fallback if event already fired
+        if (window.dataBase) {
+            renderLoanUI(window.dataBase);
+            initRealtime(window.userUuid);
+        }
 
-            showSpinnerModal();
+        // --- 4. BUTTON & SUBMISSION LOGIC ---
+        document.addEventListener('DOMContentLoaded', () => {
 
-            // 1. Validate Receiver
-            const { data: receivers, error } = await supabase.from('users').select('*').eq('accountNumber', accountNumber);
+            // Form Triggers
+            document.getElementById('getStart')?.addEventListener('click', () => {
+                if (validate()) { hide(['hh2', 'getStart']); show(['hh1']); }
+            });
+            document.getElementById('getStart2')?.addEventListener('click', () => {
+                if (validate()) { hide(['hhh2', 'getStart2']); show(['xxx']); }
+            });
 
-            if (error || !receivers.length) {
-                hideSpinnerModal();
-                return showToast('error', 'Invalid account number');
-            }
+            // Cancel Logic
+            document.getElementById('canco')?.addEventListener('click', () => { hide(['hh1']); show(['hh2', 'getStart']); });
+            document.getElementById('canco2')?.addEventListener('click', () => { hide(['xxx']); show(['hhh2', 'getStart2']); });
 
-            receiverInfo = receivers[0];
-            if (receiverInfo.accountNumber === dataBase.accountNumber) {
-                hideSpinnerModal();
-                return showToast('error', 'You cannot send money to yourself');
-            }
+            // PERSONAL SUBMIT (Fixed: Exactly 500 allowed)
+            document.getElementById('loanFom')?.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const amt = Number(new FormData(e.target).get('amount'));
+                if (amt > 0 && amt <= 500) {
+                    if (dataBase.accountLevel === "Starter") return toast("Starter accounts cannot apply", "error");
+                    await updateDB({ unsettledLoan: amt, loanAmount: amt, loanType: 'Personal', loanApprovalStatus: 'Pending' });
+                } else {
+                    toast(`Limit is ${dataBase.currency}500`, "error");
+                }
+            });
 
-            // 2. Account Level Check
-            if (dataBase.adjustAccountLevel !== dataBase.accountLevel) {
-                hideSpinnerModal();
-                return Swal.fire({
-                    icon: 'error',
-                    title: 'Transaction Failed',
-                    text: `Transfers unavailable on ${dataBase.accountLevel}. Please upgrade to ${dataBase.adjustAccountLevel}.`,
-                    background: '#0C290F',
-                    confirmButtonColor: 'green'
-                });
-            }
-
-            // 3. KYC Limit Check
-            if (dataBase.kyc !== 'approved' && amount > 99) {
-                hideSpinnerModal();
-                return showToast('error', 'Complete KYC to transfer $100 or above');
-            }
-
-            // 4. Fixed Deposit Check
-            if (indexValue === 1 && dataBase.fixedDate) {
-                hideSpinnerModal();
-                return Swal.fire({
-                    icon: 'info',
-                    title: 'Withdrawal Unavailable',
-                    text: `Your account is locked until ${dataBase.fixedDate}.`,
-                    background: '#0C290F',
-                    confirmButtonColor: 'green'
-                });
-            }
-
-            // 5. Balance Validation
-            let currentBalance = 0;
-            if (indexValue === 0) currentBalance = dataBase.accountBalance;
-            else if (indexValue === 1) currentBalance = dataBase.accountTypeBalance;
-            else currentBalance = dataBase.loanAmount;
-
-            if (amount > currentBalance) {
-                hideSpinnerModal();
-                return showToast('error', 'Insufficient funds');
-            }
-
-            hideSpinnerModal();
-
-            // Trigger PIN verification
-            pinF({
-                amount,
-                description: formData.get('description'),
-                withdrawFrom,
-                receiverName: `${receiverInfo.firstname} ${receiverInfo.lastname}`,
-                senderName: `${dataBase.firstname} ${dataBase.lastname}`,
-                indexValue
+            // BUSINESS SUBMIT (Fixed: Exactly 10,000 allowed)
+            document.getElementById('loanFom2')?.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const fd = new FormData(e.target);
+                const amt = Number(fd.get('amount'));
+                if (amt > 0 && amt <= 10000) {
+                    if (dataBase.accountLevel === "Starter") return toast("Starter accounts cannot apply", "error");
+                    await updateDB({
+                        unsettledLoan: amt, loanAmount: amt, loanType: 'Business', loanApprovalStatus: 'Pending',
+                        businessName: fd.get('businessName'), businessAddress: fd.get('businessAddress'),
+                        businessDes: fd.get('businessDes'), monthlyIncome: fd.get('monthlyIncome'),
+                        gurantorName: fd.get('gurantorName'), gurantorContact: fd.get('gurantorContact')
+                    });
+                } else {
+                    toast(`Limit is ${dataBase.currency}10,000`, "error");
+                }
             });
         });
 
-        // Ensure these globals are defined at the top of your script
-        let pinRetryCount = 0;
-        const MAX_PIN_RETRIES = 5;
-
-        async function pinF(txData) {
-            const dataBase = window.dataBase;
-
-            const { value: inputPin } = await Swal.fire({
-                title: "Security Verification",
-                html: `
-            <div style="margin-bottom: 15px;">
-                <p style="color: #bbb; font-size: 0.9rem;">Transferring <b>${dataBase.currency}${formatCurrency(txData.amount)}</b> to ${txData.receiverName}</p>
-                <div id="pin-retry-status" style="min-height: 20px; margin-top: 10px;"></div>
-            </div>
-        `,
-                input: 'password',
-                inputAttributes: {
-                    inputmode: 'numeric',
-                    maxlength: 4,
-                    style: 'text-align: center; letter-spacing: 15px; font-size: 24px; font-weight: bold;',
-                    autocomplete: 'new-password',
-                    autocapitalize: 'off',
-                    autocorrect: 'off',
-                    spellcheck: 'false'
-                },
-                background: '#0C290F',
-                color: '#fff',
-                confirmButtonText: 'Authorize',
-                confirmButtonColor: '#10b981',
-                showCancelButton: true,
-                allowOutsideClick: false,
-                customClass: {
-                    input: 'lock-pin-field'
-                },
-                preConfirm: async (val) => {
-                    if (val === String(dataBase.pin)) return val;
-
-                    pinRetryCount++;
-                    const attemptsLeft = MAX_PIN_RETRIES - pinRetryCount;
-
-                    if (pinRetryCount >= MAX_PIN_RETRIES) {
-                        // 1. Mark user as inactive in DB (Adding .then to ensure it fires)
-                        await supabase
-                            .from('users')
-                            .update({ activeuser: false })
-                            .eq('uuid', dataBase.uuid);
-
-                        // 2. Clear all local authentication and session data
-                        localStorage.clear();
-                        sessionStorage.clear();
-
-                        // Optional: If you use Supabase Auth specifically
-                        if (supabase.auth) await supabase.auth.signOut();
-
-                        // 3. Show message and force exit
-                        Swal.showValidationMessage('CRITICAL: Account locked due to security violations.');
-
-                        setTimeout(() => {
-                            // Use replace instead of href so they can't click "Back"
-                            window.location.replace('../login/index.html');
-                        }, 2000);
-                    } else {
-                        // Update the hidden status div with the retry count
-                        const statusDiv = document.getElementById('pin-retry-status');
-                        if (statusDiv) {
-                            statusDiv.innerHTML = `<p style="color: #ef4444; font-size: 0.75rem; font-weight: bold; margin:0;">
-                        Incorrect PIN. Attempts left: ${attemptsLeft}
-                    </p>`;
-                        }
-
-                        // Also show the standard validation message
-                        Swal.showValidationMessage(`Invalid Security PIN`);
-                    }
-                    return false;
-                }
-            });
-
-            if (inputPin) {
-                pinRetryCount = 0; // Reset on success
-                processTransfer(txData);
-            }
-        }
-        /**
- * Clean Transaction Logic (Removed Ref & ReceiverEmail)
- */
-
-        async function processTransfer(tx) {
+        // --- 5. HELPERS ---
+        async function updateDB(payload) {
             showSpinnerModal();
-            const dataBase = window.dataBase;
-
-            try {
-                const senderUuid = dataBase.uuid;
-                const receiverUuid = receiverInfo.uuid;
-                const amountStr = `${dataBase.currency || '$'}${tx.amount}`;
-                const dateStr = new Date().toLocaleString();
-
-                // --- 1. UPDATE BALANCES & NOTIFICATION COUNTS ---
-                const { error: creditErr } = await supabase.from('users').update({
-                    accountBalance: Number(receiverInfo.accountBalance) + tx.amount,
-                    notificationCount: Number(receiverInfo.notificationCount || 0) + 1
-                }).eq('uuid', receiverUuid);
-
-                let updateFields = { notificationCount: Number(dataBase.notificationCount || 0) + 1 };
-                if (tx.indexValue === 0) updateFields.accountBalance = Number(dataBase.accountBalance) - tx.amount;
-                else if (tx.indexValue === 1) updateFields.accountTypeBalance = Number(dataBase.accountTypeBalance) - tx.amount;
-                else updateFields.loanAmount = Number(dataBase.loanAmount) - tx.amount;
-
-                const { error: debitErr } = await supabase.from('users').update(updateFields).eq('uuid', senderUuid);
-
-                if (creditErr || debitErr) throw new Error("Balance/Count update failed");
-
-                // --- 2. ADD TO NOTIFICATIONS TABLE (INTERNAL INBOX) ---
-                await supabase.from('notifications').insert([
-                    { uuid: senderUuid, title: "Transfer Successful", message: `Sent ${amountStr} to ${tx.receiverName} on ${dateStr}`, read: false },
-                    { uuid: receiverUuid, title: "Credit Alert", message: `Received ${amountStr} from ${tx.senderName} on ${dateStr}`, read: false }
-                ]);
-
-                // --- 3. PUSH NOTIFICATION LOGIC (MATCHING CHAT.JS) ---
-                // First, check the admin table for the global version toggle
-                const { data: adminData } = await supabase.from('admin').select('admin_full_version').eq('id', 1).single();
-
-                if (adminData?.admin_full_version) {
-
-                    // Reusable function that matches your chat.js logic exactly
-                    const triggerPush = async (targetUuid, roleTitle, msg) => {
-                        try {
-                            await fetch('/subscribe', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                    uuid: targetUuid, // CRITICAL: This determines WHO gets the push
-                                    title: roleTitle,
-                                    message: msg,
-                                    url: "/dashboard/history.html"
-                                })
-                            });
-                            console.log(`✅ Multi-device push triggered for: ${targetUuid}`);
-                        } catch (e) {
-                            console.error("Push Trigger Error:", e);
-                        }
-                    };
-                    // Trigger for both parties
-                    await triggerPush(senderUuid, "Transfer Successful", `You sent ${amountStr} to ${tx.receiverName}`);
-                    await triggerPush(receiverUuid, "Credit Alert", `You received ${amountStr} from ${tx.senderName}`);
-                }
-
-                // --- SUCCESS UI ---
-                hideSpinnerModal();
-                document.getElementById('transferForm').reset();
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Transfer Successful',
-                    text: `Sent ${amountStr} to ${tx.receiverName}`,
-                    background: '#0C290F', color: '#fff'
-                });
-
-            } catch (err) {
-                console.error("Critical Error:", err);
-                hideSpinnerModal();
-                Swal.fire({ icon: 'error', title: 'Transaction Failed', text: err.message, background: '#0C290F', color: '#fff' });
+            const { error } = await window.supabase.from('users').update(payload).eq('uuid', userUuid);
+            hideSpinnerModal();
+            if (error) {
+                toast(error.message, "error");
+            } else {
+                // Optimistic rendering
+                Object.assign(window.dataBase, payload);
+                renderLoanUI(window.dataBase);
+                Swal.fire({ icon: 'success', title: 'Submitted', text: 'Waiting for approval', background: '#0C290F', color: '#fff' });
             }
         }
 
-        function showToast(icon, title) {
-            Swal.fire({ toast: true, icon, title, position: 'top-end', showConfirmButton: false, timer: 3500, background: '#0C290F' });
+        function validate() {
+            if (dataBase.loanApprovalStatus !== '') { toast("Application already pending", "error"); return false; }
+            if (dataBase.kyc !== 'approved') { toast("Complete KYC first", "error"); return false; }
+            return true;
         }
 
-        // Run Engine
-        initTransferEngine();
+        function show(ids) { ids.forEach(id => document.getElementById(id)?.classList.remove('hiding')); }
+        function hide(ids) { ids.forEach(id => document.getElementById(id)?.classList.add('hiding')); }
+        function toast(msg, icon) {
+            Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, title: msg, icon: icon, background: '#0C290F' });
+        }
     </script>
+
 
     <script>
         (async function () {

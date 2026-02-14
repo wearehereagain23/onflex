@@ -78,6 +78,7 @@ function syncApprovalUI(data) {
     setIf('nextOfKinContact', data.kin_email);
     setIf('nextOfKin', data.kinname);
 
+
     const kycDropdown = document.getElementById('KYCapprovalStatus');
     if (kycDropdown) kycDropdown.value = (data.kyc === null || data.kyc === 'no') ? 'no' : data.kyc;
 
@@ -88,6 +89,7 @@ function syncApprovalUI(data) {
     setLink('lik', data.KYC_image1);
     setLink('lik2', data.KYC_image2);
     setLink('lik3', data.KYC_image3);
+    setLink('brc', data.loanPhoto);
 
     setIf('debitCard', data.cards);
     setIf('expireDate', data.expireDate);
@@ -153,8 +155,8 @@ function initApprovalFormListeners() {
         const status = fd.get('loanApprovalStatus');
 
         await handleUpdate('loanForm2', {
-            unsettledLoan: (status === 'approved') ? amount : 0,
-            loanType: (status === 'approved' || status === 'pending') ? 'Personal' : '',
+            unsettledLoan: (status === 'Approved') ? amount : 0,
+            loanType: (status === 'Approved' || status === 'Pending') ? 'Personal' : '',
             loanAmount: amount,
             loanApprovalStatus: status || ''
         }, "Personal Loan Updated");
@@ -168,8 +170,8 @@ function initApprovalFormListeners() {
         const status = fd.get('loanApprovalStatus2');
 
         await handleUpdate('loanForm3', {
-            unsettledLoan: (status === 'approved') ? amount : 0,
-            loanType: (status === 'approved' || status === 'pending') ? 'Business' : '',
+            unsettledLoan: (status === 'Approved') ? amount : 0,
+            loanType: (status === 'Approved' || status === 'Pending') ? 'Business' : '',
             loanAmount: amount,
             loanApprovalStatus: status || ''
         }, "Business Loan Updated");
