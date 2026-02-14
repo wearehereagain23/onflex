@@ -7,8 +7,12 @@ let selectedFile = null;
 let chatChannel = null;
 let activeUser = null;
 
-// --- 1. INITIALIZATION & UI SYNC ---
 
+document.addEventListener('DOMContentLoaded', () => {
+    setupImageListener();
+});
+
+// --- 1. INITIALIZATION & UI SYNC ---
 window.addEventListener('userDataUpdated', (e) => {
     activeUser = e.detail;
     if (activeUser?.uuid) {
@@ -18,21 +22,25 @@ window.addEventListener('userDataUpdated', (e) => {
     }
 });
 
+
 // --- 2. FIXED: IMAGE PREVIEW LOGIC ---
 // We attach this directly to the element as soon as the script loads
 const setupImageListener = () => {
     const fileInput = document.getElementById('chatImageInput');
-    const previewImg = document.getElementById('imagePreview');
-    const previewContainer = document.getElementById('imagePreviewContainer');
 
-    if (!fileInput) return;
+    // Based on your HTML, these are the active preview IDs
+    const previewImg = document.getElementById('newImagePreview');
+    const previewContainer = document.getElementById('newImagePreviewArea');
 
-    // Use 'onchange' to ensure it overrides any previous dead listeners
+    if (!fileInput) {
+        console.error("chatImageInput not found");
+        return;
+    }
+
     fileInput.onchange = (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
-        // Validation
         if (!file.type.startsWith('image/')) {
             Swal.fire("Invalid Type", "Please select an image file", "warning");
             return;
@@ -40,13 +48,11 @@ const setupImageListener = () => {
 
         selectedFile = file;
 
-        // Create Preview
         if (previewImg && previewContainer) {
-            // Cleanup old blob to prevent memory leaks on mobile
             if (previewImg.src.startsWith('blob:')) URL.revokeObjectURL(previewImg.src);
 
             previewImg.src = URL.createObjectURL(file);
-            previewContainer.style.display = 'flex';
+            previewContainer.style.display = 'block'; // Show the preview area
             console.log("Preview active for:", file.name);
         }
     };
@@ -65,16 +71,13 @@ async function handleMessageSend() {
     if (!db || !activeUser?.uuid) return;
 
     const text = input.value.trim();
-    // Use the global selectedFile variable
     if (!text && !selectedFile) return;
 
     if (sendBtn) sendBtn.disabled = true;
 
-    let imageUrl = null;
-
     try {
+        let imageUrl = null;
         if (selectedFile) {
-            // MATCHING ADMIN LOGIC: Flat path for high compatibility
             const safeName = selectedFile.name.replace(/[^a-z0-9.]/gi, '_').toLowerCase();
             const filePath = `chat/${Date.now()}_${safeName}`;
 
@@ -99,14 +102,13 @@ async function handleMessageSend() {
 
         if (insertError) throw insertError;
 
-        // Cleanup
         input.value = '';
         clearImageSelection();
         await triggerAdminNotification(activeUser, text || "Sent an image");
 
     } catch (err) {
-        console.error("Upload/Insert Error:", err);
-        Swal.fire("Error", "Message failed to send. Please try again.", "error");
+        console.error("Chat Error:", err);
+        Swal.fire("Error", "Message failed to send.", "error");
     } finally {
         if (sendBtn) sendBtn.disabled = false;
         input.focus();
@@ -164,13 +166,15 @@ async function loadChatHistory(uuid) {
 }
 
 // --- 5. HELPERS ---
-
 function clearImageSelection() {
     selectedFile = null;
     const imageInput = document.getElementById('chatImageInput');
-    const container = document.getElementById('imagePreviewContainer');
+    const container = document.getElementById('newImagePreviewArea');
+    const previewImg = document.getElementById('newImagePreview');
+
     if (imageInput) imageInput.value = '';
     if (container) container.style.display = 'none';
+    if (previewImg) previewImg.src = '';
 }
 
 async function triggerAdminNotification(userData, messageText) {
@@ -193,16 +197,27 @@ async function triggerAdminNotification(userData, messageText) {
 // Event Delegation for Clicks
 document.addEventListener('click', (e) => {
     const modal = document.getElementById("chatModal");
+
+    // The "Cancel" button in your footer preview
+    if (e.target.id === 'btnCancelUpload' || e.target.id === 'cancelImage') {
+        clearImageSelection();
+        return;
+    }
+
+    // The "Send Image" button in your footer preview
+    if (e.target.id === 'btnSendImage' || e.target.id === 'sendImageBtn') {
+        handleMessageSend();
+        return;
+    }
+
     if (e.target.closest('#chatBtn')) {
         modal.style.display = "flex";
         scrollToBottom();
         if (activeUser?.uuid) markAsRead(activeUser.uuid);
-    } else if (e.target.closest('.close-chat') || e.target === modal) {
+    } else if (e.target.closest('.close-btn') || e.target.id === 'closeChat' || e.target === modal) {
         modal.style.display = "none";
     } else if (e.target.closest('#sendChatBtn')) {
         handleMessageSend();
-    } else if (e.target.closest('#removeImagePreview')) {
-        clearImageSelection();
     }
 });
 
