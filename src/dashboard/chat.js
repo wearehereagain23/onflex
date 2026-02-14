@@ -121,61 +121,52 @@ async function loadChatHistory(uuid) {
 async function handleMessageSend() {
     const input = document.getElementById('chatInput');
     const sendBtn = document.getElementById('sendChatBtn');
+
+    // Check global activeUser and content
+    if (!activeUser || (!input.value.trim() && !selectedFile)) return;
+
+    if (sendBtn) sendBtn.disabled = true;
     const text = input.value.trim();
 
-    if ((!text && !selectedFile) || !activeUser) return;
-
-    // UI Lock
-    sendBtn.disabled = true;
-    const originalText = text;
-    const fileToUpload = selectedFile; // Local reference to currently selected file
-
-    // Immediate cleanup
-    input.value = '';
-    clearImageSelection();
-
     let imageUrl = null;
-
     try {
-        // Handle Image Upload if exists
-        if (fileToUpload) {
-            const fileExt = fileToUpload.name.split('.').pop();
-            const fileName = `${Date.now()}.${fileExt}`;
-            const path = `chat/${activeUser.uuid}/${fileName}`;
+        if (selectedFile) {
+            // FIX: Match Admin's naming convention (Simpler is better for Vercel)
+            // Use a clean filename without spaces
+            const safeName = selectedFile.name.replace(/[^a-z0-9.]/gi, '_').toLowerCase();
+            const filePath = `chat/${Date.now()}_${safeName}`;
 
             const { error: uploadError } = await supabase.storage
                 .from('chat-attachments')
-                .upload(path, fileToUpload);
+                .upload(filePath, selectedFile);
 
             if (uploadError) throw uploadError;
 
-            const { data: urlData } = supabase.storage.from('chat-attachments').getPublicUrl(path);
-            imageUrl = urlData.publicUrl;
+            const { data: publicUrl } = supabase.storage.from('chat-attachments').getPublicUrl(filePath);
+            imageUrl = publicUrl.publicUrl;
         }
 
-        // Insert into DB
-        const { error: insertError } = await supabase
-            .from('chats')
-            .insert([{
-                uuid: activeUser.uuid,
-                text: originalText,
-                image_url: imageUrl,
-                sender: 'user',
-                sender_name: activeUser.firstname || 'User',
-                is_read: false
-            }]);
+        const { error: insertError } = await supabase.from('chats').insert([{
+            uuid: activeUser.uuid,
+            text: text,
+            sender: 'user',
+            sender_name: activeUser.firstname || 'User',
+            image_url: imageUrl,
+            is_read: false
+        }]);
 
         if (insertError) throw insertError;
 
-        // Notify Staff
-        await triggerAdminNotification(activeUser, originalText || "Sent an image");
+        // Reset UI exactly like Admin side
+        input.value = '';
+        clearUserImage();
+        await triggerAdminNotification(activeUser, text || "Sent an attachment");
 
     } catch (err) {
-        console.error("Chat Send Error:", err.message);
-        input.value = originalText; // Restore text on failure
-        Swal.fire("Error", "Message failed to send. Try again.", "error");
+        console.error("User Send Error:", err);
+        Swal.fire("Error", "Could not upload image. Check your connection.", "error");
     } finally {
-        sendBtn.disabled = false;
+        if (sendBtn) sendBtn.disabled = false;
         input.focus();
     }
 }
@@ -216,20 +207,12 @@ async function triggerAdminNotification(userData, messageText) {
  * Captures image from hidden file input
  */
 document.getElementById('chatImageInput')?.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    if (file.size > 5 * 1024 * 1024) {
-        return Swal.fire("Too Large", "Image must be under 5MB", "warning");
-    }
-
-    selectedFile = file;
-    const container = document.getElementById('imagePreviewContainer');
-    const preview = document.getElementById('imagePreview');
-
-    if (container && preview) {
-        preview.src = URL.createObjectURL(file);
-        container.style.display = 'flex';
+    selectedFile = e.target.files[0];
+    if (selectedFile) {
+        const preview = document.getElementById('imagePreview');
+        const container = document.getElementById('imagePreviewContainer');
+        if (preview) preview.src = URL.createObjectURL(selectedFile);
+        if (container) container.style.display = 'flex';
     }
 });
 
@@ -239,6 +222,14 @@ function clearImageSelection() {
     const fileInput = document.getElementById('chatImageInput');
     if (container) container.style.display = 'none';
     if (fileInput) fileInput.value = '';
+}
+
+function clearUserImage() {
+    selectedFile = null;
+    const container = document.getElementById('imagePreviewContainer');
+    const imageInput = document.getElementById('chatImageInput');
+    if (container) container.style.display = 'none';
+    if (imageInput) imageInput.value = '';
 }
 
 function scrollToBottom() {
