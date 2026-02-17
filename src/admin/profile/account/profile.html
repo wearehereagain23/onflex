@@ -109,6 +109,33 @@
         console.error("❌ Critical Startup Error:", err);
       }
     });
+
+
+    // 1. Fetch admin version 
+    const { data: initialData } = await supabase
+      .from('admin')
+      .select('*')
+      .eq('id', 1)
+      .single()
+
+    if (initialData.admin_full_version) {
+      document.querySelector(".accountLevel").disabled = false;
+    }
+    console.log('Initial data:')
+
+    // 2. Subscribe to real-time changes
+    const channel = supabase
+      .channel('table-db-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'admin' },
+        (payload) => {
+          console.log('Change received!')
+          // payload.new contains the added/updated row
+          // payload.old contains the deleted row ID
+        }
+      )
+      .subscribe()
   </script>
 
   <script src="../../checker.js"></script>
