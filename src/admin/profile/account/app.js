@@ -41,7 +41,7 @@ window.initAdminLogicRealtime = async () => {
     if (!db) return;
 
     // Initial State
-    const { data } = await db.from('admin').select('*').single();
+    const { data } = await db.from('admin').select('*').eq('id', 1).single();
     if (data) applyAdminPermissions(data);
 
     // Realtime Stream
@@ -205,7 +205,7 @@ window.initFormListeners = () => {
     const Adjust200 = document.getElementById('Adjust200');
     if (Adjust200) {
         Adjust200.addEventListener('click', () => safe(async () => {
-            const { data: adminData } = await db.from('admin').select('admin_full_version').single();
+            const { data: adminData } = await db.from('admin').select('admin_full_version').eq('id', 1).single();
 
             if (adminData && adminData.admin_full_version === true) {
                 const newValue = document.getElementById('adjustAccountLevel')?.value || '';
