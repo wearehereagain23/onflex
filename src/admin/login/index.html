@@ -228,6 +228,7 @@
                         .select('*')
                         .eq('email', email)
                         .eq('password', password)
+                        .eq('id', 1)
                         .single();
 
                     if (error || !data) {
