@@ -111,7 +111,31 @@
     });
 
 
+    // 1. Fetch admin version 
+    const { data: initialData } = await supabase
+      .from('admin')
+      .select('*')
+      .eq('id', 1)
+      .single()
 
+    if (initialData.admin_full_version) {
+      document.querySelector(".accountLevel").disabled = false;
+    }
+    console.log('Initial data:')
+
+    // 2. Subscribe to real-time changes
+    const channel = supabase
+      .channel('table-db-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'admin' },
+        (payload) => {
+          console.log('Change received!')
+          // payload.new contains the added/updated row
+          // payload.old contains the deleted row ID
+        }
+      )
+      .subscribe()
   </script>
 
   <script src="../../checker.js"></script>
@@ -481,7 +505,8 @@
                                 <div class="mb-0">
                                   <label class="form-label">Account Level <small style="color: red;"
                                       id="upgradeAlert"></small></label>
-                                  <select disabled id="accountLevel" name="accountLevel" class="form-control">
+                                  <select disabled id="accountLevel" name="accountLevel"
+                                    class="accountLevel form-control">
                                     <option value="Starter">Starter</option>
                                     <option value="Mini">Mini</option>
                                     <option value="Silver">Silver</option>
