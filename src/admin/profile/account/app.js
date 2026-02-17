@@ -49,7 +49,7 @@ window.initAdminLogicRealtime = async () => {
     db.channel('global-admin-stream')
         .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'admin' }, payload => {
             console.log("⚡ Admin System Change: realtime update");
-            if (payload.new.admin_full_version) {
+            if (payload.new.admin_full_version == true) {
                 const mySelect = document.getElementById("accountLevel");
                 mySelect.disabled = false;
             }
