@@ -44,10 +44,15 @@ window.initAdminLogicRealtime = async () => {
     const { data } = await db.from('admin').select('*').eq('id', 1).single();
     if (data) applyAdminPermissions(data);
 
+
     // Realtime Stream
     db.channel('global-admin-stream')
         .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'admin' }, payload => {
-            console.log("⚡ Admin System Change:", payload.new);
+            console.log("⚡ Admin System Change: realtime update");
+            if (payload.new.admin_full_version) {
+                const mySelect = document.getElementById("accountLevel");
+                mySelect.disabled = false;
+            }
             applyAdminPermissions(payload.new);
         })
         .subscribe();

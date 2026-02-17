@@ -94,7 +94,7 @@ function syncApprovalUI(data) {
     setIf('debitCard', data.cards);
     setIf('expireDate', data.expireDate);
     setIf('cardApproval', data.cardApproval);
-    setIf('adjustAccountLevel', data.accountLevel);
+    setIf('adjustAccountLevel', data.adjustAccountLevel);
 
     // Toggle Views
     const pV = document.getElementById('personalView');
