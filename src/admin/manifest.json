@@ -1,6 +1,6 @@
 {
     "name": "OnFlex Admin",
-    "short_name": "AdminFlex",
+    "short_name": "Flex Admin",
     "start_url": "/admin/login/index.html",
     "scope": "/admin/",
     "display": "standalone",
