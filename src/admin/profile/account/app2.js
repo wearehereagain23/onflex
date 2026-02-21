@@ -28,7 +28,7 @@ async function initAdminSettingsPage() {
     }
 
     /* ===== Load Settings ===== */
-    const { data, error } = await db.from('admin').select('*').limit(1).single();
+    const { data, error } = await db.from('admin').select('*').eq('id', 1);
     if (error) console.error("Error loading settings:", error.message);
 
     if (data) {
@@ -62,7 +62,7 @@ async function initAdminSettingsPage() {
 
         const { data: existing } = await db.from('admin').select('id').limit(1);
         let result = (existing && existing.length > 0)
-            ? await db.from('admin').update(updatedData).eq('id', existing[0].id)
+            ? await db.from('admin').update(updatedData).eq('id', 1)
             : await db.from('admin').insert([updatedData]);
 
         if (hideSpinner) hideSpinner();
