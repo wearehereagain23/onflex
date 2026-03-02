@@ -28,7 +28,7 @@ async function initAdminSettingsPage() {
     }
 
     /* ===== Load Settings ===== */
-    const { data, error } = await db.from('admin').select('*').eq('id', 1);
+    const { data, error } = await db.from('admin').select('*').eq('id', 1).single();
     if (error) console.error("Error loading settings:", error.message);
 
     if (data) {
