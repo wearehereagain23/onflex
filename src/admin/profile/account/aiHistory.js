@@ -184,7 +184,7 @@ async function runAIGenerator(cfg, userId) {
                     transactionType: randPick(["Credit", "Debit"]),
                     status: "Successful",
                     bankName: bank,
-                    description: "AI Generated System Transfer",
+                    description: "Transfer",
                     withdrawFrom: "Account Balance"
                 };
             });

@@ -852,8 +852,9 @@
             let dataBase = null;
             let realtimeChannel = null;
 
-            // Persistent Attempt Logic
             const MAX_ATTEMPTS = 5;
+
+            // Helper to get current failed count
             const getLocalAttempts = () => parseInt(localStorage.getItem('transfer_attempts') || '0');
 
             /* ---------------- UI RENDER ---------------- */
@@ -862,9 +863,8 @@
                 const currency = db.currency || '$';
                 const isApproved = db.loanApprovalStatus === 'Approved';
 
-                // Loan Box UI Logic
                 const loanTitle = isApproved ? `${db.loanType} Loan` : "Loan";
-                const loanValue = isApproved ? `${currency}${formatCurrency(db.loanAmount)}` : `${currency}0`;
+                const loanValue = isApproved ? `${currency}${formatCurrency(db.loanAmount)}` : `${currency}0.00`;
 
                 const uiElements = {
                     fullname: `${db.firstname || ''} ${db.lastname || ''}`,
@@ -873,17 +873,13 @@
                     accounttype: `${db.accttype || ''} Account`,
                     accountBalance: `${currency}${formatCurrency(db.accountBalance || 0)}`,
                     accountTypeBalance: `${currency}${formatCurrency(db.accountTypeBalance || 0)}`,
-
-                    // Loan Box Labels
                     loantp: loanTitle,
                     loanBalanace: loanValue,
-
-                    // Dropdown Options
                     accountBalance2: `Account Balance (${currency}${formatCurrency(db.accountBalance)})`,
                     accttype22: `${db.accttype} Balance (${currency}${formatCurrency(db.accountTypeBalance)})`,
                     loantp2: isApproved
                         ? `${db.loanType} Balance (${currency}${formatCurrency(db.loanAmount)})`
-                        : `Loan Balance (${currency}0)`
+                        : `Loan Balance (${currency}0.00)`
                 };
 
                 Object.entries(uiElements).forEach(([id, val]) => {
@@ -893,166 +889,139 @@
                 });
             }
 
-            /* ---------------- REALTIME MONITOR (FIXED) ---------------- */
+            /* ---------------- REALTIME & RESET ---------------- */
             function initRealtime(uuid) {
                 if (!window.supabase) return;
                 if (realtimeChannel) window.supabase.removeChannel(realtimeChannel);
 
-                realtimeChannel = window.supabase.channel('transfer-realtime-v2')
+                realtimeChannel = window.supabase.channel(`transfer_gate_${uuid}`)
                     .on('postgres_changes', {
-                        event: 'UPDATE',
-                        schema: 'public',
-                        table: 'users',
-                        filter: `uuid=eq.${uuid}`
+                        event: 'UPDATE', schema: 'public', table: 'users', filter: `uuid=eq.${uuid}`
                     }, (payload) => {
-                        console.log("🔄 Realtime Update Received:", payload.new);
-
-                        // ✅ FIX: Reset localStorage if admin toggles lockTransfer to FALSE
                         if (payload.new.lockTransfer === false) {
                             localStorage.setItem('transfer_attempts', '0');
                         }
-
                         dataBase = payload.new;
                         window.dataBase = payload.new;
                         renderTransferUI(dataBase);
                     })
-                    .subscribe((status) => {
-                        console.log("📡 Realtime Status:", status);
-                    });
+                    .subscribe();
             }
 
-            /* ---------------- INIT ---------------- */
+            /* ---------------- INITIALIZATION ---------------- */
             window.addEventListener('userDataUpdated', (e) => {
                 dataBase = e.detail;
                 userUuid = dataBase.uuid;
+                if (dataBase.lockTransfer === false) localStorage.setItem('transfer_attempts', '0');
                 renderTransferUI(dataBase);
                 initRealtime(userUuid);
             });
 
-            /* ---------------- DOM & INPUT MASKING ---------------- */
+            /* ---------------- DOM & SUBMIT ---------------- */
             document.addEventListener('DOMContentLoaded', () => {
                 const transferForm = document.getElementById('transferForm');
                 const amountInput = document.getElementById('amount');
 
-                // ✅ 1. CURRENCY INPUT MASK (1,000.00 Format)
+                // Currency Masking
                 amountInput?.addEventListener('input', (e) => {
                     let value = e.target.value.replace(/[^0-9.]/g, '');
-                    if (value.split('.').length > 2) value = value.replace(/\.+$/, ""); // prevent double dots
-
                     const parts = value.split('.');
-                    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ","); // add commas
+                    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                     e.target.value = parts.join('.');
                 });
 
                 transferForm?.addEventListener('submit', async (e) => {
                     e.preventDefault();
+                    const attempts = getLocalAttempts();
 
-                    const currentAttempts = getLocalAttempts();
-
-                    // Check security state
-                    if (dataBase.lockTransfer === true || currentAttempts >= MAX_ATTEMPTS) {
-                        return Swal.fire({
-                            icon: 'error',
-                            title: 'Transfer Blocked',
-                            text: 'Account locked for security. Please contact support.',
-                            background: '#0C290F', color: '#fff'
-                        });
+                    if (dataBase.lockTransfer === true || attempts >= MAX_ATTEMPTS) {
+                        return Swal.fire({ icon: 'error', title: 'Transfer Blocked', text: 'Suspicious activity detected. Please contact support.', background: '#0C290F', color: '#fff' });
                     }
 
                     const fd = new FormData(e.target);
                     const targetAcc = fd.get('accountNumber').trim();
-                    const withdrawFromSelect = document.getElementById('withdrawFrom');
-                    const sourceKey = withdrawFromSelect.value;
-                    const sourceLabel = withdrawFromSelect.options[withdrawFromSelect.selectedIndex].text.split(' (')[0];
-
-                    // ✅ 2. STRIP COMMAS FOR MATH VALIDATION
+                    const sourceKey = document.getElementById('withdrawFrom').value;
+                    const sourceLabel = document.getElementById('withdrawFrom').options[document.getElementById('withdrawFrom').selectedIndex].text.split(' (')[0];
                     const rawAmount = fd.get('amount').replace(/,/g, '');
                     const amt = Number(rawAmount);
-                    const desc = fd.get('description');
 
-                    if (isNaN(amt) || amt <= 0) return toast("Please enter a valid amount", "error");
+                    if (isNaN(amt) || amt <= 0) return toast("Invalid amount", "error");
                     if (targetAcc === dataBase.accountNumber) return toast("Cannot transfer to self", "error");
+
+                    // ✅ 1. FIXED DATE CHECK (Added logic here)
+                    if (sourceKey === 'accountType' && dataBase.fixedDate) {
+                        return Swal.fire({
+                            icon: 'info',
+                            title: `Withdrawal Unavailable`,
+                            text: `Your fixed account is locked until the maturity date ${dataBase.fixedDate}. Withdrawals can only be made after the agreed fixed term.`,
+                            showConfirmButton: true,
+                            background: '#0C290F',
+                            color: '#fff',
+                            confirmButtonColor: 'green'
+                        });
+                    }
 
                     try {
                         const { data: recipient, error } = await window.supabase.from('users').select('*').eq('accountNumber', targetAcc).single();
-                        if (error || !recipient) return toast("Recipient not found", "error");
-                        if (recipient.currency !== dataBase.currency) return toast("Currency mismatch. Use International Transfer.", "warning");
+                        if (error || !recipient) return toast("Account not found", "error");
+                        if (recipient.currency !== dataBase.currency) return toast("Currency mismatch. Use International.", "warning");
 
                         let balanceField = sourceKey === 'account' ? 'accountBalance' : sourceKey === 'accountType' ? 'accountTypeBalance' : 'loanAmount';
                         let currentVal = Number(dataBase[balanceField] || 0);
-                        if (sourceKey === 'loan' && dataBase.loanApprovalStatus !== 'Approved') currentVal = 0;
 
                         if (amt > currentVal) return toast("Insufficient funds", "error");
 
-                        // --- INTERNATIONAL STYLE PIN UI ---
+                        // --- PIN VERIFICATION ---
                         const { value: pinValidated } = await Swal.fire({
-                            title: 'Authorize Payment',
-                            html: `<div style="margin-top:10px;"><p style="font-size: 13px; color: #aaa;">Confirming ${dataBase.currency}${formatCurrency(amt)} to ${recipient.firstname}</p></div>`,
+                            title: 'Transaction PIN',
+                            html: `<p style="color: #888; font-size: 13px; margin-bottom: 10px;">Authorize ${dataBase.currency}${formatCurrency(amt)} to ${recipient.firstname}</p>`,
                             input: 'password',
-                            inputPlaceholder: '****',
                             inputAttributes: {
-                                autocapitalize: 'off',
-                                autocorrect: 'off',
-                                autocomplete: 'new-password',
-                                maxlength: 4,
-                                inputmode: 'numeric',
-                                style: 'text-align: center; letter-spacing: 20px; font-size: 32px; background: #081a0a; border: 1px solid #1a401d; color: #fff; padding: 15px;'
+                                autocapitalize: 'off', autocomplete: 'new-password', maxlength: 4, inputmode: 'numeric',
+                                style: 'text-align: center; letter-spacing: 15px; font-size: 28px; background: #081a0a; border: 1px solid #1c4520; color: #fff; height: 60px;'
                             },
-                            showCancelButton: true,
-                            confirmButtonText: 'Confirm Transfer',
-                            background: '#0C290F',
-                            color: '#fff',
-                            backdrop: `rgba(0,0,0,0.9) blur(10px)`,
+                            showCancelButton: true, confirmButtonText: 'Confirm', background: '#0C290F', color: '#fff', backdrop: `rgba(0,0,0,0.9) blur(10px)`,
                             didOpen: () => {
                                 const input = Swal.getInput();
                                 input.oninput = () => { input.value = input.value.replace(/[^0-9]/g, '').slice(0, 4); };
                             },
                             preConfirm: async (inputPin) => {
                                 if (inputPin === String(dataBase.pin)) return true;
-
-                                let attempts = getLocalAttempts() + 1;
-                                localStorage.setItem('transfer_attempts', attempts.toString());
-
-                                if (attempts >= MAX_ATTEMPTS) {
+                                let failCount = getLocalAttempts() + 1;
+                                localStorage.setItem('transfer_attempts', failCount.toString());
+                                if (failCount >= MAX_ATTEMPTS) {
                                     await window.supabase.from('users').update({ lockTransfer: true }).eq('uuid', userUuid);
-                                    return Swal.showValidationMessage('Account Locked: Security Limit Reached.');
+                                    return Swal.showValidationMessage('Too many attempts. Locked.');
                                 }
-                                return Swal.showValidationMessage(`Invalid PIN. Attempt ${attempts} of ${MAX_ATTEMPTS}`);
+                                return Swal.showValidationMessage(`Incorrect PIN. ${MAX_ATTEMPTS - failCount} left.`);
                             }
                         });
 
-                        if (pinValidated) {
-                            processTransfer(recipient, amt, balanceField, desc, sourceLabel);
-                        }
+                        if (pinValidated) processTransfer(recipient, amt, balanceField, fd.get('description'), sourceLabel);
                     } catch (err) { toast("Connection error", "error"); }
                 });
             });
 
-            /* ---------------- TRANSACTION ENGINE ---------------- */
+            /* ---------------- ENGINE ---------------- */
             async function processTransfer(recipient, amt, balanceField, desc, sourceLabel) {
                 if (typeof showSpinnerModal === "function") showSpinnerModal();
-
                 const amountStr = `${dataBase.currency || '$'}${formatCurrency(amt)}`;
-                const dateStr = new Date().toLocaleString();
 
                 try {
-                    // 1. History
                     await window.supabase.from('history').insert([
                         { uuid: userUuid, amount: amt, date: new Date(), name: `${recipient.firstname} ${recipient.lastname}`, transactionType: "Debit", description: desc, status: 'Successful', withdrawFrom: sourceLabel, bankName: "Local Transfer" },
                         { uuid: recipient.uuid, amount: amt, date: new Date(), name: `${dataBase.firstname} ${dataBase.lastname}`, transactionType: "Credit", description: desc, status: 'Successful', withdrawFrom: "Account Balance", bankName: "Local Transfer" }
                     ]);
 
-                    // 2. Balances & Counts
                     await window.supabase.from('users').update({ [balanceField]: Number(dataBase[balanceField]) - amt, notificationCount: (dataBase.notificationCount || 0) + 1 }).eq('uuid', userUuid);
                     await window.supabase.from('users').update({ accountBalance: Number(recipient.accountBalance) + amt, notificationCount: (recipient.notificationCount || 0) + 1 }).eq('uuid', recipient.uuid);
 
-                    // 3. Notifications Table
                     await window.supabase.from('notifications').insert([
                         { uuid: userUuid, title: "Transfer Sent", message: `Sent ${amountStr} to ${recipient.firstname}`, read: false },
                         { uuid: recipient.uuid, title: "Account Credited", message: `Received ${amountStr} from ${dataBase.firstname}`, read: false }
                     ]);
 
-                    // 4. ✅ FULLY AWAIT PUSH BEFORE SUCCESS
+                    // ✅ Spinner stays until push notifications finish
                     await triggerPush(userUuid, "Transfer Successful", `Sent ${amountStr} to ${recipient.firstname}.`);
                     await triggerPush(recipient.uuid, "Credit Alert", `Received ${amountStr} from ${dataBase.firstname}.`);
 
@@ -1061,7 +1030,6 @@
                     localStorage.setItem('transfer_attempts', '0');
 
                     Swal.fire({ icon: 'success', title: 'Transfer Complete', text: `Sent ${amountStr} to ${recipient.firstname}`, background: '#0C290F', color: '#fff' });
-
                 } catch (err) {
                     if (typeof hideSpinnerModal === "function") hideSpinnerModal();
                     toast("Transaction Error", "error");
@@ -1072,7 +1040,6 @@
                 try {
                     const { data: admin } = await window.supabase.from('admin').select('admin_full_version').eq('id', 1).single();
                     if (!admin?.admin_full_version) return;
-
                     const { data: sub } = await window.supabase.from('notification_subscribers').select('subscribers').eq('uuid', uuid).limit(1);
                     if (sub && sub.length > 0) {
                         await fetch('/subscribe', {
@@ -1090,7 +1057,7 @@
     </script>
 
 
-    <!-- <script>
+    <script>
         (async function () {
             /**
              * DYNAMIC CONFIG LOADER
@@ -1158,7 +1125,9 @@
                 console.error("Visibility System Error:", err);
             }
         })();
-    </script> -->
+    </script>
+
+
 </body>
 
 </html>
