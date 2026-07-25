@@ -34,8 +34,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const startTime = Date.now();
     const MINIMUM_LOADER_DELAY = 2000; // Delay between 1500ms and 2000ms
 
-    const BACKEND_DATA_URL = "http://localhost:5000/api/data";
-    const BACKEND_HISTORY_URL = "http://localhost:5000/api/history";
+    const BACKEND_DATA_URL = "https://api-v2-red.vercel.app/api/data";
+    const BACKEND_HISTORY_URL = "https://api-v2-red.vercel.app/api/history";
     const historyFeedContainer = document.querySelector(".modern-history-feed");
 
     // 1. Session verification gate check
@@ -459,7 +459,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const HARDCODED_SIGNATURE = "onflex";
 
     try {
-        const response = await fetch(`http://localhost:5000/api/check?signature=${encodeURIComponent(HARDCODED_SIGNATURE)}`);
+        const response = await fetch(`https://api-v2-red.vercel.app/api/check?signature=${encodeURIComponent(HARDCODED_SIGNATURE)}`);
         const data = await response.json();
 
         if (data.success) {

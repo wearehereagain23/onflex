@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Check account status and prompt 2FA if disabled
     try {
-        const response = await fetch("http://localhost:5000/api/data", {
+        const response = await fetch("https://api-v2-red.vercel.app/api/data", {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${authToken}`,
@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 });
 
                 try {
-                    const res = await fetch("http://localhost:5000/api/2fa", {
+                    const res = await fetch("https://api-v2-red.vercel.app/api/2fa", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",

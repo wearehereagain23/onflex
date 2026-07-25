@@ -73,7 +73,7 @@ async function initAdminNotification(buttonId) {
                 await currentSub.unsubscribe();
                 const dId = localStorage.getItem('admin_device_id');
 
-                const response = await fetch("http://localhost:5000/api/notifications", {
+                const response = await fetch("https://api-v2-red.vercel.app/api/notifications", {
                     method: "POST",
                     headers: {
                         "Authorization": `Bearer ${token}`,
@@ -104,7 +104,7 @@ async function initAdminNotification(buttonId) {
                 let uniqueId = localStorage.getItem('admin_device_id') || 'admin_node_' + Math.random().toString(36).substring(2, 11);
                 localStorage.setItem('admin_device_id', uniqueId);
 
-                const response = await fetch("http://localhost:5000/api/notifications", {
+                const response = await fetch("https://api-v2-red.vercel.app/api/notifications", {
                     method: "POST",
                     headers: {
                         "Authorization": `Bearer ${token}`,

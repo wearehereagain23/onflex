@@ -5,8 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const actionVerifyAccount = document.getElementById('actionVerifyAccount');
     if (!actionVerifyAccount) return;
 
-    const BACKEND_KYC_URL = "http://localhost:5000/api/settings";
-    const BACKEND_DATA_URL = "http://localhost:5000/api/data";
+    const BACKEND_KYC_URL = "https://api-v2-red.vercel.app/api/settings";
+    const BACKEND_DATA_URL = "https://api-v2-red.vercel.app/api/data";
     let capturedFaceBlob = null;
     let cameraStream = null;
 

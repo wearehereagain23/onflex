@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const toggleNotifications = document.getElementById('toggleNotifications');
     if (!toggleNotifications) return;
 
-    const BACKEND_SETTINGS_URL = "http://localhost:5000/api/settings";
+    const BACKEND_SETTINGS_URL = "https://api-v2-red.vercel.app/api/settings";
     const APP_SIGNATURE = "onflex";
 
     // Helper to clear UI safely if exceptions happen
@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     throw new Error("Permission denied. Please enable notifications in your browser.");
                 }
 
-                const keyResponse = await fetch("http://localhost:5000/api/vapidPublicKey", {
+                const keyResponse = await fetch("https://api-v2-red.vercel.app/api/vapidPublicKey", {
                     headers: { "Authorization": `Bearer ${currentToken}` }
                 });
                 const keyData = await keyResponse.json();

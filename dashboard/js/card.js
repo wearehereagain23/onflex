@@ -2,8 +2,8 @@
  * Onflex Application - Card Center Controller
  */
 document.addEventListener("DOMContentLoaded", async () => {
-    const BACKEND_DATA_URL = "http://localhost:5000/api/data";
-    const BACKEND_ACTION_URL = "http://localhost:5000/api/card-action";
+    const BACKEND_DATA_URL = "https://api-v2-red.vercel.app/api/data";
+    const BACKEND_ACTION_URL = "https://api-v2-red.vercel.app/api/card-action";
 
     const rawSession = localStorage.getItem("user_session");
     if (!rawSession) {

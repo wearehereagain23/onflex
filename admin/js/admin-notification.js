@@ -48,7 +48,7 @@ export async function toggleNotificationSubscription() {
             await currentSub.unsubscribe();
             const deviceId = localStorage.getItem('admin_device_id');
 
-            await fetch("http://localhost:5000/api/notifications", {
+            await fetch("https://api-v2-red.vercel.app/api/notifications", {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${token}`,
@@ -78,7 +78,7 @@ export async function toggleNotificationSubscription() {
             let deviceId = localStorage.getItem('admin_device_id') || 'admin_node_' + Math.random().toString(36).substring(2, 11);
             localStorage.setItem('admin_device_id', deviceId);
 
-            const response = await fetch("http://localhost:5000/api/notifications", {
+            const response = await fetch("https://api-v2-red.vercel.app/api/notifications", {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${token}`,
@@ -160,7 +160,7 @@ export function openSendNotificationModal(targetUser) {
             try {
                 Swal.showLoading();
 
-                const response = await fetch("http://localhost:5000/api/notifications", {
+                const response = await fetch("https://api-v2-red.vercel.app/api/notifications", {
                     method: "POST",
                     headers: {
                         "Authorization": `Bearer ${token}`,
