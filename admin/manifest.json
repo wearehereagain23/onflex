@@ -1,20 +1,20 @@
 {
-    "name": "OnFlex Admin",
-    "short_name": "OnFlex-Admin",
-    "start_url": "/admin/login.html",
-    "scope": "/admin/",
+    "name": "OnFlex Admin Console",
+    "short_name": "OnFlex Admin",
+    "start_url": "./login.html",
+    "scope": "./",
     "display": "standalone",
     "theme_color": "#0C290F",
     "background_color": "#0C290F",
-    "description": "OnFlex Admin Finance Banking App",
+    "description": "OnFlex Admin Console App",
     "icons": [
         {
-            "src": "icon-192.png",
+            "src": "./icon-192.png",
             "sizes": "192x192",
             "type": "image/png"
         },
         {
-            "src": "icon-512.png",
+            "src": "./icon-512.png",
             "sizes": "512x512",
             "type": "image/png"
         }
