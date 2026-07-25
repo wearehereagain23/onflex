@@ -219,15 +219,15 @@
 
                     <form id="loanApplicationForm" class="loan-input-matrix">
                         <div class="input-field-group">
-                            <label class="form-input-label" for="loanAmountInput">Desired Loan Amount</label>
+                            <label class="form-input-label" for="loanAmountInput">Desired Loan Amount ($)</label>
                             <div class="input-relative-container">
-                                <span class="input-prefix-icon" id="currencyPrefix">$</span>
+                                <span class="input-prefix-icon">$</span>
                                 <input type="number" id="loanAmountInput"
                                     class="custom-dashboard-input asset-input-padding" placeholder="50.00" min="50"
-                                    max="100000" required>
+                                    max="25000" required>
                             </div>
-                            <span class="input-hint-msg">Minimum: 50.00 | Maximum authorized: <span
-                                    id="hintMaxLimit">$100,000.00</span></span>
+                            <span class="input-hint-msg">Minimum: $50.00 | Maximum authorized: <span
+                                    id="hintMaxLimit">$25,000.00</span></span>
                         </div>
 
                         <div class="input-field-group">
@@ -254,7 +254,7 @@
                             </div>
                         </div>
 
-                        <!-- Real-Time Yield Ledger -->
+                        <!-- Real-Time Yield Ledger (Hidden dynamically until conditions match) -->
                         <div id="liveCalcWidget" class="live-calculation-card" style="display: none;">
                             <h4 class="calc-card-title">Real-Time Yield Ledger</h4>
                             <div class="calc-data-grid">
@@ -279,7 +279,7 @@
                         </div>
 
                         <div class="submit-btn-holder">
-                            <button type="submit" class="full-width-btn form-submit-btn">
+                            <button type="submit" class=" full-width-btn form-submit-btn">
                                 Execute Contract & Disburse Funds
                             </button>
                         </div>
@@ -428,6 +428,7 @@
             display: none !important;
         }
 
+        /* Clean styling for Google's native dropdown inside dark theme */
         .goog-te-combo {
             background: transparent;
             color: var(--text-main, #ffffff);

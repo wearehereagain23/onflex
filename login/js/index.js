@@ -71,6 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 openSecureMFAInterface(result.user_id, emailVal, passwordVal);
             } else {
                 // Direct login if 2FA is disabled
+                localStorage.setItem("show_2fa_prompt", "true");
                 localStorage.setItem("user_session", JSON.stringify({
                     token: result.token,
                     uuid: result.user.uuid,

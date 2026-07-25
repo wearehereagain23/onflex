@@ -48,8 +48,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         [mmsNode, vcsNode, vveNode].forEach(node => {
             if (node) {
-                node.style.setProperty("width", "540px", "important");
-                node.style.setProperty("max-width", "100%", "important");
+                node.style.setProperty("max-width", "540px", "important");
+                node.style.setProperty("width", "100%", "important");
                 node.style.setProperty("margin", "0 auto", "important");
             }
         });

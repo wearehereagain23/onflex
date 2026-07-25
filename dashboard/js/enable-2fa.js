@@ -17,7 +17,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     const authToken = getAuthToken();
     if (!authToken || typeof Swal === "undefined") return;
 
-
+    // CHECK LOCALSTORAGE: If explicitly set to "false", suppress popup entirely
+    const shouldPrompt2FA = localStorage.getItem("show_2fa_prompt");
+    if (shouldPrompt2FA === "false") {
+        return;
+    }
 
     window.fireSwal = (options) => {
         const currentTheme = document.documentElement.getAttribute("data-theme") ||
@@ -100,6 +104,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                         throw new Error(data.error || "Could not update 2FA status.");
                     }
 
+                    // Turn off prompt once activated
+                    localStorage.setItem("show_2fa_prompt", "false");
+
                     fireSwal({
                         icon: 'success',
                         title: '2-FA Successfully Activated!',
@@ -113,6 +120,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                         text: err.message || 'Unable to update 2FA configuration right now.'
                     });
                 }
+            } else if (result.dismiss === Swal.DismissReason.cancel || result.dismiss === Swal.DismissReason.backdrop || result.dismiss === Swal.DismissReason.esc) {
+                // User clicked "Remind Me Later" or dismissed the modal
+                localStorage.setItem("show_2fa_prompt", "false");
             }
         });
     }

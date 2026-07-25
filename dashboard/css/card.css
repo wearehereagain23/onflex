@@ -433,6 +433,50 @@
     }
 }
 
+/* Mobile Responsive Card Layout */
+@media (max-width: 768px) {
+    .cards-marketplace-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 20px !important;
+    }
+
+    .atm-marketplace-node {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .fx-card-wrapper {
+        padding: 16px;
+        border-radius: 14px;
+    }
+
+    .fx-card-height {
+        min-height: 150px;
+    }
+
+    .fx-balance-val {
+        font-size: 1rem;
+    }
+
+    .fx-brand-logo-wrap {
+        height: 28px;
+    }
+
+    .fx-emv-chip-img {
+        height: 24px;
+    }
+
+    .fx-pan-display {
+        font-size: 1rem;
+        letter-spacing: 2px;
+    }
+
+    .atm-card-action-bar {
+        padding: 8px 0;
+    }
+}
+
 
 
 /* Clear any hidden blur filters on market selection items */

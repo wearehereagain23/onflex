@@ -1,21 +1,58 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const BACKEND_DATA_URL = "https://api-v2-red.vercel.app/api/data";
     const BACKEND_LOAN_UPDATE_URL = "https://api-v2-red.vercel.app/api/loan-action";
-    const GLOBAL_PIN_URL = "https://api-v2-red.vercel.app/api/card-action";
+    const GLOBAL_PIN_URL = "https://api-v2-red.vercel.app/api/verify-pin";
 
     const rawSession = localStorage.getItem("user_session");
     if (!rawSession) { window.location.href = "../login/index.html"; return; }
     const session = JSON.parse(rawSession);
 
-    const DYNAMIC_INTEREST_RATE = 5;
-    const MAX_AUTHORIZED_LIMIT = 25000.00;
-    const MIN_AUTHORIZED_LIMIT = 50.00;
+    // =========================================================================
+    // TIER COLOR LOGIC & CONFIGURATION MAP
+    // =========================================================================
+    const TIER_CONFIG = {
+        "1": {
+            rate: 5.0,
+            minLimit: 50.00,
+            maxLimit: 25000.00,
+            primaryColor: "#00f2fe", // Cyan / Teal
+            badgeBg: "rgba(0, 242, 254, 0.15)",
+            badgeColor: "#00f2fe",
+            btnHoverFilter: "brightness(1.15)"
+        },
+        "2": {
+            rate: 3.5,
+            minLimit: 50.00,
+            maxLimit: 50000.00,
+            primaryColor: "#f59e0b", // Gold / Amber
+            badgeBg: "rgba(245, 158, 11, 0.15)",
+            badgeColor: "#f59e0b",
+            btnHoverFilter: "brightness(1.15)"
+        },
+        "3": {
+            rate: 2.0,
+            minLimit: 50.00,
+            maxLimit: 100000.00,
+            primaryColor: "#10b981", // Emerald Green
+            badgeBg: "rgba(16, 185, 129, 0.15)",
+            badgeColor: "#10b981",
+            btnHoverFilter: "brightness(1.15)"
+        }
+    };
+
+    // Default configuration (Tier 1 fallback)
+    let currentTierConfig = TIER_CONFIG["1"];
+    let DYNAMIC_INTEREST_RATE = currentTierConfig.rate;
+    let MAX_AUTHORIZED_LIMIT = currentTierConfig.maxLimit;
+    let MIN_AUTHORIZED_LIMIT = currentTierConfig.minLimit;
+    let userCurrency = "$";
 
     const headerInterestRate = document.getElementById('headerInterestRate');
     const ledgerRateLabel = document.getElementById('ledgerRateLabel');
     const displayMaxLimit = document.getElementById('displayMaxLimit');
     const hintMaxLimit = document.getElementById('hintMaxLimit');
     const loanAmountInput = document.getElementById('loanAmountInput');
+    const currencyPrefix = document.getElementById('currencyPrefix');
     const loanTermSelect = document.getElementById('loanTerm');
     const loanPurposeSelect = document.getElementById('loanPurpose');
     const liveCalcWidget = document.getElementById('liveCalcWidget');
@@ -47,6 +84,50 @@ document.addEventListener('DOMContentLoaded', async () => {
         color: "#fff",
         confirmButtonColor: "#0a698f"
     };
+
+    // Helper: Apply dynamic color scheme to loan form components
+    function applyTierTheme(tierKey) {
+        const config = TIER_CONFIG[tierKey] || TIER_CONFIG["1"];
+        currentTierConfig = config;
+
+        DYNAMIC_INTEREST_RATE = config.rate;
+        MAX_AUTHORIZED_LIMIT = config.maxLimit;
+        MIN_AUTHORIZED_LIMIT = config.minLimit;
+
+        // Update form inputs and limit hints
+        if (loanAmountInput) {
+            loanAmountInput.min = MIN_AUTHORIZED_LIMIT;
+            loanAmountInput.max = MAX_AUTHORIZED_LIMIT;
+            loanAmountInput.placeholder = MIN_AUTHORIZED_LIMIT.toFixed(2);
+        }
+
+        if (currencyPrefix) currencyPrefix.textContent = userCurrency;
+        if (headerInterestRate) headerInterestRate.textContent = `${DYNAMIC_INTEREST_RATE.toFixed(2)}%`;
+        if (ledgerRateLabel) ledgerRateLabel.textContent = `${DYNAMIC_INTEREST_RATE}%`;
+        if (displayMaxLimit) displayMaxLimit.textContent = `${userCurrency}${MAX_AUTHORIZED_LIMIT.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+        if (hintMaxLimit) hintMaxLimit.textContent = `${userCurrency}${MAX_AUTHORIZED_LIMIT.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+
+        // Style the submit button dynamically
+        const submitBtn = document.querySelector('.form-submit-btn');
+        if (submitBtn) {
+            submitBtn.style.setProperty('background-color', config.primaryColor, 'important');
+            submitBtn.style.setProperty('background', config.primaryColor, 'important');
+            submitBtn.style.setProperty('color', '#0d1520', 'important');
+            submitBtn.style.setProperty('border', 'none', 'important');
+        }
+
+        // Style progress bar fill dynamically
+        if (utilizationBar) {
+            utilizationBar.style.background = config.primaryColor;
+        }
+
+        // Style Tier badges dynamically
+        const badges = document.querySelectorAll('.panel-header-badge .feed-badge');
+        badges.forEach(badge => {
+            badge.style.background = config.badgeBg;
+            badge.style.color = config.badgeColor;
+        });
+    }
 
     function renderLoanStateLayout(userRecord) {
         const status = (userRecord.loanApprovalStatus || '').trim();
@@ -117,10 +198,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (data.success) {
                 cachedUserRecord = data.data;
                 const u = cachedUserRecord;
-                if (tier) tier.innerHTML = u.tiers || "1";
-                if (tiersNav) tiersNav.innerHTML = u.tiers || "1";
+                userCurrency = u.currency || "$";
 
-                const s = u.currency || "$";
+                const userTier = String(u.tiers || "1").trim();
+                if (tier) tier.innerHTML = userTier;
+                if (tiersNav) tiersNav.innerHTML = userTier;
+
+                // Apply tier color theme and interest rate limits
+                applyTierTheme(userTier);
+
+                const s = userCurrency;
                 if (mainBalanceHero) mainBalanceHero.innerText = `${s}${parseFloat(u.accountBalance || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
                 if (typeBalanceHero) typeBalanceHero.innerText = `${s}${parseFloat(u.accountTypeBalance || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
                 if (loanBalanceHero) loanBalanceHero.innerText = `${s}${parseFloat(u.loanAmount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
@@ -138,27 +225,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     await populateDashboard();
 
-    const decimalRateMultiplier = DYNAMIC_INTEREST_RATE / 100;
-
-    if (headerInterestRate) headerInterestRate.textContent = `${DYNAMIC_INTEREST_RATE.toFixed(2)}%`;
-    if (ledgerRateLabel) ledgerRateLabel.textContent = `${DYNAMIC_INTEREST_RATE}%`;
-    if (displayMaxLimit) displayMaxLimit.textContent = `$${MAX_AUTHORIZED_LIMIT.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-    if (hintMaxLimit) hintMaxLimit.textContent = `$${MAX_AUTHORIZED_LIMIT.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-
     function performLiveCalculations() {
         if (!loanAmountInput || !loanTermSelect || !liveCalcWidget) return;
         const value = parseFloat(loanAmountInput.value);
         const months = parseInt(loanTermSelect.value) || 12;
+
+        const decimalRateMultiplier = DYNAMIC_INTEREST_RATE / 100;
 
         if (!isNaN(value) && value >= MIN_AUTHORIZED_LIMIT && value <= MAX_AUTHORIZED_LIMIT) {
             const interestCost = value * decimalRateMultiplier;
             const absoluteTotal = value + interestCost;
             const monthlyInstalment = absoluteTotal / months;
 
-            if (calcPrincipal) calcPrincipal.textContent = `$${value.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-            if (calcInterest) calcInterest.textContent = `$${interestCost.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-            if (calcTotal) calcTotal.textContent = `$${absoluteTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-            if (calcMonthly) calcMonthly.textContent = `$${monthlyInstalment.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+            if (calcPrincipal) calcPrincipal.textContent = `${userCurrency}${value.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+            if (calcInterest) calcInterest.textContent = `${userCurrency}${interestCost.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+            if (calcTotal) calcTotal.textContent = `${userCurrency}${absoluteTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+            if (calcMonthly) calcMonthly.textContent = `${userCurrency}${monthlyInstalment.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
 
             const usagePercentage = Math.min(((value / MAX_AUTHORIZED_LIMIT) * 100), 100);
             if (utilizationPercent) utilizationPercent.textContent = `${Math.round(usagePercentage)}%`;
@@ -199,7 +281,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     ...unifiedSwalStyle,
                     icon: 'error',
                     title: 'Invalid Amount',
-                    text: `Please enter an amount between $${MIN_AUTHORIZED_LIMIT} and $${MAX_AUTHORIZED_LIMIT.toLocaleString()}.`
+                    text: `Please enter an amount between ${userCurrency}${MIN_AUTHORIZED_LIMIT.toFixed(2)} and ${userCurrency}${MAX_AUTHORIZED_LIMIT.toLocaleString()}.`
                 });
             }
 
@@ -209,8 +291,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             const confirmation = await Swal.fire({
                 ...unifiedSwalStyle,
                 title: 'Submit Loan Application?',
-                text: `Are you sure you want to apply for a $${finalValue.toLocaleString()} loan?`,
+                text: `Are you sure you want to apply for a ${userCurrency}${finalValue.toLocaleString()} loan?`,
                 showCancelButton: true,
+                confirmButtonColor: currentTierConfig.primaryColor,
                 confirmButtonText: 'Proceed to PIN',
                 cancelButtonText: 'Cancel'
             });

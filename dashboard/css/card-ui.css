@@ -19,8 +19,9 @@
 }
 
 .fx-card-height {
-    min-height: 200px;
-    height: 100%;
+    min-height: 160px;
+    /* Reduced from 200px */
+    height: auto;
 }
 
 /* Base Hidden Blur-State Configuration */

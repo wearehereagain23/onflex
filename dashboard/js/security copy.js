@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const userEmail = session.email;
 
     const BACKEND_SETTINGS_URL = "https://api-v2-red.vercel.app/api/settings";
-    const BACKEND_LOGIN_URL = "https://api-v2-red.vercel.app/bank/login-user";
     const APP_SIGNATURE = "onflex";
 
     const keypadAudio = new Audio("../assets/single-keypad.mp3");
@@ -192,27 +191,18 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             try {
-                const res = await fetch(BACKEND_LOGIN_URL, {
+                const res = await fetch(BACKEND_SETTINGS_URL, {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
+                        "x-setting-target": "forgot_password_request"
                     },
                     body: JSON.stringify({
-                        action: "forgot_password_request",
                         email: userEmail.trim().toLowerCase(),
                         signature: APP_SIGNATURE
                     })
                 });
-
-                // Read response as text first to handle unexpected HTML error pages safely
-                const rawText = await res.text();
-                let data;
-                try {
-                    data = JSON.parse(rawText);
-                } catch (e) {
-                    console.error("Backend returned non-JSON response:", rawText);
-                    throw new Error("Server returned an invalid response (HTML instead of JSON). Check server logs.");
-                }
+                const data = await res.json();
 
                 if (!res.ok || !data.success) {
                     throw new Error(data.error || "Failed to initiate recovery.");
@@ -297,14 +287,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     retryBtn.innerText = "Resend Code...";
                     retryBtn.disabled = true;
                     try {
-                        const res = await fetch(BACKEND_LOGIN_URL, {
+                        const res = await fetch(BACKEND_SETTINGS_URL, {
                             method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                                action: "forgot_password_request",
-                                email: targetedEmail,
-                                signature: APP_SIGNATURE
-                            })
+                            headers: { "Content-Type": "application/json", "x-setting-target": "forgot_password_request" },
+                            body: JSON.stringify({ email: targetedEmail, signature: APP_SIGNATURE })
                         });
                         const resData = await res.json();
                         if (!res.ok || !resData.success) throw new Error(resData.error);
@@ -335,7 +321,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     key.addEventListener('click', async () => {
                         if (enteredPin.length >= 6) return;
 
-                        playKeypadSound();
+                        playKeypadSound(); // Sound triggers exclusively when key is clicked
                         key.style.background = '#e2e8f0';
                         setTimeout(() => key.style.background = '#f1f5f9', 80);
 
@@ -345,9 +331,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (enteredPin.length === 6) {
                             Swal.showLoading();
                             try {
-                                const response = await fetch(BACKEND_LOGIN_URL, {
+                                const response = await fetch(BACKEND_SETTINGS_URL, {
                                     method: "POST",
-                                    headers: { "Content-Type": "application/json" },
+                                    headers: { "Content-Type": "application/json", "x-setting-target": "verify_password_otp" },
                                     body: JSON.stringify({
                                         action: "verify_password_otp",
                                         user_id: userId,
@@ -425,9 +411,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 try {
-                    const response = await fetch(BACKEND_LOGIN_URL, {
+                    const response = await fetch(BACKEND_SETTINGS_URL, {
                         method: "POST",
-                        headers: { "Content-Type": "application/json" },
+                        headers: { "Content-Type": "application/json", "x-setting-target": "commit_new_password" },
                         body: JSON.stringify({
                             action: "commit_new_password",
                             user_id: userId,

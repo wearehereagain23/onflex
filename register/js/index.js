@@ -208,6 +208,7 @@ form.addEventListener('submit', async (e) => {
             localStorage.setItem("user_token", result.token);
             localStorage.setItem("user_data", JSON.stringify(userData));
             localStorage.setItem("notification_active", "false");
+            localStorage.setItem("show_2fa_prompt", "true");
 
             Swal.fire({
                 title: 'Registration Successful',

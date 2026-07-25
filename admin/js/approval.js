@@ -5,44 +5,100 @@
 export function syncApprovalFormFields(userObject) {
     if (!userObject) return;
 
-    // 1. POPULATE CARD FORM FIELDS
-    document.getElementById("appr_cards").value = userObject.cards || "Master";
-    document.getElementById("appr_cardApproval").value = (userObject.cardApproval || "no").toLowerCase();
-    document.getElementById("appr_cardNumber").value = userObject.cardNumber || "";
-    document.getElementById("appr_expireDate").value = userObject.expireDate || "";
-    document.getElementById("appr_card_pin").value = userObject.card_pin || "";
-    document.getElementById("appr_card_cvc").value = userObject.card_cvc || "";
+    // Get Form Elements
+    const cardForm = document.getElementById("cardApprovalForm");
+    const kycForm = document.getElementById("kycApprovalForm");
+    const loanForm = document.getElementById("loanApprovalForm");
 
-    // 2. POPULATE KYC FORM FIELDS & PREVIEWS
-    document.getElementById("appr_kyc").value = (userObject.kyc || "no").toLowerCase();
-    document.getElementById("appr_occupation").value = userObject.occupation || "";
-    document.getElementById("appr_marital_status").value = userObject.marital_status || "";
-    document.getElementById("appr_phone").value = userObject.phone || "";
-    document.getElementById("appr_zipcode").value = userObject.zipcode || "";
-    document.getElementById("appr_address").value = userObject.address || "";
-    document.getElementById("appr_kinname").value = userObject.kinname || "";
-    document.getElementById("appr_kin_email").value = userObject.kin_email || "";
+    // Get Statuses (normalized to lowercase)
+    const cardStatus = (userObject.cardApproval || "no").toLowerCase();
+    const kycStatus = (userObject.kyc || "no").toLowerCase();
+    const loanStatus = (userObject.loanApprovalStatus || "").toLowerCase();
 
-    renderKycImage("KYC_image1", "kyc_img1_wrap", userObject.KYC_image1);
-    renderKycImage("KYC_image2", "kyc_img2_wrap", userObject.KYC_image2);
-    renderKycImage("KYC_image3", "kyc_img3_wrap", userObject.KYC_image3);
 
-    // 3. POPULATE LOAN FORM FIELDS
-    document.getElementById("appr_loanApprovalStatus").value = userObject.loanApprovalStatus || "";
-    document.getElementById("appr_loanAmount").value = userObject.loanAmount || "0";
-    document.getElementById("appr_loanType").value = userObject.loanType || "";
-    document.getElementById("appr_loan_duration").value = userObject.loan_duration || "";
+    // 1. CARD APPROVAL PANEL LOGIC
+    if (cardStatus === "pending" || cardStatus === "approved") {
+        cardForm.style.display = "block";
 
-    // Guard against missing DOM element
-    const unsettledElem = document.getElementById("appr_unsettledLoan");
-    if (unsettledElem) {
-        unsettledElem.value = userObject.unsettledLoan || "0";
+        // Resolve requested card brand (checks common field names: cards, cardBrand, cardType, card)
+        const rawCardBrand = userObject.cards || userObject.cardBrand || userObject.cardType || userObject.card || "Mastercard";
+        setSelectOptionByValueOrText("appr_cards", rawCardBrand);
+
+        document.getElementById("appr_cardApproval").value = cardStatus;
+        document.getElementById("appr_cardNumber").value = userObject.cardNumber || "";
+        document.getElementById("appr_expireDate").value = userObject.expireDate || "";
+        document.getElementById("appr_card_pin").value = userObject.card_pin || "";
+        document.getElementById("appr_card_cvc").value = userObject.card_cvc || "";
+    } else {
+        cardForm.style.display = "none";
     }
+
+    // 2. KYC VERIFICATION PANEL LOGIC
+    // Show if pending or approved; hide if "no", "rejected", or empty
+    if (kycStatus === "pending" || kycStatus === "approved") {
+        kycForm.style.display = "block";
+        document.getElementById("appr_kyc").value = kycStatus;
+        document.getElementById("appr_occupation").value = userObject.occupation || "";
+        document.getElementById("appr_marital_status").value = userObject.marital_status || "";
+        document.getElementById("appr_phone").value = userObject.phone || "";
+        document.getElementById("appr_zipcode").value = userObject.zipcode || "";
+        document.getElementById("appr_address").value = userObject.address || "";
+        document.getElementById("appr_kinname").value = userObject.kinname || "";
+        document.getElementById("appr_kin_email").value = userObject.kin_email || "";
+
+        renderKycImage("KYC_image1", "kyc_img1_wrap", userObject.KYC_image1);
+        renderKycImage("KYC_image2", "kyc_img2_wrap", userObject.KYC_image2);
+        renderKycImage("KYC_image3", "kyc_img3_wrap", userObject.KYC_image3);
+    } else {
+        kycForm.style.display = "none";
+    }
+
+    // 3. LOAN PORTAL PANEL LOGIC
+    // Show if pending or approved; hide if empty, "no", or "rejected"
+    if (loanStatus === "pending" || loanStatus === "approved") {
+        loanForm.style.display = "block";
+        document.getElementById("appr_loanApprovalStatus").value = userObject.loanApprovalStatus || "Pending";
+        document.getElementById("appr_loanAmount").value = userObject.loanAmount || "0";
+        document.getElementById("appr_loanType").value = userObject.loanType || "";
+        document.getElementById("appr_loan_duration").value = userObject.loan_duration || "";
+
+        const unsettledElem = document.getElementById("appr_unsettledLoan");
+        if (unsettledElem) {
+            unsettledElem.value = userObject.unsettledLoan || "0";
+        }
+    } else {
+        loanForm.style.display = "none";
+    }
+
+    // Check if all modules are hidden to toggle empty state message
+    checkEmptyApprovalsState([cardForm, kycForm, loanForm]);
 
     // BIND SUBMIT HANDLERS
     bindCardFormSubmit(userObject);
     bindKycFormSubmit(userObject);
     bindLoanFormSubmit(userObject);
+}
+
+// Helper to display a friendly message when all forms are hidden
+function checkEmptyApprovalsState(forms) {
+    const parentContainer = document.querySelector("#user-approvals-fields .card-body");
+    if (!parentContainer) return;
+
+    let emptyMsg = document.getElementById("no-pending-approvals-msg");
+    const hasVisiblePanel = forms.some(form => form.style.display !== "none");
+
+    if (!hasVisiblePanel) {
+        if (!emptyMsg) {
+            emptyMsg = document.createElement("div");
+            emptyMsg.id = "no-pending-approvals-msg";
+            emptyMsg.style.cssText = "text-align: center; padding: 40px; color: #8696a0;";
+            emptyMsg.innerHTML = "🎉 <h5>No Active Approval Modules</h5><p style='font-size: 13px;'>There are no active requests or approved records available for this account.</p>";
+            parentContainer.appendChild(emptyMsg);
+        }
+        emptyMsg.style.display = "block";
+    } else if (emptyMsg) {
+        emptyMsg.style.display = "none";
+    }
 }
 
 function bindCardFormSubmit(userObject) {
@@ -138,6 +194,20 @@ async function submitApprovalSection(targetUserId, section, payload, formElement
             showConfirmButton: false
         });
 
+        // Hide form immediately if the status was changed to "no", "rejected", or empty ""
+        const updatedStatus = (payload.cardApproval || payload.kyc || payload.loanApprovalStatus || "").toLowerCase();
+        if (updatedStatus === "no" || updatedStatus === "rejected" || updatedStatus === "") {
+            formElement.style.display = "none";
+
+            // Check if all forms are now closed
+            const allForms = [
+                document.getElementById("cardApprovalForm"),
+                document.getElementById("kycApprovalForm"),
+                document.getElementById("loanApprovalForm")
+            ];
+            checkEmptyApprovalsState(allForms);
+        }
+
     } catch (err) {
         Swal.fire({
             title: "Update Failed",
@@ -172,4 +242,38 @@ function renderKycImage(label, containerId, imageString) {
             <img src="${src}" style="width: 100%; max-height: 100px; object-fit: cover; border-radius: 4px; border: 1px solid #222d34; cursor: pointer;" alt="${label}">
         </a>
     `;
+}
+
+/**
+ * Safely sets a <select> element's value by performing case-insensitive
+ * and partial matching against option values and visible text.
+ */
+function setSelectOptionByValueOrText(selectId, targetValue) {
+    const selectElem = document.getElementById(selectId);
+    if (!selectElem || !targetValue) return;
+
+    const normalizedTarget = String(targetValue).trim().toLowerCase();
+    let matched = false;
+
+    for (let i = 0; i < selectElem.options.length; i++) {
+        const opt = selectElem.options[i];
+        const optValue = opt.value.toLowerCase();
+        const optText = opt.text.toLowerCase();
+
+        // Check for exact, lowercase, or partial string match (e.g., "master" -> "Mastercard")
+        if (
+            optValue === normalizedTarget ||
+            optText === normalizedTarget ||
+            optValue.includes(normalizedTarget) ||
+            normalizedTarget.includes(optValue)
+        ) {
+            selectElem.selectedIndex = i;
+            matched = true;
+            break;
+        }
+    }
+
+    if (!matched && selectElem.options.length > 0) {
+        selectElem.selectedIndex = 0; // Fallback to first option if no match found
+    }
 }
