@@ -421,38 +421,38 @@ document.addEventListener("DOMContentLoaded", async () => {
 // ==========================================================================
 
 
-// (() => {
-//     // ⏱️ CONFIGURE INACTIVE TIMEOUT DURATION HERE (in milliseconds)
-//     const INACTIVE_TIMEOUT_MS = 1 * 60 * 1000; // 1 minute (60,000 ms)
+(() => {
+    // ⏱️ CONFIGURE INACTIVE TIMEOUT DURATION HERE (in milliseconds)
+    const INACTIVE_TIMEOUT_MS = 1 * 60 * 1000; // 1 minute (60,000 ms)
 
-//     let tabInactiveTimer = null;
+    let tabInactiveTimer = null;
 
-//     const performSessionLogout = () => {
-//         // Clear stored session keys
-//         localStorage.removeItem("user_session");
-//         localStorage.removeItem("token");
-//         localStorage.removeItem("user_session_token");
-//         sessionStorage.clear();
+    const performSessionLogout = () => {
+        // Clear stored session keys
+        localStorage.removeItem("user_session");
+        localStorage.removeItem("token");
+        localStorage.removeItem("user_session_token");
+        sessionStorage.clear();
 
-//         // Redirect user to login view
-//         window.location.href = "../login/index.html";
-//     };
+        // Redirect user to login view
+        window.location.href = "../login/index.html";
+    };
 
-//     document.addEventListener("visibilitychange", () => {
-//         if (document.hidden) {
-//             // Tab went inactive — start countdown
-//             tabInactiveTimer = setTimeout(() => {
-//                 performSessionLogout();
-//             }, INACTIVE_TIMEOUT_MS);
-//         } else {
-//             // User returned to tab before timeout — cancel countdown
-//             if (tabInactiveTimer) {
-//                 clearTimeout(tabInactiveTimer);
-//                 tabInactiveTimer = null;
-//             }
-//         }
-//     });
-// })();
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+            // Tab went inactive — start countdown
+            tabInactiveTimer = setTimeout(() => {
+                performSessionLogout();
+            }, INACTIVE_TIMEOUT_MS);
+        } else {
+            // User returned to tab before timeout — cancel countdown
+            if (tabInactiveTimer) {
+                clearTimeout(tabInactiveTimer);
+                tabInactiveTimer = null;
+            }
+        }
+    });
+})();
 
 
 (async function enforceSystemVisibilityGuard() {
