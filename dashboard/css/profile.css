@@ -1,0 +1,405 @@
+/* ==========================================================================
+   ONFLEX FINTECH HIGH-FIDELITY PROFILE HUB SPECIFICATIONS 
+   ========================================================================== */
+
+/* Main Responsive Layout Wrapper Matrix */
+.premium-profile-grid {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 2rem;
+    margin: 1.5rem 0 3rem 0;
+    align-items: start;
+}
+
+/* Base High-End Glassmorphism Card System */
+.dossier-sidebar-card,
+.dossier-data-ledger-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-ui);
+    border-radius: 24px;
+    box-shadow: 0 20px 40px var(--nav-shadow);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s ease;
+}
+
+/* Left Card Accent Presentation Layout rules */
+.dossier-sidebar-card {
+    padding: 3rem 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* Enhanced Social Media Style Floating Avatar Component */
+.social-avatar-container {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin-bottom: 2rem;
+}
+
+.avatar-ring-track {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    padding: 6px;
+    background: linear-gradient(135deg, var(--primary-teal) 0%, #4facfe 100%);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(76, 195, 217, 0.2);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.avatar-ring-track:hover {
+    transform: rotate(5deg) scale(1.03);
+}
+
+.hero-image-render {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    background: var(--bg-main);
+    border: 4px solid var(--bg-card);
+}
+
+/* Overlay Curtain Mask Reveal Engine */
+.avatar-hover-curtain {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    right: 6px;
+    bottom: 6px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0;
+    color: var(--primary-teal);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: opacity 0.3s ease;
+}
+
+.avatar-ring-track:hover .avatar-hover-curtain {
+    opacity: 0.9;
+}
+
+.curtain-upload-icon {
+    width: 20px;
+    height: 20px;
+    animation: bounceVertical 2s infinite;
+}
+
+/* The Floating Social Media Camera Floating Icon Action Badge */
+.camera-badge-action {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background: var(--text-main);
+    color: var(--bg-main);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    border: 4px solid var(--bg-card);
+    transition: background 0.2s ease, transform 0.2s ease, color 0.2s ease;
+    z-index: 10;
+}
+
+.camera-badge-action:hover {
+    background: var(--primary-teal);
+    color: #060b0d;
+    transform: scale(1.12);
+}
+
+.camera-badge-action svg {
+    width: 16px;
+    height: 16px;
+    stroke-width: 2.5px;
+}
+
+/* Identity Text Labels and Metadata Pills */
+.hero-identity-text-meta {
+    text-align: center;
+    width: 100%;
+    margin-bottom: 2rem;
+}
+
+.hero-identity-text-meta h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--text-main);
+    margin: 0 0 0.5rem 0;
+}
+
+.premium-account-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--accent-orange);
+    background: rgba(249, 115, 22, 0.1);
+    padding: 0.4rem 1rem;
+    border-radius: 50px;
+    border: 1px solid rgba(249, 115, 22, 0.2);
+}
+
+.badge-icon-inline {
+    width: 12px;
+    height: 12px;
+    fill: currentColor;
+}
+
+/* Trust Metric Module Component Styling */
+.dossier-trust-score-panel {
+    width: 100%;
+    background: var(--btn-neutral) !important;
+    border-radius: 16px;
+    padding: 1.25rem;
+    border: 1px solid var(--border-ui);
+}
+
+.trust-flex-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.trust-title {
+    color: var(--text-muted);
+}
+
+.trust-percentage {
+    color: var(--primary-teal);
+}
+
+.trust-progress-bar-rail {
+    width: 100%;
+    height: 6px;
+    background: var(--btn-neutral);
+    border-radius: 50px;
+    overflow: hidden;
+}
+
+.trust-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4facfe 0%, var(--primary-teal) 100%);
+    border-radius: 50px;
+}
+
+/* Right Ledger Panel Sheet Wrapper CSS */
+.dossier-data-ledger-card {
+    padding: 2.5rem;
+}
+
+.ledger-header {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-bottom: 2.5rem;
+}
+
+.header-icon-box {
+    background: rgba(76, 195, 217, 0.1);
+    color: var(--primary-teal);
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid rgba(76, 195, 217, 0.2);
+}
+
+.header-icon-box svg {
+    width: 24px;
+    height: 24px;
+}
+
+.ledger-header h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+    color: var(--text-main);
+}
+
+.ledger-header p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* Grid Field Cell Matrix Array */
+.premium-data-matrix-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+}
+
+.matrix-data-cell {
+    background: var(--btn-neutral);
+    border: 1px solid var(--border-ui);
+    border-radius: 16px;
+    padding: 1.25rem;
+    display: flex;
+    position: relative;
+    transition: background 0.25s, border-color 0.25s, box-shadow 0.25s;
+}
+
+.matrix-data-cell:hover {
+    background: var(--bg-card) !important;
+    border-color: var(--primary-teal);
+}
+
+/* Custom Highlight Rules for Account Block */
+.matrix-data-cell.highlight-cell {
+    background: linear-gradient(90deg, rgba(249, 115, 22, 0.05) 0%, var(--btn-neutral) 100__) !important;
+    border-color: rgba(249, 115, 22, 0.2);
+}
+
+.matrix-data-cell.highlight-cell:hover {
+    border-color: var(--accent-orange);
+}
+
+.matrix-data-cell.full-width {
+    grid-column: span 2;
+}
+
+.cell-inner-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.cell-label-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cell-decor-icon {
+    width: 16px;
+    height: 16px;
+}
+
+.cell-lbl {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.75px;
+    color: var(--text-muted);
+}
+
+.cell-val {
+    font-size: 1rem;
+    color: var(--text-main);
+    font-weight: 500;
+}
+
+.cell-val.mono-digit {
+    font-family: 'SF Mono', SFMono-Regular, Consolas, monospace;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--accent-orange);
+    letter-spacing: 1px;
+}
+
+/* Corner System Badges */
+.secure-badge {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    background: var(--btn-neutral);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.secure-badge svg {
+    width: 10px;
+    height: 10px;
+}
+
+/* Vertically Bouncing Camera Core Animation Indicator */
+@keyframes bounceVertical {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-4px);
+    }
+}
+
+/* ==========================================================================
+   DYNAMIC MEDIA QUERY BREAKPOINTS OVERRIDES
+   ========================================================================== */
+@media (max-width: 1120px) {
+    .premium-profile-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .premium-data-matrix-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .matrix-data-cell.full-width {
+        grid-column: span 1;
+    }
+
+    .dossier-data-ledger-card {
+        padding: 1.5rem;
+    }
+}
+
+
+/* Updated tier background targets */
+html[data-theme="dark"] body[data-tier="1"] .card-ui,
+html[data-theme="dark"] body[data-tier="1"] .dossier-sidebar-card,
+html[data-theme="dark"] body[data-tier="1"] .dossier-data-ledger-card {
+    background: #0b181c !important;
+    border-color: rgba(76, 195, 217, 0.25) !important;
+}
+
+html[data-theme="dark"] body[data-tier="2"] .card-ui,
+html[data-theme="dark"] body[data-tier="2"] .dossier-sidebar-card,
+html[data-theme="dark"] body[data-tier="2"] .dossier-data-ledger-card {
+    background: #0d172a !important;
+    border-color: rgba(37, 99, 235, 0.3) !important;
+}
+
+html[data-theme="dark"] body[data-tier="3"] .card-ui,
+html[data-theme="dark"] body[data-tier="3"] .dossier-sidebar-card,
+html[data-theme="dark"] body[data-tier="3"] .dossier-data-ledger-card {
+    background: #1c140b !important;
+    border-color: rgba(180, 83, 9, 0.3) !important;
+}

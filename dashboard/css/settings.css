@@ -1,0 +1,376 @@
+/* ==========================================================================
+   ONFLEX FINTECH SETTINGS AND CORE COMPONENT GRAPHICS SPECIFICATIONS
+   ========================================================================== */
+
+.settings-control-grid {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 2rem;
+    margin: 1.5rem 0 3rem 0;
+    align-items: start;
+}
+
+.settings-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-ui);
+    border-radius: 24px;
+    box-shadow: 0 20px 40px var(--nav-shadow);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 2.5rem;
+}
+
+.settings-card.flex-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+}
+
+.settings-card.forms-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+}
+
+/* Headers Hierarchy Rules */
+.settings-section-title {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.settings-section-title svg {
+    color: var(--primary-teal);
+    width: 22px;
+    height: 22px;
+    margin-top: 2px;
+}
+
+.settings-section-title h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+    color: var(--text-main);
+}
+
+.settings-section-title p {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* Custom Interactive Switches Controls UI Engine */
+.control-toggle-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.toggle-row-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--border-ui);
+}
+
+.toggle-row-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.toggle-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.toggle-lbl {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.toggle-desc {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    line-height: 1.3;
+}
+
+/* Premium Component Checkbox Toggle Engine Wrapper */
+.premium-switch {
+    position: relative;
+    display: inline-block;
+    width: 46px;
+    height: 26px;
+    flex-shrink: 0;
+}
+
+.premium-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.switch-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--btn-neutral);
+    border: 1px solid var(--border-ui);
+    transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 34px;
+}
+
+.switch-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: var(--text-muted);
+    transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 50%;
+}
+
+.premium-switch input:checked+.switch-slider {
+    background-color: rgba(76, 195, 217, 0.2);
+    border-color: var(--primary-teal);
+}
+
+.premium-switch input:checked+.switch-slider:before {
+    transform: translateX(20px);
+    background-color: var(--primary-teal);
+    box-shadow: 0 0 8px rgba(76, 195, 217, 0.5);
+}
+
+/* Premium Form Elements */
+.premium-settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-top: 1.5rem;
+}
+
+.dual-input-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+}
+
+.input-field-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-field-lbl {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.premium-settings-form input {
+    background: var(--btn-neutral);
+    border: 1px solid var(--border-ui);
+    border-radius: 12px;
+    padding: 0.9rem 1.25rem;
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: 0.95rem;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.premium-settings-form input:focus {
+    outline: none;
+    border-color: var(--primary-teal);
+    box-shadow: 0 0 0 3px rgba(76, 195, 217, 0.15);
+}
+
+/* Custom Multi-Tier Button Architectures */
+.settings-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 0.9rem 1.75rem;
+    border-radius: 14px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, filter 0.2s, box-shadow 0.2s;
+    border: none;
+    font-family: inherit;
+}
+
+.settings-action-btn:active {
+    transform: scale(0.98);
+}
+
+.primary-btn {
+    background: linear-gradient(135deg, #4facfe 0%, var(--primary-teal) 100%);
+    color: #060b0d;
+    box-shadow: 0 4px 15px rgba(76, 195, 217, 0.25);
+}
+
+.primary-btn:hover {
+    filter: brightness(1.1);
+}
+
+.secondary-btn {
+    background: var(--btn-neutral);
+    color: var(--text-main);
+    border: 1px solid var(--border-ui);
+}
+
+.secondary-btn:hover {
+    filter: brightness(1.08);
+}
+
+.destruction-btn {
+    background: rgba(239, 68, 68, 0.08);
+    color: var(--accent-red);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.destruction-btn:hover {
+    background: var(--accent-red);
+    color: #ffffff;
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.2);
+}
+
+.destruction-zone-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: auto;
+    border-top: 1px solid var(--border-ui);
+    padding-top: 2rem;
+}
+
+.section-divider-line {
+    height: 1px;
+    background: linear-gradient(90deg, var(--border-ui) 0%, rgba(255, 255, 255, 0) 100__);
+    width: 100%;
+}
+
+.align-self-end {
+    align-self: flex-end;
+}
+
+/* Responsive Media Breakdown Intersections */
+@media (max-width: 1150px) {
+    .settings-control-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 680px) {
+    .dual-input-row {
+        grid-template-columns: 1fr;
+    }
+
+    .settings-action-btn {
+        width: 100%;
+    }
+
+    .settings-card {
+        padding: 1.5rem;
+    }
+}
+
+/* Action Button Containers inside Left Stack */
+.action-buttons-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.action-flow-btn {
+    background: var(--btn-neutral);
+    color: var(--text-main);
+    border: 1px solid var(--border-ui);
+    justify-content: flex-start !important;
+    padding: 1rem 1.25rem;
+}
+
+.action-flow-btn svg {
+    color: var(--primary-teal);
+    width: 18px;
+    height: 18px;
+    transition: transform 0.2s ease;
+}
+
+.action-flow-btn:hover {
+    background: rgba(76, 195, 217, 0.08);
+    border-color: var(--primary-teal);
+}
+
+.action-flow-btn:hover svg {
+    transform: scale(1.1);
+}
+
+/* Custom Actions Layout Wrapper */
+.form-actions-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+@media (max-width: 680px) {
+    .form-actions-wrapper {
+        flex-direction: column;
+        width: 100%;
+    }
+}
+
+.pill-btn-transfer-dispatch {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+
+    background: var(--tier-accent, var(--primary-teal));
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(76, 195, 217, 0.25);
+}
+
+.pill-btn-transfer-dispatch:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(76, 195, 217, 0.4);
+    filter: brightness(1.1);
+}
+
+
+/* Update dynamic dark tier styles in CSS (theme.css / style.css) */
+html[data-theme="dark"] body[data-tier="1"] .card-ui,
+html[data-theme="dark"] body[data-tier="1"] .settings-card {
+    background: #0b181c !important;
+    border-color: rgba(76, 195, 217, 0.25) !important;
+}
+
+html[data-theme="dark"] body[data-tier="2"] .card-ui,
+html[data-theme="dark"] body[data-tier="2"] .settings-card {
+    background: #0d172a !important;
+    border-color: rgba(37, 99, 235, 0.3) !important;
+}
+
+html[data-theme="dark"] body[data-tier="3"] .card-ui,
+html[data-theme="dark"] body[data-tier="3"] .settings-card {
+    background: #1c140b !important;
+    border-color: rgba(180, 83, 9, 0.3) !important;
+}

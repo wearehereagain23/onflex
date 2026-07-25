@@ -1,0 +1,241 @@
+/* ==========================================================================
+   ONFLEX FINANCED DASHBOARD - AUTHENTIC GLOBAL THEME NOTIFICATION STYLES
+   ========================================================================== */
+
+.notification-trigger-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+/* Dynamic Red Unread Badge Dot Overlay */
+.notification-badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 9px;
+    height: 9px;
+    background-color: #ef4444;
+    /* Alert Red */
+    border: 2px solid var(--bg-card);
+    border-radius: 50%;
+    z-index: 10;
+    display: none;
+    pointer-events: none;
+}
+
+.notification-badge.active {
+    display: block;
+}
+
+/* Core Panel Container Dropdown Context Matching OnFlex Global Layout CSS */
+.notification-panel {
+    position: absolute;
+    top: 52px;
+    right: 0;
+    width: 360px;
+    max-height: 480px;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-ui);
+    border-radius: 14px;
+    box-shadow: 0 20px 40px var(--nav-shadow), 0 0 1px var(--border-ui);
+    z-index: 99999 !important;
+    display: none;
+    flex-direction: column;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.notification-panel.active {
+    display: flex !important;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* OnFlex Header Context strip matches `--bg-main` precisely */
+.notification-panel-header {
+    padding: 14px 16px;
+    background-color: var(--bg-main);
+    border-bottom: 1px solid var(--border-ui);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 14px 14px 0 0;
+}
+
+.notification-panel-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-main) !important;
+    letter-spacing: -0.02em;
+}
+
+.notification-clear-all {
+    font-size: 12px;
+    color: var(--bg-sidebar);
+    /* Dynamically maps to #2cb3cc (Dark Mode Cyan) or #0e7490 (Light Mode Teal) */
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: opacity 0.2s;
+}
+
+.notification-clear-all:hover {
+    opacity: 0.8;
+}
+
+/* Scroll Body Framework wrapper */
+.notification-panel-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 6px 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Custom Styled Scrollbar matching global dashboard theme styling */
+.notification-panel-body::-webkit-scrollbar {
+    width: 5px;
+}
+
+.notification-panel-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.notification-panel-body::-webkit-scrollbar-thumb {
+    background: var(--border-ui);
+    border-radius: 10px;
+}
+
+/* Feed Rows Grid Interaction Rules */
+.notification-item {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border-ui);
+    display: flex;
+    gap: 12px;
+    cursor: pointer;
+    background-color: transparent;
+    transition: background-color 0.15s ease;
+}
+
+.notification-item:hover {
+    background-color: var(--btn-neutral);
+    /* Matches theme hover states exactly */
+}
+
+.notification-item.unread {
+    background-color: var(--input-fill);
+    border-left: 3px solid var(--bg-sidebar);
+}
+
+/* Dynamic Notification Icon Color Matrices */
+.notification-icon-box {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.notif-icon-success {
+    background: rgba(34, 197, 94, 0.12);
+    color: #22c55e;
+}
+
+.notif-icon-warning {
+    background: rgba(249, 115, 22, 0.12);
+    color: #f97316;
+}
+
+.notif-icon-info {
+    background: rgba(44, 179, 204, 0.12);
+    color: var(--bg-sidebar);
+}
+
+.notification-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.notification-text {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.45;
+    color: var(--text-main) !important;
+}
+
+.notification-time {
+    font-size: 11px;
+    color: var(--text-muted) !important;
+    font-weight: 400;
+}
+
+/* Infinite Loading Async Spinner styling */
+.notification-loading-spinner {
+    padding: 16px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.notification-loading-spinner.active {
+    display: flex;
+}
+
+.spinner-circle {
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--border-ui);
+    border-top-color: var(--bg-sidebar);
+    border-radius: 50%;
+    animation: notifSpin 0.6s linear infinite;
+}
+
+@keyframes notifSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.notification-empty-state {
+    padding: 44px 20px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-muted);
+    display: none;
+}
+
+.notification-empty-state.active {
+    display: block;
+}
+
+/* ==========================================================================
+   MOBILE SCREEN DROPDOWN PLACEMENT OVERRIDES
+   ========================================================================== */
+@media (max-width: 767px) {
+    .notification-panel {
+        position: fixed !important;
+        top: 75px !important;
+        /* Locks dropdown right below your top layout bar */
+        bottom: auto !important;
+        left: 12px !important;
+        right: 12px !important;
+        width: auto !important;
+        max-height: 380px !important;
+        transform: translateY(-5px);
+        box-shadow: 0 15px 45px var(--nav-shadow);
+    }
+
+    .notification-panel.active {
+        transform: translateY(0);
+    }
+}

@@ -1,0 +1,161 @@
+/* --- Administrative History System Stylesheet Framework --- */
+
+.history-matrix-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+}
+
+.modern-history-table-container {
+    background: #1e293b;
+    border-radius: 12px;
+    border: 1px solid #334155;
+    padding: 20px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+}
+
+.modern-history-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 10px;
+}
+
+.modern-history-table th {
+    background: #0f172a;
+    color: #94a3b8;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 14px 18px;
+    border-bottom: 2px solid #334155;
+}
+
+.modern-history-table td {
+    padding: 16px 18px;
+    border-bottom: 1px solid #334155;
+    color: #cbd5e1;
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.modern-history-table tr.clickable-row-item {
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.modern-history-table tr.clickable-row-item:hover {
+    background: #293548;
+}
+
+/* Status & Type Conditional Badge Elements */
+.badge-amount-credit {
+    color: #22c55e;
+    font-weight: 700;
+    font-family: monospace;
+}
+
+.badge-amount-debit {
+    color: #ef4444;
+    font-weight: 700;
+    font-family: monospace;
+}
+
+.badge-status-pill {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.badge-status-pill.status-successful {
+    background: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
+}
+
+.badge-status-pill.status-pending {
+    background: rgba(234, 179, 8, 0.15);
+    color: #facc15;
+}
+
+.badge-status-pill.status-failed {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+}
+
+/* Custom Node Document Overlay Dialog Pane System */
+.custom-ledger-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.custom-ledger-modal-overlay.modal-active-state {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.custom-ledger-modal-window {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border: 1px solid #475569;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 650px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    transform: scale(0.95);
+    transition: transform 0.2s ease;
+    overflow: hidden;
+}
+
+.custom-ledger-modal-overlay.modal-active-state .custom-ledger-modal-window {
+    transform: scale(1);
+}
+
+.custom-ledger-modal-header {
+    padding: 18px 24px;
+    border-bottom: 1px solid #334155;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.custom-ledger-modal-header h4 {
+    margin: 0;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.custom-ledger-modal-close-trigger {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.custom-ledger-modal-body {
+    padding: 24px;
+}
+
+.custom-ledger-modal-footer {
+    padding: 18px 24px;
+    border-top: 1px solid #334155;
+    background: rgba(15, 23, 42, 0.4);
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}

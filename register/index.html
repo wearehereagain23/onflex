@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>OnFlex – Sign Up</title>
+	<link rel="manifest" href="manifest.json" />
+	<meta name="theme-color" content="#000000" />
+	<link rel="icon" href=".././logo.ico" type="image/x-icon">
+	<link rel="apple-touch-icon" href="../assets/icon-192.png" />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<link rel="stylesheet" href="css/style.css">
+
+	<style>
+		.translate-selector-wrapper {
+			margin-top: 1.5rem;
+			padding: 0.5rem;
+			background: rgba(255, 255, 255, 0.08);
+			border: 1px solid rgba(255, 255, 255, 0.15);
+			border-radius: 12px;
+			display: flex;
+			justify-content: center;
+		}
+
+		#google_translate_element {
+			color: transparent;
+		}
+
+		#google_translate_element a {
+			display: none;
+		}
+
+		.goog-te-banner-frame.skiptranslate {
+			display: none !important;
+		}
+
+		body {
+			top: 0px !important;
+		}
+
+		body>.skiptranslate {
+			display: none !important;
+		}
+
+		.goog-te-combo {
+			background: transparent;
+			color: #ffffff;
+			border: none;
+			padding: 0.4rem 0.8rem;
+			font-family: inherit;
+			font-size: 0.9rem;
+			outline: none;
+			cursor: pointer;
+			width: 100%;
+		}
+
+		.goog-te-combo option {
+			background: #111827;
+			color: #ffffff;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		<div class="welcome-panel">
+			<div class="welcome-header">
+				<img src="../assets/icon-512.png" alt="OnFlexLogo" />
+				<h2>Join OnFlex</h2>
+				<p>Enjoy secure, seamless banking at your fingertips.</p>
+
+				<!-- GOOGLE TRANSLATOR DROPDOWN COMPONENT -->
+				<div class="translate-selector-wrapper">
+					<div id="google_translate_element"></div>
+				</div>
+
+				<script>
+					function googleTranslateElementInit() {
+						new google.translate.TranslateElement({
+							pageLanguage: 'en'
+						}, 'google_translate_element');
+					}
+				</script>
+				<script type="text/javascript"
+					src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+			</div>
+
+			<div class="features-list">
+				<div class="feature-item">
+					<div class="feature-icon">✓</div>
+					<div class="feature-text">
+						<strong>Smart Multi-Currency</strong>
+						<p>Manage USD, GBP, EUR, and JPY under one account.</p>
+					</div>
+				</div>
+				<div class="feature-item">
+					<div class="feature-icon">✓</div>
+					<div class="feature-text">
+						<strong>Institutional Security</strong>
+						<p>Protected with multi-layer encryption.</p>
+					</div>
+				</div>
+				<div class="feature-item">
+					<div class="feature-icon">✓</div>
+					<div class="feature-text">
+						<strong>Zero Hidden Fees</strong>
+						<p>Absolute clarity on every transaction.</p>
+					</div>
+				</div>
+			</div>
+
+			<div class="welcome-footer">
+				<small>© 2026 OnFlex Finance. All rights reserved.</small>
+			</div>
+		</div>
+
+		<div class="form-panel">
+			<div class="form-header-row">
+				<h2>Create Account</h2>
+				<div class="step-indicator">
+					<span class="step-dot active" id="dot1">1</span>
+					<div class="step-line"></div>
+					<span class="step-dot" id="dot2">2</span>
+				</div>
+			</div>
+
+			<form id="signupForm" novalidate>
+
+				<div class="form-step active-step" id="step1">
+					<div class="row">
+						<div class="field">
+							<label><small>first name</small></label>
+							<input id="firstname" name="firstname" type="text" placeholder="First Name" required />
+							<div class="error" id="firstnameErr"></div>
+						</div>
+						<div class="field">
+							<label><small>Middle name</small></label>
+							<input id="middlename" name="middlename" type="text" placeholder="Middle Name (Optional)" />
+							<div class="error" id="middlenameErr"></div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="field">
+							<label><small>Last name</small></label>
+							<input id="lastname" name="lastname" type="text" placeholder="Last Name" required />
+							<div class="error" id="lastnameErr"></div>
+						</div>
+						<div class="field">
+							<label><small>Email address</small></label>
+							<input id="email" name="email" type="email" placeholder="Email Address" required />
+							<div class="error" id="emailErr"></div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="field">
+							<label><small>Date of birth</small></label>
+							<input id="birth" name="birth" type="date" required />
+							<div class="error" id="birthErr"></div>
+						</div>
+						<div class="field">
+							<label><small>Gender</small></label>
+							<select id="gender" name="gender" required>
+								<option value="">Select Gender</option>
+								<option value="Male">Male</option>
+								<option value="Female">Female</option>
+							</select>
+							<div class="error" id="genderErr"></div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="field">
+							<label><small>City</small></label>
+							<input id="city" name="city" type="text" placeholder="City" required />
+							<div class="error" id="cityErr"></div>
+						</div>
+						<div class="field">
+							<label><small>Country</small></label>
+							<select id="country" name="country" required>
+								<option value="">-- Country --</option>
+								<option value="United Kingdom">
+									United Kingdom</option>
+								<option value="United States of America">
+									United States of America
+								</option>
+								<option value="Argentina">
+									Argentina</option>
+								<option value="Australia">
+									Australia</option>
+								<option value="Austria">
+									Austria</option>
+								<option value="Belgium">
+									Belgium</option>
+								<option value="Bolivia">
+									Bolivia</option>
+								<option value="Bosnia &amp; Herzegovina">
+									Bosnia &amp; Herzegovina
+								</option>
+								<option value="Brazil">
+									Brazil</option>
+								<option value="Bulgaria">
+									Bulgaria</option>
+								<option value="Canada">
+									Canada</option>
+								<option value="Chile">Chile
+								</option>
+								<option value="China">China
+								</option>
+								<option value="Croatia">
+									Croatia</option>
+								<option value="Cyprus">
+									Cyprus</option>
+								<option value="Czech Republic">
+									Czech Republic</option>
+								<option value="Denmark">
+									Denmark</option>
+								<option value="Finland">
+									Finland</option>
+								<option value="France">
+									France</option>
+								<option value="Georgia">
+									Georgia</option>
+								<option value="Germany">
+									Germany</option>
+								<option value="Greece">
+									Greece</option>
+								<option value="Hong Kong">
+									Hong Kong</option>
+								<option value="Hungary">
+									Hungary</option>
+								<option value="Iceland">
+									Iceland</option>
+								<option value="India">India
+								</option>
+								<option value="Indonesia">
+									Indonesia</option>
+								<option value="Iran">Iran
+								</option>
+								<option value="Iraq">Iraq
+								</option>
+								<option value="Ireland">
+									Ireland</option>
+								<option value="Israel">
+									Israel</option>
+								<option value="Italy">Italy
+								</option>
+								<option value="Jamaica">
+									Jamaica</option>
+								<option value="Japan">Japan
+								</option>
+								<option value="Korea North">
+									Korea North</option>
+								<option value="Korea Sout">
+									Korea South</option>
+								<option value="Lesotho">
+									Lesotho</option>
+								<option value="Luxembourg">
+									Luxembourg</option>
+								<option value="Maldives">
+									Maldives</option>
+								<option value="Mexico">
+									Mexico</option>
+								<option value="Monaco">
+									Monaco</option>
+								<option value="Netherlands">
+									Netherlands (Holland,
+									Europe)</option>
+								<option value="Norway">
+									Norway</option>
+								<option value="Oman">Oman
+								</option>
+								<option value="Paraguay">
+									Paraguay</option>
+								<option value="Peru">Peru
+								</option>
+								<option value="Poland">
+									Poland</option>
+								<option value="Portugal">
+									Portugal</option>
+								<option value="Qatar">Qatar
+								</option>
+								<option value="Republic of Serbia">
+									Republic of Serbia
+								</option>
+								<option value="Romania">
+									Romania</option>
+								<option value="Russia">
+									Russia</option>
+								<option value="Serbia">
+									Serbia</option>
+								<option value="Singapore">
+									Singapore</option>
+								<option value="Slovakia">
+									Slovakia</option>
+								<option value="Slovenia">
+									Slovenia</option>
+								<option value="Spain">Spain
+								</option>
+								<option value="Sweden">
+									Sweden</option>
+								<option value="Switzerland">
+									Switzerland</option>
+								<option value="Thailand">
+									Thailand</option>
+								<option value="Turkey">
+									Turkey</option>
+								<option value="Ukraine">
+									Ukraine</option>
+								<option value="United Arab Erimates">
+									United Arab Emirates
+								</option>
+								<option value="Uraguay">
+									Uruguay</option>
+								<option value="Vietnam">
+									Vietnam</option>
+								<option value="Yemen">Yemen
+								</option>
+								<option value="Zaire">Zaire
+								</option>
+							</select>
+							<div class="error" id="countryErr"></div>
+						</div>
+					</div>
+
+					<button type="button" id="nextBtn" class="full-width">Continue</button>
+				</div>
+
+				<div class="form-step" id="step2">
+					<div class="row">
+						<div class="field">
+							<label><small>Account Type</small></label>
+							<select id="accounttype" name="accounttype" required>
+								<option value="">Account Type</option>
+								<option value="Online">Online Account</option>
+								<option value="Savings">Savings Account</option>
+								<option value="Checking">Checking Account</option>
+								<option value="Current">Current Account</option>
+								<option value="Corporate">Corporate Account</option>
+							</select>
+							<div class="error" id="accounttypeErr"></div>
+						</div>
+						<div class="field">
+							<label><small>Currency</small></label>
+							<select id="currency" name="currency" required>
+								<option value="">Currency</option>
+								<option value="$">US Dollar ($)</option>
+								<option value="€">Euro (€)</option>
+								<option value="£">Pound Sterling (£)</option>
+								<option value="CHF">Swiss Franc (CHF)</option>
+
+								<option value="CA$">Canadian Dollar (CA$)</option>
+								<option value="A$">Australian Dollar (A$)</option>
+								<option value="NZ$">New Zealand Dollar (NZ$)</option>
+								<option value="S$">Singapore Dollar (S$)</option>
+								<option value="HK$">Hong Kong Dollar (HK$)</option>
+
+								<option value="¥">Japanese Yen (¥)</option>
+								<option value="CN¥">Chinese Yuan (¥)</option>
+								<option value="₩">South Korean Won (₩)</option>
+								<option value="₹">Indian Rupee (₹)</option>
+
+								<option value="AED">UAE Dirham (AED)</option>
+								<option value="SAR">Saudi Riyal (SAR)</option>
+								<option value="QAR">Qatari Riyal (QAR)</option>
+								<option value="KWD">Kuwaiti Dinar (KWD)</option>
+								<option value="₪">Israeli Shekel (₪)</option>
+
+								<option value="SEkr">Swedish Krona (kr)</option>
+								<option value="NOkr">Norwegian Krone (kr)</option>
+								<option value="DKkr">Danish Krone (kr)</option>
+								<option value="zł">Polish Złoty (zł)</option>
+								<option value="₽">Russian Ruble (₽)</option>
+								<option value="₺">Turkish Lira (₺)</option>
+
+								<option value="R$">Brazilian Real (R$)</option>
+								<option value="Mex$">Mexican Peso (Mex$)</option>
+								<option value="R">South African Rand (R)</option>
+								<option value="₦">Nigerian Naira (₦)</option>
+							</select>
+							<div class="error" id="currencyErr"></div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="field">
+							<label><small>Password</small></label>
+							<input id="password" name="password" type="password" placeholder="Password"
+								autocomplete="new-password" required />
+							<div class="strength-wrap">
+								<div class="strength-bar">
+									<div id="strengthFill"></div>
+								</div>
+								<div class="strength-label" id="strengthLabel">Weak</div>
+							</div>
+							<div class="hint">Use 8+ chars (upper, lower, number, special).</div>
+							<div class="error" id="passwordErr"></div>
+						</div>
+						<div class="field">
+							<label><small>Confirm Password</small></label>
+							<input id="password2" name="password2" type="password" placeholder="Confirm Password"
+								autocomplete="new-password" required />
+							<div class="error" id="password2Err"></div>
+						</div>
+					</div>
+
+
+					<div class="btn-group">
+						<button type="button" id="prevBtn" class="btn-secondary">Back</button>
+						<button id="submitBtn" type="submit" class="btn-primary">Complete Signup</button>
+					</div>
+				</div>
+
+				<p class="muted">Have an account? <a class="link" href="../login/index.html">Sign in</a></p>
+			</form>
+
+			<div class="footer">
+				<strong>No Hidden Fees</strong>
+				Stay updated with text alerts, email notifications, or call our 24/7 friendly support team.
+			</div>
+		</div>
+	</div>
+
+	<div id="spinnerModal">
+		<div class="spinner"></div>
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<script src="js/index.js"></script>
+</body>
+
+</html>

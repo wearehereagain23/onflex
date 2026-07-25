@@ -1,0 +1,193 @@
+/* ==========================================================================
+   ONFLEX PREMIUM MODULAR DEBIT/CREDIT CARD STYLESHEET
+   ========================================================================== */
+
+/* Base Canvas Layout Framework */
+.fx-card-wrapper {
+    position: relative;
+    border-radius: 20px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+    background: linear-gradient(135deg, #1e1e24 0%, #111115 100%);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-sizing: border-box;
+}
+
+.fx-card-height {
+    min-height: 200px;
+    height: 100%;
+}
+
+/* Base Hidden Blur-State Configuration */
+.fx-card-header,
+.fx-card-chip-row,
+.fx-card-footer {
+    filter: blur(10px);
+    opacity: 0.25;
+    transition: filter 0.5s ease, opacity 0.5s ease;
+}
+
+/* ==========================================================================
+   UNACTIVATED BLUR OVERLAY & INTERACTION ELEMENTS
+   ========================================================================== */
+.fx-card-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    background: rgba(15, 15, 20, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 20px;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+.fx-activation-msg {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: rgba(255, 255, 255, 0.6);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.fx-apply-btn {
+    background: #ffffff;
+    color: #0b0b0e;
+    border: none;
+    padding: 10px 22px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.25);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fx-apply-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 255, 255, 0.4);
+}
+
+/* ==========================================================================
+   APPROVED STATE REMOVAL RULES
+   ========================================================================== */
+.fx-card-wrapper.active-card .fx-card-overlay {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.fx-card-wrapper.active-card .fx-card-header,
+.fx-card-wrapper.active-card .fx-card-chip-row,
+.fx-card-wrapper.active-card .fx-card-footer {
+    filter: blur(0);
+    opacity: 1;
+}
+
+/* ==========================================================================
+   INNER STRUCTURAL DATA DESIGN LAYOUT
+   ========================================================================== */
+.fx-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.fx-meta-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: rgba(255, 255, 255, 0.45);
+    margin-bottom: 4px;
+}
+
+.fx-balance-val {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.fx-brand-logo-wrap {
+    height: 38px;
+    display: flex;
+    align-items: center;
+}
+
+.fx-network-logo {
+    height: 100%;
+    width: auto;
+    object-fit: contain;
+}
+
+/* Smart EMV Microchip Component alignment */
+.fx-card-chip-row {
+    margin: 12px 0;
+    display: flex;
+}
+
+.fx-emv-chip-img {
+    height: 32px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+/* PAN Code Section Layout Matrix */
+.fx-pan-display {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: 3.5px;
+    color: #ffffff;
+    word-spacing: 2px;
+    margin-bottom: 16px;
+    text-shadow: 1px 2px 3px rgba(0, 0, 0, 0.6);
+}
+
+.fx-holder-layout {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.fx-holder-name,
+.fx-expiry-val {
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 1px;
+    color: #ffffff;
+    text-transform: uppercase;
+}
+
+/* ==========================================================================
+   DYNAMIC THEMATIC GRADIENTS ENGINE (BY UNIQUE BRAND)
+   ========================================================================== */
+
+/* Theme 1: Premium Master Class Signature Style (Rich Dark Obsidian Carbon) */
+.fx-card-wrapper[data-card-theme="master"] {
+    background: linear-gradient(135deg, #242429 0%, #0e0e11 50%, #16161b 100%);
+    border: 1px solid rgba(247, 148, 30, 0.15);
+}
+
+/* Theme 2: Premium Visa Signature Style (Deep Royal Blue Gold Ambient Gloss) */
+.fx-card-wrapper[data-card-theme="visa"] {
+    background: linear-gradient(135deg, #0f2b6e 0%, #08143a 60%, #1a3a8a 100%);
+    border: 1px solid rgba(26, 115, 232, 0.2);
+}
+
+/* Theme 3: Interbank Verve Style (Modern Forest Mint Vibrant Teal Blend) */
+.fx-card-wrapper[data-card-theme="verve"] {
+    background: linear-gradient(135deg, #022e22 0%, #051310 50%, #084c37 100%);
+    border: 1px solid rgba(0, 230, 118, 0.15);
+}

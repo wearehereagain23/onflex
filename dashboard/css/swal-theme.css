@@ -1,0 +1,114 @@
+/* ==========================================================================
+   ONFLEX DASHBOARD - DYNAMIC SWEETALERT2 CSS VARIABLE THEMING
+   ========================================================================== */
+
+:root {
+    --swal-bg: #0b141a;
+    --swal-color: #f8fafc;
+    --swal-border: rgba(255, 255, 255, 0.08);
+    --swal-title-color: #ffffff;
+    --swal-text-color: #94a3b8;
+    --swal-confirm-bg: var(--tier-accent, #e05326);
+    /* Inherits dynamic Tier blue/teal */
+    --swal-confirm-color: #ffffff;
+    --swal-cancel-bg: rgba(255, 255, 255, 0.05);
+    --swal-cancel-color: #94a3b8;
+    --swal-cancel-border: rgba(255, 255, 255, 0.1);
+}
+
+/* Light Mode Overrides */
+body.light-mode,
+[data-theme="light"] {
+    --swal-bg: #ffffff;
+    --swal-color: #1e293b;
+    --swal-border: rgba(0, 0, 0, 0.08);
+    --swal-title-color: #0f172a;
+    --swal-text-color: #475569;
+    --swal-cancel-bg: #f1f5f9;
+    --swal-cancel-color: #475569;
+    --swal-cancel-border: rgba(0, 0, 0, 0.1);
+}
+
+/* Dynamic Tier Background Matching for Dark Mode */
+html[data-theme="dark"] body[data-tier="1"] {
+    --swal-bg: #0b181c;
+    --swal-border: rgba(76, 195, 217, 0.25);
+}
+
+html[data-theme="dark"] body[data-tier="2"] {
+    --swal-bg: #0d172a;
+    --swal-border: rgba(37, 99, 235, 0.3);
+}
+
+html[data-theme="dark"] body[data-tier="3"] {
+    --swal-bg: #1c140b;
+    --swal-border: rgba(180, 83, 9, 0.3);
+}
+
+/* 1. DYNAMIC POPUP STYLES */
+html body div.swal2-container div.swal2-popup,
+html body .swal2-popup,
+.swal2-popup {
+    background: var(--swal-bg) !important;
+    background-color: var(--swal-bg) !important;
+    color: var(--swal-color) !important;
+    border-radius: 16px !important;
+    border: 1px solid var(--swal-border) !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6) !important;
+    font-family: inherit !important;
+}
+
+/* 2. TEXT & CONTENT STYLES */
+html body div.swal2-container .swal2-title {
+    color: var(--swal-title-color) !important;
+    font-weight: 700 !important;
+    font-size: 1.5rem !important;
+}
+
+html body div.swal2-container .swal2-html-container {
+    color: var(--swal-text-color) !important;
+}
+
+/* 3. ICON STYLING */
+html body div.swal2-container .swal2-icon.swal2-warning {
+    border-color: var(--tier-accent, #f59e0b) !important;
+    color: var(--tier-accent, #f59e0b) !important;
+}
+
+/* 4. BUTTON STYLES */
+html body div.swal2-container .swal2-actions {
+    gap: 12px !important;
+}
+
+html body div.swal2-container .swal2-styled {
+    font-weight: 600 !important;
+    border-radius: 10px !important;
+    padding: 10px 22px !important;
+    font-size: 0.9rem !important;
+    box-shadow: none !important;
+}
+
+/* Force Confirm Button to use dynamic tier accent, overriding SWAL inline styles */
+html body div.swal2-container button.swal2-confirm,
+html body div.swal2-container .swal2-styled.swal2-confirm,
+html body div.swal2-container .swal-btn-success {
+    background-color: var(--tier-accent, var(--primary-teal)) !important;
+    background: var(--tier-accent, var(--primary-teal)) !important;
+    color: #ffffff !important;
+    border: none !important;
+}
+
+/* Ensure hover and focus states keep the dynamic tier accent */
+html body div.swal2-container button.swal2-confirm:hover,
+html body div.swal2-container button.swal2-confirm:focus {
+    background-color: var(--tier-accent, var(--primary-teal)) !important;
+    background: var(--tier-accent, var(--primary-teal)) !important;
+    filter: brightness(1.15);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3) !important;
+}
+
+html body div.swal2-container .swal2-cancel {
+    background-color: var(--swal-cancel-bg) !important;
+    color: var(--swal-cancel-color) !important;
+    border: 1px solid var(--swal-cancel-border) !important;
+}

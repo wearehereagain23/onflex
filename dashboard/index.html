@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OnFlex Finance Dashboard</title>
+
+    <link rel="icon" type="image/png" href="../assets/icon-512.png">
+
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/chat.css">
+    <link rel="stylesheet" href="css/notification.css">
+    <link rel="stylesheet" href="css/popup.css">
+    <link rel="stylesheet" href="css/card-ui.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="css/swal-theme.css">
+</head>
+
+<body>
+
+    <aside class="sidebar animate-fade-in-left">
+        <div class="sidebar-logo">
+            <img src="../assets/icon-512.png" style="background-color: rgb(255, 255, 255); border-radius: 20px;"
+                alt="OnFlex Logo" class="brand-logo-img">
+        </div>
+        <nav class="nav-container">
+            <a href="#" class="nav-link active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <rect width="7" height="9" x="3" y="3" rx="1" />
+                    <rect width="7" height="5" x="14" y="3" rx="1" />
+                    <rect width="7" height="9" x="14" y="12" rx="1" />
+                    <rect width="7" height="5" x="3" y="16" rx="1" />
+                </svg>
+                Dashboard
+            </a>
+            <a href="./cards.html" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <rect width="20" height="14" x="2" y="5" rx="2" />
+                    <line x1="2" x2="22" y1="10" y2="10" />
+                </svg>
+                Cards
+            </a>
+            <a href="#" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                </svg>
+                Deposit
+            </a>
+            <a href="./local.html" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="m18 8-4-4-4 4M14 4v12M6 16l4 4 4-4M10 20V8" />
+                </svg>
+                Local
+            </a>
+            <a href="./international.html" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20" />
+                </svg>
+                Global
+            </a>
+            <a href="./loan.html" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 1 0 0 7.75" />
+                </svg>
+                Loan
+            </a>
+            <a href="./history.html" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                    <path d="M3 3v5h5M12 7v5l4 2" />
+                </svg>
+                History
+            </a>
+            <a href="./profile.html" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" />
+                </svg>
+                Profile
+            </a>
+            <a href="./security.html" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path
+                        d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                    <circle cx="12" cy="12" r="3" />
+                </svg>
+                Settings
+            </a>
+            <a href="#" class="nav-link logout-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                    <polyline points="16 17 21 12 16 7" />
+                    <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+                Logout
+            </a>
+        </nav>
+    </aside>
+
+    <main class="workspace animate-fade-in-up">
+
+        <header class="header-system">
+            <div class="mobile-header-logo">
+                <img src="../assets/icon-512.png" alt="OnFlex Logo" class="brand-logo-img">
+            </div>
+
+            <div class="header-spacer"></div>
+
+            <div class="meta-actions">
+                <!-- Chat Button -->
+                <button class="icon-circle-btn toggle-glow-effect" id="headerChatBtn" aria-label="Open Live Chat">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg>
+                </button>
+
+                <!-- Theme Toggler -->
+                <button class="icon-circle-btn toggle-glow-effect" id="themeToggler" aria-label="Toggle Theme Engine">
+                    <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5" />
+                        <line x1="12" y1="1" x2="12" y2="3" />
+                        <line x1="12" y1="21" x2="12" y2="23" />
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                        <line x1="1" y1="12" x2="3" y2="12" />
+                        <line x1="21" y1="12" x2="23" y2="12" />
+                        <line x1="4.22" y1="19.22" x2="5.64" y2="17.76" />
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                    </svg>
+                    <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        style="display:none;">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                    </svg>
+                </button>
+
+                <!-- Notification Button (Explicit ID Added) -->
+                <button class="icon-circle-btn toggle-glow-effect" id="notificationBtn" aria-label="Open Notifications">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0" />
+                    </svg>
+                </button>
+
+                <div id="profile-nav" class="header-profile-block">
+                    <img src="./image/prof.jpg" alt="User Profile" class="user-avatar">
+                    <div class="header-profile-meta">
+                        <span class="header-profile-name"></span>
+                        <span class="header-profile-role">Tier <span id="tiers"></span></span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <section class="welcome-block">
+            <div class="welcome-title-wrap">
+                <h1>OnFlex Dashboard</h1>
+                <p>Welcome back, <span class="user-highlight"></span></p>
+            </div>
+
+            <div class="action-pills-row">
+                <div id="dashboardDate" class="pill-btn date-pill">Loading Date...</div>
+                <button class="pill-btn pill-btn-primary interactive-pop">+ Add Money</button>
+            </div>
+        </section>
+
+        <div class="dashboard-grid">
+            <div class="left-column">
+                <div class="card-ui height-managed hover-lift">
+                    <div class="card-title-header">My Accounts</div>
+                    <div class="accounts-list-wrapper">
+                        <div class="account-item-row active">
+                            <div class="account-icon-box">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="2" y="5" width="20" height="14" rx="2" />
+                                    <line x1="2" y1="10" x2="22" y2="10" />
+                                </svg>
+                            </div>
+                            <div class="account-details">
+                                <div class="account-name-label">Account Balance</div>
+                            </div>
+                            <div class="account-value-display">0.00</div>
+                        </div>
+                        <div class="account-item-row">
+                            <div class="account-icon-box">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect width="20" height="12" x="2" y="6" rx="2" />
+                                    <circle cx="12" cy="12" r="2" />
+                                </svg>
+                            </div>
+                            <div class="account-details">
+                                <div class="account-name-label"><span id="accountType"></span> Account</div>
+                                <div class="account-sub-label">(Fixed) 2026-02-21 Ⓡ</div>
+                            </div>
+                            <div class="account-value-display">0.00</div>
+                        </div>
+                        <div class="account-item-row">
+                            <div class="account-icon-box">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path
+                                        d="M4 22V4c0-.5.2-1 .6-1.4C5 2.2 5.5 2 6 2h12c.5 0 1 .2 1.4.6.4.4.6.9.6 1.4v18l-4-2-4 2-4-2-4 2z" />
+                                </svg>
+                            </div>
+                            <div class="account-details">
+                                <!-- Kept id="loanType" inside the parent label -->
+                                <div class="account-name-label"><span id="loanType"></span>Loan</div>
+                            </div>
+                            <div class="account-value-display">0.00</div>
+                        </div>
+                        <div class="account-item-row">
+                            <div class="account-icon-box">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect width="20" height="14" x="2" y="5" rx="2" />
+                                    <line x1="2" y1="10" x2="22" y2="10" />
+                                </svg>
+                            </div>
+                            <div class="account-details">
+                                <div class="account-name-label">Debit Card</div>
+                                <div class="account-sub-label master-badge"></div>
+                            </div>
+                            <div class="account-value-display"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-ui height-managed hover-lift">
+                    <div class="card-title-header">Quick Actions</div>
+                    <div class="quick-actions-grid">
+                        <button class="action-square-btn interactive-pop">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                style="color: var(--accent-green);">
+                                <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+                                <polyline points="16 7 22 7 22 13" />
+                            </svg>
+                            <span>Transfer</span>
+                        </button>
+                        <button id="loan-nav" class="action-square-btn interactive-pop">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                style="color: var(--accent-red);">
+                                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                            </svg>
+                            <span>Loan</span>
+                        </button>
+                        <button id="card-nav" class="action-square-btn interactive-pop">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                style="color: var(--accent-blue);">
+                                <rect width="20" height="14" x="2" y="5" rx="2" />
+                                <line x1="2" y1="10" x2="22" y2="10" />
+                            </svg>
+                            <span>Cards</span>
+                        </button>
+                        <button class="action-square-btn interactive-pop">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                style="color: var(--accent-orange);">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                            </svg>
+                            <span>Deposit</span>
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-column-grid">
+                <div id="portfolioCard" class="card-ui height-managed hover-lift">
+                    <div class="card-title-header split-title">
+                        <span>Total Balance</span>
+                        <span class="title-meta-tag">Overall Portfolio Assets</span>
+                    </div>
+                    <div id="portfolioTotal" class="balance-hero-value">0.00</div>
+                    <div class="breakdown-row"><span>Account Balance</span><span id="breakdownMain">0.00</span></div>
+                    <div class="breakdown-row"><span>Online Account</span><span id="breakdownType">0.00</span></div>
+                    <div class="breakdown-row">
+                        <span><span id="breakdownLoanType"></span>Loan</span>
+                        <span id="breakdownLoan">0.00</span>
+                    </div>
+                </div>
+
+                <!-- Modular Dynamic Credit Card Component Container -->
+                <div id="cardCanvas" class="fx-card-wrapper fx-card-height hover-lift">
+                    <!-- Unactivated State Overlay -->
+                    <div class="fx-card-overlay">
+                        <div class="fx-activation-msg">CARD NOT ACTIVATED</div>
+                        <button id="navcard2" class="fx-apply-btn interactive-pop">Apply for card</button>
+                    </div>
+
+                    <!-- Top Row: Card Balance & Asset Network Branding Logo -->
+                    <div class="fx-card-header">
+                        <div class="fx-balance-block">
+                            <div class="fx-meta-label">Current Balance</div>
+                            <div id="ccBalanceDisplay" class="fx-balance-val">0.00</div>
+                        </div>
+                        <!-- Card Network Logo Container -->
+                        <div class="fx-brand-logo-wrap">
+                            <img id="ccBrandLogo" src="image/master.png" alt="Card Network" class="fx-network-logo">
+                        </div>
+                    </div>
+
+                    <!-- Center Row: Integrated Digital Microchip Component Element -->
+                    <div class="fx-card-chip-row">
+                        <img src="image/chip.png" alt="EMV Chip" class="fx-emv-chip-img">
+                    </div>
+
+                    <!-- Bottom Row: Card PAN Sequence & Identification Metadata -->
+                    <div class="fx-card-footer">
+                        <div id="ccNumberDisplay" class="fx-pan-display">**** **** **** 0000</div>
+                        <div class="fx-holder-layout">
+                            <div class="fx-holder-col">
+                                <div class="fx-meta-label">Card Holder</div>
+                                <div id="ccHolderDisplay" class="fx-holder-name">Loading...</div>
+                            </div>
+                            <div class="fx-expiry-col">
+                                <div class="fx-meta-label">Expires</div>
+                                <div id="ccExpiryDisplay" class="fx-expiry-val">00/00</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sub-metrics-row">
+                    <div class="card-ui mini-card-flex height-managed-mini hover-lift">
+                        <div>
+                            <div class="mini-value-title">Account Number</div>
+                            <div id="miniAccountNumber" class="mini-value-hero">0000000000</div>
+                        </div>
+                        <div class="mini-status-badge status-blue">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+                                <polyline points="17 6 23 6 23 12" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="card-ui mini-card-flex height-managed-mini hover-lift">
+                        <div>
+                            <div class="mini-value-title">Account Tier</div>
+                            <div class="mini-value-hero">Tier <span id="miniTier"></span></div>
+                        </div>
+                        <div class="mini-status-badge status-red">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="23 18 13.5 8.5 8.5 13.5 1 6" />
+                                <polyline points="17 18 23 18 23 12" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="card-ui mini-card-flex height-managed-mini hover-lift">
+                        <div>
+                            <div class="mini-value-title">Account Type</div>
+                            <div id="miniAccountType" class="mini-value-hero"></div>
+                        </div>
+                        <div class="mini-status-badge status-yellow">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect width="20" height="14" x="2" y="5" rx="2" />
+                                <line x1="2" y1="10" x2="22" y2="10" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-ui span-two hover-lift">
+                    <div class="history-card-header">
+                        <div class="card-title-header no-margin">Account History</div>
+                        <button class="pill-btn compact-btn interactive-pop"
+                            onclick="location.href='./history.html'">View All</button>
+                    </div>
+                    <!-- Dynamic Feed Container -->
+                    <div class="modern-history-feed">
+                        <div style="padding: 15px; text-align: center; color: #94a3b8;">Loading history...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer-brand-strip">
+            <div>© Copyright OnFlex | All Rights Reserved</div>
+            <div class="social-links-row"><a href="#">f</a><a href="#">t</a><a href="#">in</a><a href="#">yt</a></div>
+        </footer>
+    </main>
+
+    <div class="mobile-bottom-nav">
+        <a href="#" class="mobile-nav-pill active">
+            <div class="mobile-icon-wrapper">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <rect width="7" height="9" x="3" y="3" rx="1" />
+                    <rect width="7" height="5" x="14" y="3" rx="1" />
+                    <rect width="7" height="9" x="14" y="12" rx="1" />
+                    <rect width="7" height="5" x="3" y="16" rx="1" />
+                </svg>
+            </div>
+            <span>Home</span>
+        </a>
+        <a href="#" class="mobile-nav-pill">
+            <div class="mobile-icon-wrapper">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="m18 8-4-4-4 4M14 4v12M6 16l4 4 4-4M10 20V8" />
+                </svg>
+            </div>
+            <span>Transfer</span>
+        </a>
+
+        <a href="./history.html" class="mobile-nav-pill">
+            <div class="mobile-icon-wrapper">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                    <path d="M3 3v5h5M12 7v5l4 2" />
+                </svg>
+            </div>
+            <span>History</span>
+        </a>
+
+        <a href="./profile.html" class="mobile-nav-pill">
+            <div class="mobile-icon-wrapper">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" />
+                </svg>
+            </div>
+            <span>Profile</span>
+        </a>
+        <a href="./security.html" class="mobile-nav-pill">
+            <div class="mobile-icon-wrapper">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path
+                        d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                    <circle cx="12" cy="12" r="3" />
+                </svg>
+            </div>
+            <span>Settings</span>
+        </a>
+    </div>
+
+    <script src="js/theme.js"></script>
+    <script src="js/index.js"></script>
+    <script src="js/chat.js"></script>
+    <script src="js/notification.js"></script>
+    <script src="js/popup.js"></script>
+    <script src="js/enable-2fa.js"></script>
+
+    <script>
+
+        document.getElementById('loan-nav').addEventListener('click', () => {
+            location.href = "./loan.html"
+
+        })
+        document.getElementById('card-nav').addEventListener('click', () => {
+            location.href = "./cards.html"
+
+        })
+
+        document.getElementById('profile-nav').addEventListener('click', () => {
+            location.href = "./profile.html"
+
+        })
+
+        document.getElementById('navcard2').addEventListener('click', () => {
+            location.href = "./cards.html"
+
+        })
+    </script>
+
+    <script>
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en'
+            }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript"
+        src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <style>
+        .translate-selector-wrapper {
+            margin: 1rem 0;
+            padding: 0.5rem;
+            background: var(--btn-neutral, rgba(255, 255, 255, 0.05));
+            border: 1px solid var(--border-ui, rgba(255, 255, 255, 0.1));
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+        }
+
+        #google_translate_element {
+            color: transparent;
+        }
+
+        #google_translate_element a {
+            display: none;
+        }
+
+        .goog-te-banner-frame.skiptranslate {
+            display: none !important;
+        }
+
+        body {
+            top: 0px !important;
+        }
+
+        body>.skiptranslate {
+            display: none !important;
+        }
+
+        /* Clean styling for Google's native dropdown inside dark theme */
+        .goog-te-combo {
+            background: transparent;
+            color: var(--text-main, #ffffff);
+            border: none;
+            padding: 0.4rem 0.8rem;
+            font-family: inherit;
+            font-size: 0.9rem;
+            outline: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .goog-te-combo option {
+            background: #111827;
+            color: #ffffff;
+        }
+    </style>
+</body>
+
+</html>

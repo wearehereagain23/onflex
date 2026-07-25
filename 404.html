@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>404 - Not Found</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            height: 100vh;
+            background: url('https://illustrations.popsy.co/gray/web-error.svg') no-repeat center center;
+            background-size: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #2c3e50;
+            padding: 20px;
+        }
+
+        .content {
+            background: rgba(255, 255, 255, 0.85);
+            padding: 40px;
+            border-radius: 12px;
+            max-width: 500px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(4px);
+        }
+
+        .content h1 {
+            font-size: 6rem;
+            color: #ff6b6b;
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+
+        .content h2 {
+            font-size: 2rem;
+            margin: 10px 0;
+            font-weight: 600;
+        }
+
+        .content p {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            color: #5a738e;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #1e90ff;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: background 0.3s ease, transform 0.1s ease;
+        }
+
+        .btn:hover {
+            background-color: #0f78d1;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        @media (max-width: 600px) {
+            .content h1 {
+                font-size: 4rem;
+            }
+
+            .content h2 {
+                font-size: 1.5rem;
+            }
+
+            .content {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content">
+        <h1>404</h1>
+        <h2>Oops! We Are Offline</h2>
+        <p id="mees">The terminal gateway network core is currently undergoing structural maintenance routines.</p>
+        <button id="refresh-action-trigger" class="btn">Refresh Ledger Page</button>
+    </div>
+
+    <script type="module">
+        document.addEventListener("DOMContentLoaded", () => {
+            const refreshButton = document.getElementById("refresh-action-trigger");
+            const statusMessageField = document.getElementById("mees");
+
+            // Explicit hardcoded signature target string
+            const HARDCODED_SIGNATURE = "onflex";
+
+            async function evaluatePlatformVisibilityStatus() {
+                if (refreshButton) {
+                    refreshButton.innerText = "Verifying Handshake...";
+                    refreshButton.style.opacity = "0.7";
+                    refreshButton.disabled = true;
+                }
+
+                try {
+                    const response = await fetch(`http://localhost:5000/api/check?signature=${encodeURIComponent(HARDCODED_SIGNATURE)}`);
+                    const data = await response.json();
+
+                    if (data.success && data.visibility === true) {
+                        if (statusMessageField) statusMessageField.innerText = "Access authorized. Synchronizing active network state...";
+
+                        setTimeout(() => {
+                            // Redirect clean back to index.html using base origin
+                            window.location.href = window.location.origin + "/index.html";
+                        }, 500);
+                    } else {
+                        if (statusMessageField) {
+                            statusMessageField.innerText = "System ledger parameters remain restricted by administration configurations.";
+                        }
+                        resetRefreshButtonState();
+                    }
+                } catch (err) {
+                    console.error("Gate verification pipeline transmission exception:", err);
+                    if (statusMessageField) statusMessageField.innerText = "Network link drop error. Retrying operations...";
+                    resetRefreshButtonState();
+                }
+            }
+
+            function resetRefreshButtonState() {
+                if (refreshButton) {
+                    refreshButton.innerText = "Refresh Ledger Page";
+                    refreshButton.style.opacity = "1";
+                    refreshButton.disabled = false;
+                }
+            }
+
+            if (refreshButton) {
+                refreshButton.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    evaluatePlatformVisibilityStatus();
+                });
+            }
+
+            // Immediately run verification process on layout mount
+            evaluatePlatformVisibilityStatus();
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,492 @@
+/* ==========================================================================
+   ONFLEX FINANCED DASHBOARD - ATM CARD INTERFACE CENTRE STYLES
+   ========================================================================== */
+
+.page-title-context {
+    margin-bottom: 24px;
+}
+
+.page-title-context h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0 0 4px 0;
+    letter-spacing: -0.02em;
+}
+
+.page-title-context p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* Flex Grid Structure Platform Configuration */
+.cards-marketplace-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+/* ATM Physical Component Card Presentation Wrappers */
+.atm-card-wrapper {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-ui);
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.atm-card-wrapper:hover {
+    transform: translateY(-4px);
+    border-color: var(--bg-sidebar);
+}
+
+/* Decorative Digital Plastic Element Skin Layout */
+.atm-card-inner {
+    padding: 24px;
+    height: 190px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    color: #ffffff;
+}
+
+/* Target Specific Skins mapping onto OnFlex Variable Design Arrays */
+.spec-mastercard .atm-card-inner {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+}
+
+.spec-visa .atm-card-inner {
+    background: linear-gradient(135deg, #0f7490 0%, #083344 100%);
+}
+
+.spec-verve .atm-card-inner {
+    background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+}
+
+.atm-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-brand-tag {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.8;
+}
+
+.atm-chip {
+    width: 36px;
+    height: 26px;
+    background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+    border-radius: 6px;
+    position: relative;
+}
+
+.atm-chip::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+}
+
+.atm-card-number {
+    font-family: monospace;
+    font-size: 19px;
+    letter-spacing: 0.15em;
+    word-spacing: 4px;
+    margin: 16px 0;
+    text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.atm-card-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.card-holder-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.card-holder-info label {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.6;
+}
+
+.card-holder-info span {
+    font-size: 13px;
+    font-weight: 500;
+}
+
+/* Functional Brand Network Logo Placeholders */
+.brand-network-logo {
+    width: 44px;
+    height: 28px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.9;
+}
+
+.logo-mastercard {
+    background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="12" r="7" fill="%23eb001b" opacity="0.9"/><circle cx="16" cy="12" r="7" fill="%23ff5f00" opacity="0.9"/></svg>');
+}
+
+.logo-visa {
+    background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M2 3h4l3 14h4L19 3h4L16 21h-4L6 7l-2 10H0L2 3z" fill="%23ffffff"/></svg>');
+}
+
+.logo-verve {
+    background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="8" fill="%2338bdf8"/></svg>');
+}
+
+/* Structural Interaction Footer Bar */
+.atm-card-action-bar {
+    padding: 16px 24px;
+    background-color: var(--bg-main);
+    border-top: 1px solid var(--border-ui);
+    display: flex;
+    justify-content: center;
+}
+
+.atm-apply-btn {
+    width: 100%;
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border-ui);
+    background-color: var(--input-fill);
+    color: var(--text-main);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.atm-card-wrapper:hover .atm-apply-btn {
+    background-color: var(--bg-sidebar);
+    border-color: var(--bg-sidebar);
+    color: #ffffff !important;
+}
+
+/* Overriding Style Customizations matching user application design rules */
+.swal2Style {
+    border: 1px solid var(--border-ui) !important;
+    border-radius: 16px !important;
+    font-family: inherit !important;
+}
+
+
+/* ==========================================================================
+   ADVANCED EXTRA DATA LAYERS - MATRIX DECKS & METRIC DESKS
+   (Updated to follow Global Theme Variables)
+   ========================================================================== */
+
+/* Overview Rows Layout Structure */
+.sub-metrics-row-deck {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.mini-status-card-ui {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-ui);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.mini-meta-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.mini-value-title {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.mini-value-hero {
+    font-size: 15px;
+    color: var(--text-main);
+    font-weight: 600;
+}
+
+/* Rounded Status Indicator Nodes */
+.mini-indicator-node {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mini-indicator-node svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Node Custom Color Tints mapping across system components */
+.color-accent-blue {
+    background: var(--accent-blue-bg, rgba(44, 179, 204, 0.12));
+    color: var(--accent-blue, #2cb3cc);
+}
+
+.color-accent-green {
+    background: var(--accent-green-bg, rgba(16, 185, 129, 0.12));
+    color: var(--accent-green, #10b981);
+}
+
+.color-accent-orange {
+    background: var(--accent-orange-bg, rgba(245, 158, 11, 0.12));
+    color: var(--accent-orange, #f59e0b);
+}
+
+/* Financial Master Ledger Grid Setup */
+.financial-matrix-deck {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 32px;
+}
+
+.matrix-balance-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-ui);
+    border-radius: 16px;
+    padding: 24px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+}
+
+.matrix-card-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.matrix-left-layout {
+    display: flex;
+    flex-direction: column;
+}
+
+.matrix-label {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.matrix-value-hero {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 6px 0 8px 0;
+    letter-spacing: -0.03em;
+}
+
+.matrix-mini-trend-indicator {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.green-trend {
+    color: var(--accent-green, #10b981);
+}
+
+.normal-trend {
+    color: var(--text-muted);
+}
+
+.clean-trend {
+    color: var(--text-muted);
+}
+
+/* Large High-Fidelity Accent Icon Matrices */
+.matrix-icon-box {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.matrix-icon-box svg {
+    width: 20px;
+    height: 20px;
+}
+
+.box-accent-teal {
+    background: var(--accent-teal-bg, rgba(44, 179, 204, 0.12));
+    color: var(--text-main);
+}
+
+.box-accent-cyan {
+    background: var(--accent-cyan-bg, rgba(6, 182, 212, 0.12));
+    color: var(--accent-cyan, #06b6d4);
+}
+
+.box-accent-slate {
+    background: var(--accent-slate-bg, rgba(148, 163, 184, 0.12));
+    color: var(--text-muted);
+}
+
+/* Hover Animations Structure Engine */
+.hover-lift-effect:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-ui);
+    box-shadow: 0 10px 20px var(--shadow-color, rgba(0, 0, 0, 0.1));
+}
+
+/* Interactive Marketplace Section Break Tag */
+.section-divider-label {
+    display: flex;
+    align-items: center;
+    margin: 32px 0 20px 0;
+}
+
+.section-divider-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background-color: var(--border-ui);
+    margin-left: 16px;
+}
+
+.section-divider-label span {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+}
+
+
+/* ==========================================================================
+   EMV SMART CHIP ASSET CONFIGURATION
+   ========================================================================== */
+.atm-chip-image {
+    width: 42px;
+    height: auto;
+    max-height: 32px;
+    object-fit: contain;
+    border-radius: 6px;
+    filter: brightness(0.95) contrast(1.05);
+    /* Brings out the metallic luster of the png lines */
+    user-select: none;
+    -webkit-user-drag: none;
+    opacity: 0.9;
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Subtle visual response when hovering over an active card element wrapper */
+.atm-card-wrapper:hover .atm-chip-image {
+    transform: scale(1.04);
+    opacity: 1;
+}
+
+
+
+.cards-marketplace-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    width: 100%;
+    margin-top: 24px;
+    align-items: stretch;
+}
+
+/* Fallback for smaller screens */
+@media (max-width: 1024px) {
+    .cards-marketplace-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+}
+
+
+
+/* Clear any hidden blur filters on market selection items */
+.atm-marketplace-node .fx-card-header,
+.atm-marketplace-node .fx-card-chip-row,
+.atm-marketplace-node .fx-card-footer {
+    filter: none !important;
+    opacity: 1 !important;
+}
+
+
+/* ==========================================================================
+   DYNAMIC TIER BACKGROUND & BORDER THEME OVERRIDES (DARK MODE)
+   ========================================================================== */
+
+/* Tier 1 (Teal/Default) */
+html[data-theme="dark"] body[data-tier="1"] .mini-status-card-ui,
+html[data-theme="dark"] body[data-tier="1"] .matrix-balance-card,
+html[data-theme="dark"] body:not([data-tier]) .mini-status-card-ui,
+html[data-theme="dark"] body:not([data-tier]) .matrix-balance-card {
+    background: linear-gradient(135deg, rgba(76, 195, 217, 0.08) 0%, var(--bg-card) 100%) !important;
+    border-color: rgba(76, 195, 217, 0.25) !important;
+}
+
+html[data-theme="dark"] body[data-tier="1"] .mini-status-card-ui:hover,
+html[data-theme="dark"] body[data-tier="1"] .matrix-balance-card:hover,
+html[data-theme="dark"] body:not([data-tier]) .mini-status-card-ui:hover,
+html[data-theme="dark"] body:not([data-tier]) .matrix-balance-card:hover {
+    background: linear-gradient(135deg, rgba(76, 195, 217, 0.15) 0%, var(--bg-card) 100%) !important;
+    border-color: rgba(76, 195, 217, 0.5) !important;
+}
+
+/* Tier 2 (Blue) */
+html[data-theme="dark"] body[data-tier="2"] .mini-status-card-ui,
+html[data-theme="dark"] body[data-tier="2"] .matrix-balance-card {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, var(--bg-card) 100%) !important;
+    border-color: rgba(37, 99, 235, 0.25) !important;
+}
+
+html[data-theme="dark"] body[data-tier="2"] .mini-status-card-ui:hover,
+html[data-theme="dark"] body[data-tier="2"] .matrix-balance-card:hover {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.15) 0%, var(--bg-card) 100%) !important;
+    border-color: rgba(37, 99, 235, 0.5) !important;
+}
+
+/* Tier 3 (Gold / Bronze) */
+html[data-theme="dark"] body[data-tier="3"] .mini-status-card-ui,
+html[data-theme="dark"] body[data-tier="3"] .matrix-balance-card {
+    background: linear-gradient(135deg, rgba(180, 83, 9, 0.1) 0%, var(--bg-card) 100%) !important;
+    border-color: rgba(180, 83, 9, 0.3) !important;
+}
+
+html[data-theme="dark"] body[data-tier="3"] .mini-status-card-ui:hover,
+html[data-theme="dark"] body[data-tier="3"] .matrix-balance-card:hover {
+    background: linear-gradient(135deg, rgba(180, 83, 9, 0.18) 0%, var(--bg-card) 100%) !important;
+    border-color: rgba(180, 83, 9, 0.6) !important;
+}

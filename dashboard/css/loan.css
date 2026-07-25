@@ -1,0 +1,394 @@
+/* --- Header Margin Fix & Structure --- */
+.dashboard-subheader-wrapper {
+    margin-bottom: 32px;
+    padding-top: 8px;
+    width: 100%;
+}
+
+.page-title-context h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-main, #ffffff);
+    margin: 12px 0 6px 0;
+}
+
+.page-title-context p {
+    font-size: 0.95rem;
+    color: var(--text-muted, #8a99ad);
+    margin: 0;
+}
+
+/* --- Metrics Grid --- */
+.loan-metrics-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 32px;
+    width: 100%;
+}
+
+.metric-tile {
+    padding: 24px !important;
+}
+
+.tile-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tile-lbl {
+    font-size: 0.8rem;
+    color: var(--text-muted, #8a99ad);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tile-val {
+    font-size: 1.7rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.flat-lbl {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    background: rgba(16, 185, 129, 0.15);
+    border-radius: 4px;
+    color: #10b981;
+    margin-left: 4px;
+}
+
+.tile-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tile-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* --- Context Colors --- */
+.text-teal {
+    color: #00f2fe;
+}
+
+.text-orange {
+    color: #f59e0b;
+}
+
+.text-green {
+    color: #10b981;
+}
+
+.bg-opacity-teal {
+    background: rgba(0, 242, 254, 0.1);
+    color: #00f2fe;
+}
+
+.bg-opacity-orange {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+}
+
+.bg-opacity-green {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+/* --- Split Layout Engine --- */
+.loan-grid-split {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 28px;
+    width: 100%;
+    align-items: start;
+}
+
+.unified-form-padding {
+    padding: 32px !important;
+}
+
+.panel-header-badge {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.panel-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--text-main, #ffffff);
+    margin: 0;
+}
+
+.panel-desc {
+    font-size: 0.9rem;
+    color: var(--text-muted, #8a99ad);
+    margin: 0 0 28px 0;
+    line-height: 1.5;
+}
+
+/* --- Premium Custom Input/Select Overhauls --- */
+.loan-input-matrix {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.input-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-input-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-main, #ffffff);
+}
+
+.input-relative-container {
+    position: relative;
+    width: 100%;
+}
+
+.custom-dashboard-input {
+    width: 100%;
+    background-color: #0d1520 !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 8px !important;
+    color: #ffffff !important;
+    padding: 14px 16px !important;
+    font-size: 1rem !important;
+    outline: none !important;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.custom-dashboard-input:focus {
+    border-color: #00f2fe !important;
+    box-shadow: 0 0 0 3px rgba(0, 242, 254, 0.15) !important;
+}
+
+.custom-dashboard-input.asset-input-padding {
+    padding-left: 38px !important;
+}
+
+/* Custom Dropdown Styles */
+.select-dropdown-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.select-dropdown-wrapper::after {
+    content: "";
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 10px;
+    height: 6px;
+    background-color: #8a99ad;
+    clip-path: polygon(100% 0, 0 0, 50% 100%);
+    pointer-events: none;
+}
+
+.custom-dashboard-select {
+    width: 100%;
+    background-color: #0d1520 !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 8px !important;
+    color: #ffffff !important;
+    padding: 14px 40px 14px 16px !important;
+    font-size: 1rem !important;
+    outline: none !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.custom-dashboard-select:focus {
+    border-color: #00f2fe !important;
+}
+
+.custom-dashboard-select option {
+    background-color: #0d1520;
+    color: #ffffff;
+    padding: 12px;
+}
+
+.input-hint-msg {
+    font-size: 0.8rem;
+    color: var(--text-muted, #8a99ad);
+    margin-top: 4px;
+}
+
+/* --- Dynamic Ledger Card --- */
+.live-calculation-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.calc-card-title {
+    margin: 0 0 16px 0;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: var(--text-muted, #8a99ad);
+    letter-spacing: 0.5px;
+}
+
+.calc-data-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.calc-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.95rem;
+    color: var(--text-main, #ffffff);
+}
+
+.calc-item.bold {
+    font-weight: 600;
+}
+
+.calc-item.border-top-divider {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 14px;
+    margin-top: 4px;
+}
+
+.full-width-btn {
+    width: 100%;
+    background: #00f2fe;
+    color: #0d1520;
+    border: none;
+    padding: 16px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s, filter 0.2s;
+}
+
+.full-width-btn:hover {
+    filter: brightness(1.1);
+}
+
+.full-width-btn:active {
+    transform: scale(0.99);
+}
+
+/* --- Right Column Panels --- */
+.info-card-padding {
+    padding: 28px !important;
+}
+
+.structural-margin-top {
+    margin-top: 24px;
+}
+
+.compliance-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-top: 20px;
+}
+
+.compliance-item {
+    display: flex;
+    gap: 16px;
+}
+
+.comp-icon {
+    color: #00f2fe;
+    flex-shrink: 0;
+}
+
+.comp-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.comp-text h5 {
+    margin: 0 0 6px 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.comp-text p {
+    margin: 0;
+    font-size: 0.88rem;
+    color: #8a99ad;
+    line-height: 1.5;
+}
+
+/* --- Micro Allocation Component --- */
+.matrix-hint-text {
+    font-size: 0.88rem;
+    color: #8a99ad;
+    margin: 6px 0 24px 0;
+}
+
+.progress-bar-container {
+    margin-top: 12px;
+}
+
+.progress-bar-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: #ffffff;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.progress-bar-track {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00f2fe, #0072ff);
+    border-radius: 4px;
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+/* --- Mobile Responsiveness Layout Media Queries --- */
+@media (max-width: 1024px) {
+    .loan-metrics-strip {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .loan-grid-split {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .dashboard-subheader-wrapper {
+        margin-bottom: 24px;
+    }
+}

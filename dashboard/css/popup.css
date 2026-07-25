@@ -1,0 +1,429 @@
+/* ==========================================================================
+   ONFLEX FINANCED DASHBOARD - AUTHENTIC VARIABLE OVERLAY STYLES
+   ========================================================================== */
+
+.onflex-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(5px);
+    z-index: 9999999 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    padding: 16px;
+}
+
+.onflex-popup-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Master Overlay Window Panel Base */
+.onflex-popup-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-ui);
+    width: 100%;
+    max-width: 440px;
+    border-radius: 16px;
+    box-shadow: 0 25px 50px var(--nav-shadow);
+    transform: scale(0.95) translateY(12px);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: hidden;
+}
+
+.onflex-popup-overlay.visible .onflex-popup-card {
+    transform: scale(1) translateY(0);
+}
+
+/* Modal Title bar Component */
+.onflex-popup-header {
+    background-color: var(--bg-main);
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-ui);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.onflex-popup-header h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-main) !important;
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+
+.onflex-popup-close {
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    line-height: 1;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.15s;
+    padding: 4px;
+}
+
+.onflex-popup-close:hover {
+    color: var(--text-main);
+}
+
+.onflex-popup-body {
+    padding: 22px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.popup-intro-text {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text-muted) !important;
+    margin: 0 0 4px 0;
+}
+
+/* ==========================================================================
+   ADVANCED DEPOSIT UI CARD STRUCTURES
+   ========================================================================== */
+.deposit-grid-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.deposit-row-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--input-fill);
+    border: 1px solid var(--border-ui);
+    padding: 12px 14px;
+    border-radius: 10px;
+}
+
+.row-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted) !important;
+}
+
+.row-value-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.row-text-value {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-main) !important;
+}
+
+/* Accent Highlight Mode Row adjustments */
+.deposit-row-item.highlight-row {
+    background-color: rgba(44, 179, 204, 0.04);
+    border-color: var(--bg-sidebar);
+}
+
+.deposit-row-item.highlight-row .row-text-value {
+    color: var(--bg-sidebar) !important;
+    font-family: monospace;
+    font-size: 15px;
+    letter-spacing: 0.02em;
+}
+
+.row-copy-btn {
+    background-color: var(--btn-neutral);
+    border: 1px solid var(--border-ui);
+    color: var(--text-muted);
+    padding: 6px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.row-copy-btn:hover {
+    color: var(--text-main);
+    background-color: var(--border-ui);
+}
+
+/* Modern Status Banner element */
+.advanced-status-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: var(--btn-neutral);
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-top: 4px;
+}
+
+.advanced-status-banner span {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted) !important;
+    line-height: 1.4;
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+    background-color: #22c55e;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.status-dot.pulsing {
+    animation: statusPulse 1.8s infinite ease-in-out;
+}
+
+@keyframes statusPulse {
+    0% {
+        transform: scale(0.9);
+        opacity: 0.6;
+    }
+
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(0.9);
+        opacity: 0.6;
+    }
+}
+
+/* ==========================================================================
+   MATRIX ACTION SPLIT HUB MODULE STYLES
+   ========================================================================== */
+.matrix-routing-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.matrix-route-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px;
+    background-color: var(--input-fill);
+    border: 1px solid var(--border-ui);
+    border-radius: 12px;
+    text-decoration: none !important;
+    transition: all 0.2s ease;
+}
+
+.matrix-route-btn:hover {
+    background-color: var(--btn-neutral);
+    border-color: var(--bg-sidebar);
+}
+
+.route-icon-box {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.route-icon-box svg {
+    width: 18px;
+    height: 18px;
+}
+
+.route-icon-box.primary-accent {
+    background-color: rgba(44, 179, 204, 0.12);
+    color: var(--bg-sidebar);
+}
+
+.route-icon-box.orange-accent {
+    background-color: rgba(249, 115, 22, 0.12);
+    color: #f97316;
+}
+
+.route-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.route-content h4 {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-main) !important;
+}
+
+.route-content span {
+    font-size: 11px;
+    color: var(--text-muted) !important;
+    line-height: 1.4;
+}
+
+/* ==========================================================================
+   MOBILE SCREEN DROPDOWN ACTION SHEET OVERRIDES
+   ========================================================================== */
+@media (max-width: 767px) {
+    .onflex-popup-overlay {
+        align-items: flex-end;
+        padding: 0;
+    }
+
+    .onflex-popup-card {
+        max-width: 100%;
+        border-radius: 20px 20px 0 0;
+        border-bottom: none;
+        border-left: none;
+        border-right: none;
+        transform: translateY(100%);
+        transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.12);
+    }
+
+    .onflex-popup-overlay.visible .onflex-popup-card {
+        transform: translateY(0);
+    }
+
+    .onflex-popup-body {
+        padding: 20px 20px 32px 20px;
+    }
+}
+
+/* ==========================================================================
+   DYNAMIC TIER-BASED OVERLAY & MODAL CARD STYLES (FULL MODAL OVERRIDE)
+   ========================================================================== */
+
+/* Dark Mode Modal Overlay Base */
+html[data-theme="dark"] .onflex-popup-card {
+    background-color: var(--bg-card) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Tier 1 (Teal/Default) */
+html[data-theme="dark"] body[data-tier="1"] .onflex-popup-header,
+html[data-theme="dark"] body:not([data-tier]) .onflex-popup-header {
+    background-color: rgba(76, 195, 217, 0.05) !important;
+    border-bottom-color: rgba(76, 195, 217, 0.2) !important;
+}
+
+html[data-theme="dark"] body[data-tier="1"] .deposit-row-item,
+html[data-theme="dark"] body:not([data-tier]) .deposit-row-item {
+    background-color: rgba(76, 195, 217, 0.04) !important;
+    border-color: rgba(76, 195, 217, 0.15) !important;
+}
+
+html[data-theme="dark"] body[data-tier="1"] .deposit-row-item.highlight-row,
+html[data-theme="dark"] body:not([data-tier]) .deposit-row-item.highlight-row {
+    background-color: rgba(76, 195, 217, 0.12) !important;
+    border-color: rgba(76, 195, 217, 0.4) !important;
+}
+
+html[data-theme="dark"] body[data-tier="1"] .deposit-row-item.highlight-row .row-text-value,
+html[data-theme="dark"] body:not([data-tier]) .deposit-row-item.highlight-row .row-text-value,
+html[data-theme="dark"] body[data-tier="1"] .route-icon-box.primary-accent,
+html[data-theme="dark"] body:not([data-tier]) .route-icon-box.primary-accent {
+    color: #4cc3d9 !important;
+    background-color: rgba(76, 195, 217, 0.15) !important;
+}
+
+html[data-theme="dark"] body[data-tier="1"] .matrix-route-btn,
+html[data-theme="dark"] body:not([data-tier]) .matrix-route-btn {
+    background-color: rgba(76, 195, 217, 0.04) !important;
+    border-color: rgba(76, 195, 217, 0.15) !important;
+}
+
+html[data-theme="dark"] body[data-tier="1"] .matrix-route-btn:hover,
+html[data-theme="dark"] body:not([data-tier]) .matrix-route-btn:hover {
+    border-color: #4cc3d9 !important;
+    background-color: rgba(76, 195, 217, 0.12) !important;
+}
+
+html[data-theme="dark"] body[data-tier="1"] .advanced-status-banner,
+html[data-theme="dark"] body:not([data-tier]) .advanced-status-banner {
+    background-color: rgba(76, 195, 217, 0.08) !important;
+}
+
+/* Tier 2 (Blue) */
+html[data-theme="dark"] body[data-tier="2"] .onflex-popup-header {
+    background-color: rgba(37, 99, 235, 0.05) !important;
+    border-bottom-color: rgba(37, 99, 235, 0.2) !important;
+}
+
+html[data-theme="dark"] body[data-tier="2"] .deposit-row-item {
+    background-color: rgba(37, 99, 235, 0.04) !important;
+    border-color: rgba(37, 99, 235, 0.15) !important;
+}
+
+html[data-theme="dark"] body[data-tier="2"] .deposit-row-item.highlight-row {
+    background-color: rgba(37, 99, 235, 0.12) !important;
+    border-color: rgba(37, 99, 235, 0.4) !important;
+}
+
+html[data-theme="dark"] body[data-tier="2"] .deposit-row-item.highlight-row .row-text-value,
+html[data-theme="dark"] body[data-tier="2"] .route-icon-box.primary-accent {
+    color: #3b82f6 !important;
+    background-color: rgba(37, 99, 235, 0.15) !important;
+}
+
+html[data-theme="dark"] body[data-tier="2"] .matrix-route-btn {
+    background-color: rgba(37, 99, 235, 0.04) !important;
+    border-color: rgba(37, 99, 235, 0.15) !important;
+}
+
+html[data-theme="dark"] body[data-tier="2"] .matrix-route-btn:hover {
+    border-color: #3b82f6 !important;
+    background-color: rgba(37, 99, 235, 0.12) !important;
+}
+
+html[data-theme="dark"] body[data-tier="2"] .advanced-status-banner {
+    background-color: rgba(37, 99, 235, 0.08) !important;
+}
+
+/* Tier 3 (Gold / Bronze) */
+html[data-theme="dark"] body[data-tier="3"] .onflex-popup-header {
+    background-color: rgba(180, 83, 9, 0.05) !important;
+    border-bottom-color: rgba(180, 83, 9, 0.2) !important;
+}
+
+html[data-theme="dark"] body[data-tier="3"] .deposit-row-item {
+    background-color: rgba(180, 83, 9, 0.04) !important;
+    border-color: rgba(180, 83, 9, 0.15) !important;
+}
+
+html[data-theme="dark"] body[data-tier="3"] .deposit-row-item.highlight-row {
+    background-color: rgba(180, 83, 9, 0.12) !important;
+    border-color: rgba(180, 83, 9, 0.4) !important;
+}
+
+html[data-theme="dark"] body[data-tier="3"] .deposit-row-item.highlight-row .row-text-value,
+html[data-theme="dark"] body[data-tier="3"] .route-icon-box.primary-accent {
+    color: #f59e0b !important;
+    background-color: rgba(180, 83, 9, 0.15) !important;
+}
+
+html[data-theme="dark"] body[data-tier="3"] .matrix-route-btn {
+    background-color: rgba(180, 83, 9, 0.04) !important;
+    border-color: rgba(180, 83, 9, 0.15) !important;
+}
+
+html[data-theme="dark"] body[data-tier="3"] .matrix-route-btn:hover {
+    border-color: #f59e0b !important;
+    background-color: rgba(180, 83, 9, 0.12) !important;
+}
+
+html[data-theme="dark"] body[data-tier="3"] .advanced-status-banner {
+    background-color: rgba(180, 83, 9, 0.08) !important;
+}

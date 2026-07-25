@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OnFlex Finance Dashboard - Global Transfer</title>
+
+    <link rel="icon" type="image/png" href="../assets/icon-512.png">
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/chat.css">
+    <link rel="stylesheet" href="css/notification.css">
+    <link rel="stylesheet" href="css/popup.css">
+    <link rel="stylesheet" href="css/international.css">
+    <link rel="stylesheet" href="css/loan.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="css/swal-theme.css">
+</head>
+
+<body>
+
+    <aside class="sidebar animate-fade-in-left">
+        <div class="sidebar-logo">
+            <img src="../assets/icon-512.png" style="background-color: rgb(255, 255, 255); border-radius: 20px;"
+                alt="OnFlex Logo" class="brand-logo-img">
+        </div>
+        <nav class="nav-container">
+            <a href="./index.html" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <rect width="7" height="9" x="3" y="3" rx="1" />
+                    <rect width="7" height="5" x="14" y="3" rx="1" />
+                    <rect width="7" height="9" x="14" y="12" rx="1" />
+                    <rect width="7" height="5" x="3" y="16" rx="1" />
+                </svg>
+                Dashboard
+            </a>
+            <a href="./cards.html" class="nav-link ">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <rect width="20" height="14" x="2" y="5" rx="2" />
+                    <line x1="2" x2="22" y1="10" y2="10" />
+                </svg>
+                Cards
+            </a>
+            <a href="#" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                </svg>
+                Deposit
+            </a>
+            <a href="./local.html" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="m18 8-4-4-4 4M14 4v12M6 16l4 4 4-4M10 20V8" />
+                </svg>
+                Local
+            </a>
+            <a href="./international.html" class="nav-link active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20" />
+                </svg>
+                Global
+            </a>
+            <a href="./loan.html" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 1 0 0 7.75" />
+                </svg>
+                Loan
+            </a>
+            <a href="./history.html" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                    <path d="M3 3v5h5M12 7v5l4 2" />
+                </svg>
+                History
+            </a>
+            <a href="./profile.html" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" />
+                </svg>
+                Profile
+            </a>
+            <a href="./security.html" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path
+                        d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                    <circle cx="12" cy="12" r="3" />
+                </svg>
+                Settings
+            </a>
+            <a href="#" class="nav-link logout-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                    <polyline points="16 17 21 12 16 7" />
+                    <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+                Logout
+            </a>
+        </nav>
+    </aside>
+
+    <main class="workspace animate-fade-in-up">
+        <header class="header-system">
+            <div class="mobile-header-logo">
+                <img src="../assets/icon-512.png" alt="OnFlex Logo" class="brand-logo-img">
+            </div>
+
+            <div class="header-spacer"></div>
+
+            <div class="meta-actions">
+                <button class="icon-circle-btn toggle-glow-effect" id="headerChatBtn" aria-label="Open Live Chat">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg>
+                </button>
+
+                <button class="icon-circle-btn toggle-glow-effect" id="themeToggler" aria-label="Toggle Theme Engine">
+                    <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5" />
+                        <line x1="12" y1="1" x2="12" y2="3" />
+                        <line x1="12" y1="21" x2="12" y2="23" />
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                        <line x1="1" y1="12" x2="3" y2="12" />
+                        <line x1="21" y1="12" x2="23" y2="12" />
+                        <line x1="4.22" y1="19.22" x2="5.64" y2="17.76" />
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                    </svg>
+                    <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        style="display:none;">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                    </svg>
+                </button>
+
+                <button class="icon-circle-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0" />
+                    </svg>
+                </button>
+
+                <div id="profile-nav" class="header-profile-block">
+                    <img src="./image/prof.jpg" alt="User Profile" class="user-avatar">
+                    <div class="header-profile-meta">
+                        <span class="header-profile-name"></span>
+                        <span class="header-profile-role">Tier <span id="tiers"></span></span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 1. Page Header Section (Spans Full Width) -->
+        <div class="welcome-block animate-fade-in-left" style="margin-bottom: 24px;">
+            <h1 style="margin: 0; font-size: 2rem; font-weight: 700; color: var(--text-main);">International <span
+                    class="user-highlight" style="color: var(--primary-teal);">Transfer</span></h1>
+        </div>
+
+        <div class="loan-metrics-strip animate-fade-in-up">
+            <div class="card-ui metric-tile">
+                <div class="tile-content">
+                    <div>
+                        <span class="tile-lbl">Account Balance</span>
+                        <h3 class="tile-val text-teal" id="accountBalance">$0.00</h3>
+                    </div>
+                    <div class="tile-icon bg-opacity-teal">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="card-ui metric-tile">
+                <div class="tile-content">
+                    <div>
+                        <span class="tile-lbl"><span id="accounttype">Online</span> Account</span>
+                        <h3 class="tile-val text-orange" id="accountTypeBalance">$0.00</h3>
+                    </div>
+                    <div class="tile-icon bg-opacity-orange">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                            <polyline points="22 4 12 14.01 9 11.01" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="card-ui metric-tile">
+                <div class="tile-content">
+                    <div>
+
+                        <span class="tile-lbl"><span id="loantp"></span>Loan</span>
+                        <h3 class="tile-val text-green"><span id="loanBalanace">$0.00</span></h3>
+                    </div>
+                    <div class="tile-icon bg-opacity-green">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="20" x2="18" y2="10" />
+                            <line x1="12" y1="20" x2="12" y2="4" />
+                            <line x1="6" y1="20" x2="6" y2="14" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Lower Grid Section (Form & Profile Side-By-Side) -->
+        <div class="dashboard-grid-split animate-fade-in-up">
+
+            <!-- Left: Operational Workspace Form Container -->
+            <div class="form-column-pane">
+                <div class="card-ui">
+                    <div class="split-title"
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 class="card-title-header no-margin"
+                            style="font-size: 1.15rem; font-weight: 600; margin: 0;">Enter Receiver Information</h2>
+                        <span class="feed-badge badge-success">Tier <span id="accountLevel"></span></span>
+                    </div>
+
+                    <!-- UPDATED INTERNATIONAL TRANSACTION FORM MATRIX -->
+                    <form id="ffm" class="transaction-modern-form-matrix">
+                        <div class="input-field-group">
+                            <label for="receiversName">Receiver's Full Name</label>
+                            <input name="receiversName" id="receiversName" class="dashboard-native-input" type="text"
+                                required placeholder="e.g. Jane Doe" />
+                        </div>
+
+                        <div class="input-field-group">
+                            <label for="receiverAccountNumber">Receiver's Account Number</label>
+                            <input name="receiverAccountNumber" id="receiverAccountNumber"
+                                class="dashboard-native-input" type="text" pattern="\d*" required
+                                placeholder="e.g. 9834029188" />
+                        </div>
+
+                        <div class="input-field-group">
+                            <label for="receiverAccountType">Receiver's Account Type</label>
+                            <select name="receiverAccountType" id="receiverAccountType"
+                                class="dashboard-native-input select-arrow-patch" required>
+                                <option value="">-- Select Account Type --</option>
+                                <option value="Online">Online Account</option>
+                                <option value="Savings">Savings Account</option>
+                                <option value="Checking">Checking Account</option>
+                                <option value="Current">Current Account</option>
+                                <option value="Corporate">Corporate Account</option>
+                                <option value="Offshore">Offshore Account</option>
+                                <option value="Joint">Joint Account</option>
+                            </select>
+                        </div>
+
+                        <div class="input-field-group">
+                            <label for="receiverBankName">Receiver's Bank Name</label>
+                            <input name="receiverBankName" id="receiverBankName" class="dashboard-native-input"
+                                type="text" required placeholder="e.g. Chase Bank" />
+                        </div>
+
+                        <div class="input-field-group">
+                            <label for="receiverCountry">Receiver's Country</label>
+                            <input name="receiverCountry" id="receiverCountry" class="dashboard-native-input"
+                                type="text" required placeholder="e.g. United Kingdom" />
+                        </div>
+
+                        <!-- ADDED: SWIFT / BIC Code field -->
+                        <div class="input-field-group">
+                            <label for="receiverSwiftCode">Bank SWIFT / BIC Code</label>
+                            <input name="receiverSwiftCode" id="receiverSwiftCode" class="dashboard-native-input"
+                                type="text" required placeholder="e.g. CHASUS33XXX" />
+                        </div>
+
+                        <!-- Spans full width gracefully below the grid rows -->
+                        <div class="input-field-group full-span-control">
+                            <label for="receiverIBANumber">Account IBAN / Routing Number</label>
+                            <input name="receiverIBANumber" id="receiverIBANumber" class="dashboard-native-input"
+                                type="text" required placeholder="e.g. GB29 West 1234 56" />
+                        </div>
+
+                        <div class="input-field-group full-span-control">
+                            <label for="withdrawFrom">Receiver Currency</label>
+                            <select id="currency" name="currency" class="dashboard-native-input select-arrow-patch"
+                                required>
+                                <option value="">Currency</option>
+                                <option value="$">US Dollar ($)</option>
+                                <option value="€">Euro (€)</option>
+                                <option value="£">Pound Sterling (£)</option>
+                                <option value="CHF">Swiss Franc (CHF)</option>
+
+                                <option value="CA$">Canadian Dollar (CA$)</option>
+                                <option value="A$">Australian Dollar (A$)</option>
+                                <option value="NZ$">New Zealand Dollar (NZ$)</option>
+                                <option value="S$">Singapore Dollar (S$)</option>
+                                <option value="HK$">Hong Kong Dollar (HK$)</option>
+
+                                <option value="¥">Japanese Yen (¥)</option>
+                                <option value="CN¥">Chinese Yuan (¥)</option>
+                                <option value="₩">South Korean Won (₩)</option>
+                                <option value="₹">Indian Rupee (₹)</option>
+
+                                <option value="AED">UAE Dirham (AED)</option>
+                                <option value="SAR">Saudi Riyal (SAR)</option>
+                                <option value="QAR">Qatari Riyal (QAR)</option>
+                                <option value="KWD">Kuwaiti Dinar (KWD)</option>
+                                <option value="₪">Israeli Shekel (₪)</option>
+
+                                <option value="SEkr">Swedish Krona (kr)</option>
+                                <option value="NOkr">Norwegian Krone (kr)</option>
+                                <option value="DKkr">Danish Krone (kr)</option>
+                                <option value="zł">Polish Złoty (zł)</option>
+                                <option value="₽">Russian Ruble (₽)</option>
+                                <option value="₺">Turkish Lira (₺)</option>
+
+                                <option value="R$">Brazilian Real (R$)</option>
+                                <option value="Mex$">Mexican Peso (Mex$)</option>
+                                <option value="R">South African Rand (R)</option>
+                                <option value="₦">Nigerian Naira (₦)</option>
+                            </select>
+                        </div>
+
+                        <div class="input-field-group full-span-control">
+                            <label for="withdrawFrom">Withdraw From (Source Vault)</label>
+                            <select name="withdrawFrom" id="withdrawFrom"
+                                class="dashboard-native-input select-arrow-patch" required>
+                                <option id="accountBalance2" value="Account Balance">Main Account Balance</option>
+                                <option id="accttype22" value="Savings">Savings Balance</option>
+                                <option id="loantp2" value="Credit">Credit Line Balance</option>
+                            </select>
+                        </div>
+
+                        <div class="input-field-group full-span-control">
+                            <label for="amount">Transaction Quantum Amount ($)</label>
+                            <input name="amount" id="amount" class="dashboard-native-input" type="text" pattern="\d*"
+                                required placeholder="0.00" />
+                        </div>
+
+                        <div class="input-field-group full-span-control">
+                            <label for="home_address">Narration / Description</label>
+                            <textarea class="dashboard-native-input textarea-static-resize" name="description"
+                                id="home_address" rows="3" required
+                                placeholder="Write a wire transfer note..."></textarea>
+                        </div>
+
+                        <div class="full-span-control form-submit-wrapper">
+                            <button type="submit" class="form-submit-btn btn-primary pill-btn-transfer-dispatch">
+                                Proceed to Transfer
+                            </button>
+                        </div>
+
+                        <!-- <div class="full-span-control form-submit-wrapper">
+                            <button type="submit" class="pill-btn-transfer-dispatch interactive-pop">
+                                Dispatch
+                            </button>
+                        </div> -->
+                    </form>
+                </div>
+            </div>
+
+            <!-- Right: Identity Matrix Profile Card Panel -->
+            <div class="profile-column-pane">
+                <div class="card-ui identity-card-container">
+                    <div class="identity-top-section">
+                        <div class="split-title"
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h2 class="card-title-header no-margin"
+                                style="font-size: 1.15rem; font-weight: 600; margin: 0;">Identity Matrix</h2>
+                            <span class="feed-badge badge-success">Tier <span id="accountLevel2"></span></span>
+                        </div>
+
+                        <div class="profile-card-display">
+                            <div class="avatar-frame-container">
+                                <img src="./image/prof.jpg" id="profilePic2" class="avatar-frame-image"
+                                    alt="Profile Vector Account holder">
+                            </div>
+                            <h3 class="profile-display-name" id="profileName"></h3>
+                            <p class="profile-display-account" id="profileAccount"></p>
+                        </div>
+                    </div>
+
+                    <div class="identity-actions-section">
+                        <button onclick="pro()" class="pill-btn interactive-pop security-profile-btn"
+                            style="cursor: pointer;">
+                            Security Parameters Profile
+                        </button>
+
+                        <div class="quick-actions-grid">
+                            <button id="Trans3" type="button" class="action-square-btn hover-lift">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" class="status-blue">
+                                    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+                                    <polyline points="16 7 22 7 22 13"></polyline>
+                                </svg>
+                                <span>Transfer</span>
+                            </button>
+                            <button id="goLoan" type="button" class="action-square-btn hover-lift">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" class="status-red">
+                                    <path d="M23 18l-8.5-8.5-5 5L1 6"></path>
+                                    <polyline points="17 18 23 18 23 12"></polyline>
+                                </svg>
+                                <span>Loans</span>
+                            </button>
+                            <button id="cards" type="button" class="action-square-btn hover-lift">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" class="status-yellow">
+                                    <rect width="20" height="14" x="2" y="5" rx="2"></rect>
+                                    <line x1="2" x2="22" y1="10" y2="10"></line>
+                                </svg>
+                                <span>Cards</span>
+                            </button>
+                            <button id="openDeposit2" type="button" class="action-square-btn hover-lift">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" class="status-teal-icon">
+                                    <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path>
+                                    <path d="M14 2v4a2 2 0 0 0 2 2h4"></path>
+                                </svg>
+                                <span>Deposit</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer-brand-strip">
+            <div>© Copyright OnFlex | All Rights Reserved</div>
+            <div class="social-links-row"><a href="#">f</a><a href="#">t</a><a href="#">in</a><a href="#">yt</a></div>
+        </footer>
+    </main>
+
+    <div class="mobile-bottom-nav">
+        <a href="./index.html" class="mobile-nav-pill">
+            <div class="mobile-icon-wrapper">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <rect width="7" height="9" x="3" y="3" rx="1" />
+                    <rect width="7" height="5" x="14" y="3" rx="1" />
+                    <rect width="7" height="9" x="14" y="12" rx="1" />
+                    <rect width="7" height="5" x="3" y="16" rx="1" />
+                </svg>
+            </div>
+            <span>Home</span>
+        </a>
+        <a href="" class="mobile-nav-pill active">
+            <div class="mobile-icon-wrapper">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="m18 8-4-4-4 4M14 4v12M6 16l4 4 4-4M10 20V8" />
+                </svg>
+            </div>
+            <span>Transfer</span>
+        </a>
+        <a href="./history.html" class="mobile-nav-pill">
+            <div class="mobile-icon-wrapper">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                    <path d="M3 3v5h5M12 7v5l4 2" />
+                </svg>
+            </div>
+            <span>History</span>
+        </a>
+        <a href="./profile.html" class="mobile-nav-pill">
+            <div class="mobile-icon-wrapper">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" />
+                </svg>
+            </div>
+            <span>Profile</span>
+        </a>
+        <a href="./security.html" class="mobile-nav-pill">
+            <div class="mobile-icon-wrapper">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path
+                        d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                    <circle cx="12" cy="12" r="3" />
+                </svg>
+            </div>
+            <span>Settings</span>
+        </a>
+    </div>
+
+    <!-- Script dependencies -->
+    <script src="js/auth-components.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/index.js"></script>
+    <script src="js/chat.js"></script>
+    <script src="js/notification.js"></script>
+    <script src="js/popup.js"></script>
+    <script src="js/international.js"></script>
+    <script src="js/currency.js"></script>
+    <script src="js/enable-2fa.js"></script>
+
+    <script>
+        document.getElementById('profile-nav').addEventListener('click', () => {
+            location.href = "./profile.html";
+        });
+        document.getElementById('goLoan').addEventListener('click', () => {
+            location.href = "./loan.html";
+        });
+        document.getElementById('cards').addEventListener('click', () => {
+            location.href = "./cards.html";
+        });
+    </script>
+    <script>
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en'
+            }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript"
+        src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <style>
+        .translate-selector-wrapper {
+            margin: 1rem 0;
+            padding: 0.5rem;
+            background: var(--btn-neutral, rgba(255, 255, 255, 0.05));
+            border: 1px solid var(--border-ui, rgba(255, 255, 255, 0.1));
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+        }
+
+        #google_translate_element {
+            color: transparent;
+        }
+
+        #google_translate_element a {
+            display: none;
+        }
+
+        .goog-te-banner-frame.skiptranslate {
+            display: none !important;
+        }
+
+        body {
+            top: 0px !important;
+        }
+
+        body>.skiptranslate {
+            display: none !important;
+        }
+
+        /* Clean styling for Google's native dropdown inside dark theme */
+        .goog-te-combo {
+            background: transparent;
+            color: var(--text-main, #ffffff);
+            border: none;
+            padding: 0.4rem 0.8rem;
+            font-family: inherit;
+            font-size: 0.9rem;
+            outline: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .goog-te-combo option {
+            background: #111827;
+            color: #ffffff;
+        }
+    </style>
+</body>
+
+</html>

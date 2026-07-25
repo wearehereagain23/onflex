@@ -1,0 +1,358 @@
+/* ==========================================================================
+   ONFLEX INTERACTIVE WORKSPACE GRID OVERRIDES
+   ========================================================================== */
+
+/* Overwrites the global fixed grid tracks to expand fluidly across 100% of the canvas width */
+.workspace .dashboard-grid {
+    grid-template-columns: 1.6fr 1fr;
+    width: 100%;
+    max-width: 100%;
+    gap: 28px;
+    align-items: start;
+}
+
+/* Forces columns to stay structurally cohesive without overflow */
+.left-column,
+.right-column-grid {
+    width: 100%;
+    min-width: 0;
+}
+
+/* Modifies the column components to house the Identity Module as a vertical stretch block */
+.right-column-grid {
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- Metrics Overview Row Layout Fix --- */
+.sub-metrics-row {
+    grid-column: span 1;
+    /* Stops element from trying to span out of its container */
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    width: 100%;
+}
+
+.metrics-inner-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 16px;
+}
+
+.metrics-text-block {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.metrics-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin: 0;
+}
+
+.metrics-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0;
+}
+
+/* --- Transaction Modular Form Matrix Styling --- */
+.transaction-modern-form-matrix {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    width: 100%;
+    margin-top: 16px;
+}
+
+.input-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.input-field-group.full-span-control {
+    grid-column: span 2;
+}
+
+.input-field-group label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+}
+
+.dashboard-native-input {
+    width: 100%;
+    background-color: var(--input-fill);
+    border: 1px solid var(--border-ui);
+    color: var(--text-main);
+    padding: 14px 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.dashboard-native-input:focus {
+    border-color: var(--primary-teal);
+    background-color: var(--bg-main);
+    box-shadow: 0 0 0 3px rgba(76, 195, 217, 0.15);
+}
+
+.select-arrow-patch {
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23a1b0cb'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 14px;
+    padding-right: 44px;
+}
+
+.textarea-static-resize {
+    resize: none;
+    min-height: 100px;
+    line-height: 1.5;
+}
+
+/* --- PERFECTED BUTTON ADJUSTMENT LAYOUT --- */
+.form-submit-wrapper {
+    margin-top: 8px;
+}
+
+.transaction-modern-form-matrix .pill-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 16px 24px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    background: linear-gradient(135deg, #4cc3d9, #2baec7);
+    color: #060b0d;
+    border: none;
+    box-shadow: 0 4px 16px rgba(76, 195, 217, 0.2);
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.transaction-modern-form-matrix .pill-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(76, 195, 217, 0.35);
+}
+
+/* ==========================================================================
+   IDENTITY CONTAINER ELEMENTS
+   ========================================================================== */
+.identity-card-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.profile-card-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 24px 0;
+}
+
+.avatar-frame-container {
+    width: 96px;
+    height: 96px;
+    margin-bottom: 16px;
+    position: relative;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-teal), rgba(76, 195, 217, 0.1));
+    padding: 3px;
+}
+
+.avatar-frame-image {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--bg-card);
+}
+
+.profile-display-name {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0 0 4px 0;
+}
+
+.profile-display-account {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+    font-family: monospace;
+    margin: 0;
+}
+
+.identity-actions-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.security-profile-btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 12px;
+    background: var(--btn-neutral);
+    border: 1px solid var(--border-ui);
+    color: var(--text-main);
+}
+
+.security-profile-btn:hover {
+    background: rgba(76, 195, 217, 0.08);
+    border-color: var(--primary-teal);
+    color: var(--primary-teal);
+}
+
+/* --- Quick Actions Button Matrix System --- */
+.identity-card-container .quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.identity-card-container .action-square-btn {
+    background: transparent;
+    border: 1px solid var(--border-ui);
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    color: var(--text-main);
+}
+
+.identity-card-container .action-square-btn svg {
+    width: 22px;
+    height: 22px;
+}
+
+.identity-card-container .action-square-btn span {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.identity-card-container .action-square-btn:hover {
+    background: var(--btn-neutral);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   CLEAN SCREEN INTERACTION RESPONSIVE ENGINE
+   ========================================================================== */
+@media (max-width: 1023px) {
+    .workspace .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .sub-metrics-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 767px) {
+    .transaction-modern-form-matrix {
+        grid-template-columns: 1fr;
+    }
+
+    .input-field-group.full-span-control {
+        grid-column: span 1;
+    }
+}
+
+/* --- Full Width Metrics Panel Row --- */
+.sub-metrics-row-full {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 28px;
+}
+
+/* --- Content Forms Section Side-by-Side --- */
+.dashboard-grid-split {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 28px;
+    width: 100%;
+    align-items: start;
+    /* Aligns the form box and profile card heights perfectly */
+    box-sizing: border-box;
+}
+
+.form-column-pane,
+.profile-column-pane {
+    width: 100%;
+    min-width: 0;
+}
+
+/* Clean Responsiveness Matrix for Small Viewports */
+@media (max-width: 1150px) {
+    .dashboard-grid-split {
+        grid-template-columns: 1fr;
+    }
+
+    .sub-metrics-row-full {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .sub-metrics-row-full {
+        grid-template-columns: 1fr;
+    }
+}
+
+.pill-btn-transfer-dispatch {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 14px 28px;
+    background: var(--tier-accent, var(--primary-teal));
+    color: #ffffff;
+    border: none;
+    border-radius: 30px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(76, 195, 217, 0.25);
+}
+
+.pill-btn-transfer-dispatch:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(76, 195, 217, 0.4);
+    filter: brightness(1.1);
+}

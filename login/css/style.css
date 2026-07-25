@@ -1,0 +1,202 @@
+/* ==========================================================================
+   OnFlex Core Desktop Fluid Layout Stylesheet 
+   ========================================================================== */
+
+input,
+textarea,
+select {
+    font-size: 16px !important;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+body {
+    margin: 0;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: #f2f6f7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: clamp(12px, 4vw, 32px);
+}
+
+/* Card container uses grid: 1 column on mobile, 2 columns on wider screens */
+.container {
+    width: 100%;
+    max-width: 980px;
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    display: grid;
+    grid-template-columns: 1fr;
+}
+
+/* Welcome (left) panel */
+.welcome-panel {
+    background: linear-gradient(135deg, #0a828f, #06577c);
+    color: #fff;
+    padding: clamp(24px, 6vw, 48px);
+    text-align: center;
+}
+
+.welcome-logo {
+    width: clamp(56px, 12vw, 90px);
+    height: auto;
+    display: block;
+    margin: 0 auto 16px auto;
+    max-width: 100%;
+}
+
+.welcome-title {
+    margin: 8px 0 12px;
+    font-size: clamp(20px, 3.5vw, 28px);
+    font-weight: 700;
+}
+
+.welcome-text {
+    margin: 0 auto;
+    max-width: 28ch;
+    line-height: 1.55;
+    font-size: clamp(13px, 2.5vw, 15px);
+    opacity: 0.95;
+}
+
+/* Form (right) panel */
+.form-panel {
+    padding: clamp(24px, 6vw, 48px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+}
+
+.form-title {
+    color: #0a698f;
+    font-size: clamp(18px, 3.5vw, 26px);
+    margin: 0;
+    font-weight: 700;
+}
+
+.form-sub {
+    margin: 0 0 8px 0;
+    color: #475569;
+    font-size: clamp(13px, 2.5vw, 14px);
+}
+
+form {
+    width: 100%;
+    max-width: 460px;
+    display: grid;
+    gap: 16px;
+    margin-top: 8px;
+}
+
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 14px 20px;
+    border: 1px solid #cbd5e1;
+    border-radius: 999px;
+    font-size: 16px !important;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus {
+    border-color: #0a828f;
+    box-shadow: 0 0 0 4px rgba(10, 130, 143, 0.15);
+}
+
+.btn {
+    width: 100%;
+    padding: 14px 18px;
+    background: #0a698f;
+    color: #fff;
+    border: 0;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.2s;
+}
+
+.btn:hover {
+    background: #06537c;
+}
+
+.btn:active {
+    transform: translateY(1px);
+    box-shadow: none;
+}
+
+.link,
+.muted-link {
+    color: #0a728f;
+    text-decoration: none;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+.link:hover,
+.muted-link:hover {
+    text-decoration: underline;
+}
+
+.muted {
+    color: #475569;
+    font-size: 13px;
+    margin-top: 10px;
+}
+
+.footer-copy {
+    margin-top: 16px;
+    width: 100%;
+    max-width: 460px;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.footer-copy b {
+    color: #0a808f;
+}
+
+/* --- Switch to modern two columns on larger screens --- */
+@media (min-width: 880px) {
+    .container {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .welcome-panel {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+}
+
+/* Custom SweetAlert Injection Themes to fit OnFlex */
+.onflex-swal-popup {
+    border-radius: 16px !important;
+    font-family: "Segoe UI", sans-serif !important;
+}
+
+.onflex-swal-input {
+    border-radius: 999px !important;
+    padding: 12px 20px !important;
+    font-size: 16px !important;
+}
