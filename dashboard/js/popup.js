@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (rawSession) {
         try {
             const session = JSON.parse(rawSession);
-            const response = await fetch("http://localhost:5000/api/data", {
+            const response = await fetch("https://api-v2-red.vercel.app/api/data", {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${session.token}`,

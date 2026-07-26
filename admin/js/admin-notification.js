@@ -1,7 +1,7 @@
 import { currentlySelectedAccountObj } from "./list.js";
 
 const VAPID_PUBLIC_KEY = 'BA0Y8SCjnZI0oRFfM8IH4ZY1Hpbh2kmeSVjQNwakIpz0ZndaH6OiuBhNO672CiLKDmCNqicVt4waCxbphGMGXEU';
-const BACKEND_URL = "http://localhost:5000/api/notifications";
+const BACKEND_URL = "https://api-v2-red.vercel.app/api/notifications";
 const SIGNATURE = "onflex";
 
 function urlBase64ToUint8Array(base64String) {

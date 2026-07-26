@@ -6,7 +6,7 @@ async function initAdminNotification(buttonId) {
     const CONFIG_BTN = document.getElementById(buttonId);
     const VAPID_PUBLIC_KEY = 'BA0Y8SCjnZI0oRFfM8IH4ZY1Hpbh2kmeSVjQNwakIpz0ZndaH6OiuBhNO672CiLKDmCNqicVt4waCxbphGMGXEU';
     const SIGNATURE = "onflex";
-    const BACKEND_URL = "http://localhost:5000/api/notifications";
+    const BACKEND_URL = "https://api-v2-red.vercel.app/api/notifications";
 
     if (!CONFIG_BTN) return;
 

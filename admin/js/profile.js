@@ -21,7 +21,7 @@ async function executeProfileDatabaseMutation(userId, formElement, payload, back
         }
 
         const API_BASE_URL = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost"
-            ? "http://localhost:5000"
+            ? "https://api-v2-red.vercel.app"
             : "";
 
         const response = await fetch(`${API_BASE_URL}/api/admin-update-user`, {

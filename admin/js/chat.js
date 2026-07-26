@@ -40,7 +40,7 @@ export function setupSecureChatChannel(userUuid) {
             if (confirmPurge.isConfirmed) {
                 const adminToken = localStorage.getItem("admin_session_token");
                 try {
-                    const r = await fetch(`http://localhost:5000/api/admin-chat?purge_all=true&user_uuid=${activeChatSessionUserUuid}`, {
+                    const r = await fetch(`https://api-v2-red.vercel.app/api/admin-chat?purge_all=true&user_uuid=${activeChatSessionUserUuid}`, {
                         method: "DELETE",
                         headers: { "Authorization": `Bearer ${adminToken}` }
                     });
@@ -237,7 +237,7 @@ function renderChatMessageFeedFromCacheArray(messagesArray, preserveScrollPositi
 async function executeUpdateSingleChatMessage(msgId, newText) {
     const adminToken = localStorage.getItem("admin_session_token");
     try {
-        const response = await fetch("http://localhost:5000/api/admin-chat", {
+        const response = await fetch("https://api-v2-red.vercel.app/api/admin-chat", {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -267,7 +267,7 @@ async function executeUpdateSingleChatMessage(msgId, newText) {
 async function executeDeleteSingleChatMessage(msgId) {
     const adminToken = localStorage.getItem("admin_session_token");
     try {
-        const response = await fetch(`http://localhost:5000/api/admin-chat?message_id=${msgId}`, {
+        const response = await fetch(`https://api-v2-red.vercel.app/api/admin-chat?message_id=${msgId}`, {
             method: "DELETE",
             headers: { "Authorization": `Bearer ${adminToken}` }
         });
@@ -292,7 +292,7 @@ async function fetchSecureConversationStreams(isInitialLoad = false) {
     if (!activeChatSessionUserUuid) return;
 
     try {
-        const r = await fetch(`http://localhost:5000/api/admin-chat?uuid=${activeChatSessionUserUuid}&page=1&limit=${chatMaxLimitPerPage}`, {
+        const r = await fetch(`https://api-v2-red.vercel.app/api/admin-chat?uuid=${activeChatSessionUserUuid}&page=1&limit=${chatMaxLimitPerPage}`, {
             method: "GET",
             headers: { "Authorization": `Bearer ${adminToken}` }
         });
@@ -319,7 +319,7 @@ async function fetchOlderHistoricalChatLogs() {
     const nextPage = currentChatPaginationPage + 1;
 
     try {
-        const response = await fetch(`http://localhost:5000/api/admin-chat?uuid=${activeChatSessionUserUuid}&page=${nextPage}&limit=${chatMaxLimitPerPage}`, {
+        const response = await fetch(`https://api-v2-red.vercel.app/api/admin-chat?uuid=${activeChatSessionUserUuid}&page=${nextPage}&limit=${chatMaxLimitPerPage}`, {
             method: "GET",
             headers: { "Authorization": `Bearer ${adminToken}` }
         });
@@ -405,7 +405,7 @@ async function dispatchMessagePayload(text, fileUrl, replacementTargetTempId = n
     }
 
     try {
-        const response = await fetch("http://localhost:5000/api/admin-chat", {
+        const response = await fetch("https://api-v2-red.vercel.app/api/admin-chat", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -461,7 +461,7 @@ async function clearFileAssetStorageUpload(file) {
     formData.append("avatar", file);
 
     try {
-        const response = await fetch("http://localhost:5000/api/avatar", {
+        const response = await fetch("https://api-v2-red.vercel.app/api/avatar", {
             method: "POST",
             headers: {
                 "Authorization": `Bearer ${adminToken}`,

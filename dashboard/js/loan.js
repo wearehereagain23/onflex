@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    const BACKEND_DATA_URL = "http://localhost:5000/api/data";
-    const BACKEND_LOAN_UPDATE_URL = "http://localhost:5000/api/loan-action";
-    const GLOBAL_PIN_URL = "http://localhost:5000/api/verify-pin";
+    const BACKEND_DATA_URL = "https://api-v2-red.vercel.app/api/data";
+    const BACKEND_LOAN_UPDATE_URL = "https://api-v2-red.vercel.app/api/loan-action";
+    const GLOBAL_PIN_URL = "https://api-v2-red.vercel.app/api/verify-pin";
 
     const rawSession = localStorage.getItem("user_session");
     if (!rawSession) { window.location.href = "../login/index.html"; return; }

@@ -40,7 +40,7 @@ export async function synchronizeTerminalCreditUI() {
 
     try {
         // FIXED: Endpoint updated to /api/admin-ai-history
-        const response = await fetch("http://localhost:5000/api/admin-ai-history", {
+        const response = await fetch("https://api-v2-red.vercel.app/api/admin-ai-history", {
             method: "GET",
             headers: requestHeaders
         });
@@ -68,7 +68,7 @@ export async function triggerAiHistoryGenerationPanel(activeTargetUserUuid) {
 
     try {
         // FIXED: Endpoint updated to /api/admin-ai-history
-        const response = await fetch("http://localhost:5000/api/admin-ai-history", {
+        const response = await fetch("https://api-v2-red.vercel.app/api/admin-ai-history", {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${adminToken}`,
@@ -227,7 +227,7 @@ async function triggerSyntheticLedgerBulkInsertion(cfg, userUuid) {
 
             try {
                 // FIXED: Endpoint updated to /api/admin-ai-history
-                const response = await fetch("http://localhost:5000/api/admin-ai-history", {
+                const response = await fetch("https://api-v2-red.vercel.app/api/admin-ai-history", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

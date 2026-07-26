@@ -6,7 +6,7 @@
 document.addEventListener("DOMContentLoaded", () => {
 
     // Define Express backend target URL
-    const BACKEND_URL = "http://localhost:5000";
+    const BACKEND_URL = "https://api-v2-red.vercel.app";
     const SIGNATURE = "onflex";
 
     // ----------------------------------------------------------------------

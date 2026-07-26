@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!toggleNotifications) return;
 
     // Direct production endpoint
-    const BACKEND_SETTINGS_URL = "http://localhost:5000/api/notifications";
+    const BACKEND_SETTINGS_URL = "https://api-v2-red.vercel.app/api/notifications";
     const APP_SIGNATURE = "onflex";
 
     // Hardcoded VAPID Public Key matching the admin implementation
