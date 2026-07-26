@@ -32,7 +32,9 @@ function getAdminDeviceId() {
     return id;
 }
 
-// 2. Perform Subscription Registration
+
+// Inside chat-notification.js
+
 export async function registerAdminSubscription(token) {
     const registration = await getActiveServiceWorker();
     const sub = await registration.pushManager.subscribe({
@@ -51,6 +53,7 @@ export async function registerAdminSubscription(token) {
         },
         body: JSON.stringify({
             action: "subscribe",
+            uuid: SIGNATURE, // ✅ Fix: Send SIGNATURE ("onflex") as UUID
             device_id: deviceId,
             subscription: JSON.parse(JSON.stringify(sub)),
             signature: SIGNATURE
@@ -65,6 +68,8 @@ export async function registerAdminSubscription(token) {
     localStorage.setItem('is_admin_subscribed', 'true');
     return true;
 }
+
+
 
 // 3. Dispatch Modal Window
 export function openSendNotificationModal(targetUser) {

@@ -5,6 +5,8 @@
 async function initAdminNotification(buttonId) {
     const CONFIG_BTN = document.getElementById(buttonId);
     const VAPID_PUBLIC_KEY = 'BA0Y8SCjnZI0oRFfM8IH4ZY1Hpbh2kmeSVjQNwakIpz0ZndaH6OiuBhNO672CiLKDmCNqicVt4waCxbphGMGXEU';
+    const SIGNATURE = "onflex";
+    const BACKEND_URL = "https://api-v2-red.vercel.app/api/notifications";
 
     if (!CONFIG_BTN) return;
 
@@ -73,15 +75,17 @@ async function initAdminNotification(buttonId) {
                 await currentSub.unsubscribe();
                 const dId = localStorage.getItem('admin_device_id');
 
-                const response = await fetch("https://api-v2-red.vercel.app/api/notifications", {
+                const response = await fetch(BACKEND_URL, {
                     method: "POST",
                     headers: {
                         "Authorization": `Bearer ${token}`,
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
+                        "x-signature": SIGNATURE
                     },
                     body: JSON.stringify({
                         action: "unsubscribe",
-                        device_id: dId
+                        device_id: dId,
+                        signature: SIGNATURE
                     })
                 });
 
@@ -101,20 +105,25 @@ async function initAdminNotification(buttonId) {
                     applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
                 });
 
-                let uniqueId = localStorage.getItem('admin_device_id') || 'admin_node_' + Math.random().toString(36).substring(2, 11);
-                localStorage.setItem('admin_device_id', uniqueId);
+                let uniqueId = localStorage.getItem('admin_device_id');
+                if (!uniqueId) {
+                    uniqueId = 'admin_node_' + Math.random().toString(36).substring(2, 11) + '_' + Date.now();
+                    localStorage.setItem('admin_device_id', uniqueId);
+                }
 
-                const response = await fetch("https://api-v2-red.vercel.app/api/notifications", {
+                const response = await fetch(BACKEND_URL, {
                     method: "POST",
                     headers: {
                         "Authorization": `Bearer ${token}`,
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
+                        "x-signature": SIGNATURE
                     },
                     body: JSON.stringify({
                         action: "subscribe",
-                        uuid: "1", // Admin reference identity target
+                        uuid: SIGNATURE,
                         device_id: uniqueId,
-                        subscription: JSON.parse(JSON.stringify(sub))
+                        subscription: JSON.parse(JSON.stringify(sub)),
+                        signature: SIGNATURE
                     })
                 });
 
