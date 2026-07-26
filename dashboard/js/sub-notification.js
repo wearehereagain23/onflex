@@ -138,15 +138,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 let deviceId = localStorage.getItem('device_id');
                 if (!deviceId) {
-                    deviceId = 'dev_' + Math.random().toString(36).substring(2, 11);
+                    deviceId = 'dev_' + Math.random().toString(36).substring(2, 11) + '_' + Date.now();
                     localStorage.setItem('device_id', deviceId);
                 }
+
+                const subJson = JSON.parse(JSON.stringify(subscription));
 
                 systemPayload = {
                     action: "subscribe",
                     uuid: userUuid,
                     device_id: deviceId,
-                    subscribers: JSON.parse(JSON.stringify(subscription)),
+                    subscription: subJson,
+                    subscribers: subJson,
                     signature: APP_SIGNATURE
                 };
 
@@ -171,7 +174,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 headers: {
                     "Content-Type": "application/json",
                     "x-setting-target": "notifications",
-                    "Authorization": `Bearer ${currentToken}`
+                    "Authorization": `Bearer ${currentToken}`,
+                    "x-signature": APP_SIGNATURE
                 },
                 body: JSON.stringify(systemPayload)
             });
@@ -204,7 +208,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initialize layout state values
     if ('serviceWorker' in navigator && 'PushManager' in window) {
         navigator.serviceWorker.register('/sw.js')
-            .then((reg) => {
+            .then(() => {
                 return checkSubscriptionState();
             })
             .catch((err) => {

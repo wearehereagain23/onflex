@@ -11,6 +11,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const SYSTEM_ADMIN_SIGNATURE = "onflex";
 
     // ==========================================
+    // ADMIN DEVICE ID INITIALIZATION ENGINE
+    // ==========================================
+    function initializeAdminDeviceId() {
+        let existingDeviceId = localStorage.getItem('admin_device_id');
+
+        if (!existingDeviceId) {
+            // Generate a new device ID only if one does not exist
+            existingDeviceId = 'admin_device_' + Math.random().toString(36).substring(2, 11) + '_' + Date.now();
+            localStorage.setItem('admin_device_id', existingDeviceId);
+        }
+
+        return existingDeviceId;
+    }
+
+    // ==========================================
     // PASSWORD VISIBILITY TOGGLE CONTROLLER
     // ==========================================
     if (passVisibilityTrigger && passwordFieldInput) {
@@ -52,7 +67,6 @@ document.addEventListener("DOMContentLoaded", () => {
             toggleFormButtonLoadingState(true);
 
             try {
-                // FIXED: Route path updated from '/api/admin-auth' to '/api/admin-auth'
                 const networkConnection = await fetch("https://api-v2-red.vercel.app/api/admin-auth", {
                     method: "POST",
                     headers: {
@@ -73,6 +87,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 // Independent token container ensures cross-session protection on local clients
                 localStorage.setItem("admin_session_token", serverPayloadResponse.token);
+
+                // 🔑 Check/Generate unique device ID without overwriting an existing one
+                initializeAdminDeviceId();
 
                 Swal.fire({
                     title: "Terminal Authorized",
@@ -118,7 +135,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const HARDCODED_SIGNATURE = "onflex";
 
     try {
-        // FIXED: Route path updated from '/api/check' to '/api/check'
         const response = await fetch(`https://api-v2-red.vercel.app/api/check?signature=${encodeURIComponent(HARDCODED_SIGNATURE)}`);
 
         // Safety check to ensure response is JSON before parsing
