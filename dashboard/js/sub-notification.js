@@ -8,6 +8,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const BACKEND_SETTINGS_URL = "https://api-v2-red.vercel.app/api/settings";
     const APP_SIGNATURE = "onflex";
 
+    // Hardcoded VAPID Public Key matching the admin implementation
+    const VAPID_PUBLIC_KEY = 'BA0Y8SCjnZI0oRFfM8IH4ZY1Hpbh2kmeSVjQNwakIpz0ZndaH6OiuBhNO672CiLKDmCNqicVt4waCxbphGMGXEU';
+
     // Helper to clear UI safely if exceptions happen
     const revertToggleUI = (state) => {
         toggleNotifications.checked = state;
@@ -127,15 +130,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     throw new Error("Permission denied. Please enable notifications in your browser.");
                 }
 
-                const keyResponse = await fetch("https://api-v2-red.vercel.app/api/vapidPublicKey", {
-                    headers: { "Authorization": `Bearer ${currentToken}` }
-                });
-                const keyData = await keyResponse.json();
-                if (!keyData.key) throw new Error("Could not retrieve secure transmission public keys from server.");
-
+                // Subscribing directly using the hardcoded VAPID public key
                 const subscription = await registration.pushManager.subscribe({
                     userVisibleOnly: true,
-                    applicationServerKey: urlBase64ToUint8Array(keyData.key)
+                    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
                 });
 
                 let deviceId = localStorage.getItem('device_id');
@@ -148,7 +146,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     action: "subscribe",
                     uuid: userUuid,
                     device_id: deviceId,
-                    subscribers: subscription,
+                    subscribers: JSON.parse(JSON.stringify(subscription)),
                     signature: APP_SIGNATURE
                 };
 
