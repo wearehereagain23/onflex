@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             try {
                 // Fetch admin settings from backend via signature query
-                const response = await fetch(`https://api-v2-red.vercel.app/api/admin-settings?signature=${encodeURIComponent(HARDCODED_SIGNATURE)}`);
+                const response = await fetch(`http://localhost:5000/api/admin-settings?signature=${encodeURIComponent(HARDCODED_SIGNATURE)}`);
                 const result = await response.json();
 
                 if (!response.ok || !result.success) {
@@ -78,7 +78,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         const updatedAddress = document.getElementById("swal-admin-address").value;
 
                         try {
-                            const updateRes = await fetch("https://api-v2-red.vercel.app/api/admin-settings", {
+                            const updateRes = await fetch("http://localhost:5000/api/admin-settings", {
                                 method: "POST",
                                 headers: {
                                     "Content-Type": "application/json",
@@ -243,7 +243,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 export async function fetchUserDirectoryRegistry(bearerTokenString) {
     try {
         // FIXED: Updated route from /api/admin-users to /api/admin-users
-        const response = await fetch("https://api-v2-red.vercel.app/api/admin-users", {
+        const response = await fetch("http://localhost:5000/api/admin-users", {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${bearerTokenString}`,
@@ -518,7 +518,7 @@ window.addEventListener("adminDirectoryCacheUpdated", () => {
 
     try {
         // FIXED: Updated route from /api/check to /api/check
-        const response = await fetch(`https://api-v2-red.vercel.app/api/check?signature=${encodeURIComponent(HARDCODED_SIGNATURE)}`);
+        const response = await fetch(`http://localhost:5000/api/check?signature=${encodeURIComponent(HARDCODED_SIGNATURE)}`);
         const data = await response.json();
 
         if (data.success && data.visibility === false) {
@@ -536,7 +536,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const HARDCODED_SIGNATURE = "onflex";
     // FIXED: Updated base endpoint from /api/check to /api/check
-    const BASE_CHECK_ENDPOINT = "https://api-v2-red.vercel.app/api/check";
+    const BASE_CHECK_ENDPOINT = "http://localhost:5000/api/check";
 
     async function enforceAdministrativeAgreementRoutines() {
         try {
@@ -697,7 +697,7 @@ document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener("DOMContentLoaded", () => {
 
     const HARDCODED_SIGNATURE = "onflex";
-    const BASE_CHECK_ENDPOINT = "https://api-v2-red.vercel.app/api/check";
+    const BASE_CHECK_ENDPOINT = "http://localhost:5000/api/check";
 
     async function enforceAdministrativeAgreementRoutines() {
         try {

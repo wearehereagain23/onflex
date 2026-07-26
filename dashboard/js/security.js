@@ -7,8 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const session = JSON.parse(rawSession);
     const userEmail = session.email;
 
-    const BACKEND_SETTINGS_URL = "https://api-v2-red.vercel.app/api/settings";
-    const BACKEND_LOGIN_URL = "https://api-v2-red.vercel.app/bank/login-user";
+    const BACKEND_SETTINGS_URL = "http://localhost:5000/api/settings";
+    const BACKEND_LOGIN_URL = "http://localhost:5000/bank/login-user";
     const APP_SIGNATURE = "onflex";
 
     const keypadAudio = new Audio("../assets/single-keypad.mp3");

@@ -1,5 +1,5 @@
 // ===== API Connection Core Parameters =====
-const BACKEND_URL = "https://api-v2-red.vercel.app/register-user";
+const BACKEND_URL = "http://localhost:5000/register-user";
 const APP_SIGNATURE = "onflex";
 
 // ===== UI Reference Elements =====
@@ -180,7 +180,7 @@ form.addEventListener('submit', async (e) => {
     };
 
     try {
-        const response = await fetch("https://api-v2-red.vercel.app/register-user", {
+        const response = await fetch("http://localhost:5000/register-user", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

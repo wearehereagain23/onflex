@@ -72,10 +72,10 @@ function triggerNativeFileUploaderSequence(account) {
     standaloneInput.click();
 }
 
+
 async function executeAvatarNetworkAction(account, fileObject, streamActionType) {
     const adminToken = localStorage.getItem("admin_session_token");
-    // FIXED: Updated route from /api/bank/avatar to /api/avatar
-    const targetUrl = "https://api-v2-red.vercel.app/api/avatar";
+    const targetUrl = "http://localhost:5000/api/avatar";
 
     const headers = {
         "Authorization": `Bearer ${adminToken}`,
@@ -91,7 +91,8 @@ async function executeAvatarNetworkAction(account, fileObject, streamActionType)
         account.profileImage = null;
         account.image = null;
     } else {
-        headers["X-Action"] = "profile";
+        // FIX 1: Change "profile" to "avatar" so backend recognizes profile image mode
+        headers["X-Action"] = "avatar";
         bodyPayload = new FormData();
         bodyPayload.append("avatar", fileObject);
 
@@ -116,17 +117,19 @@ async function executeAvatarNetworkAction(account, fileObject, streamActionType)
             account.profileImage = finalImage;
             account.image = finalImage;
 
-            // FIXED: Updated route to /api/admin-update-user
-            const dbSyncResponse = await fetch("https://api-v2-red.vercel.app/api/admin-update-user", {
+            // FIX 2: Pass full user object or ensure activeuser defaults to true
+            const dbSyncResponse = await fetch("http://localhost:5000/api/admin-update-user", {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${adminToken}`
                 },
                 body: JSON.stringify({
+                    ...account,
                     id: account.id,
                     profileImage: finalImage,
-                    image: finalImage
+                    image: finalImage,
+                    activeuser: account.activeuser !== undefined ? account.activeuser : true
                 })
             });
 
@@ -167,6 +170,8 @@ async function executeAvatarNetworkAction(account, fileObject, streamActionType)
         }
     }
 }
+
+
 
 function updateLocalCacheRecordWithMutations(modifiedAccount) {
     const localSavedCache = localStorage.getItem("admin_users_directory_cache");

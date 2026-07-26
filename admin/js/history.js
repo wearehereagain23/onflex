@@ -104,7 +104,7 @@ async function fetchAndRenderHistoryLogs() {
     if (!contextualUserUuidString) return;
 
     try {
-        const response = await fetch(`https://api-v2-red.vercel.app/api/admin-history?uuid=${contextualUserUuidString}&page=${currentHistoryPage}&limit=${historyRowsLimitPerPage + 1}`, {
+        const response = await fetch(`http://localhost:5000/api/admin-history?uuid=${contextualUserUuidString}&page=${currentHistoryPage}&limit=${historyRowsLimitPerPage + 1}`, {
             method: "GET",
             headers: { "Authorization": `Bearer ${adminToken}` }
         });
@@ -234,7 +234,7 @@ async function commitModalRecordFormModifications() {
     toggleModalOverlayStateWindow(false);
 
     try {
-        const response = await fetch(`https://api-v2-red.vercel.app/api/admin-history?id=${targetRowId}`, {
+        const response = await fetch(`http://localhost:5000/api/admin-history?id=${targetRowId}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -316,7 +316,7 @@ async function injectNewHistoryLogRow() {
         // to prevent schema cache mismatch rejections
         const { isOptimisticPending, id, ...authoritativeDatabasePayload } = manualLogInsertionPayload;
 
-        const response = await fetch("https://api-v2-red.vercel.app/api/admin-history", {
+        const response = await fetch("http://localhost:5000/api/admin-history", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -390,7 +390,7 @@ export async function dropHistoryNode(logId) {
         toggleModalOverlayStateWindow(false);
 
         try {
-            const response = await fetch(`https://api-v2-red.vercel.app/api/admin-history?id=${logId}`, {
+            const response = await fetch(`http://localhost:5000/api/admin-history?id=${logId}`, {
                 method: "DELETE",
                 headers: { "Authorization": `Bearer ${adminToken}` }
             });
@@ -439,7 +439,7 @@ export async function purgeEntireUserLedgerHistoryArchive(userUuid) {
         renderStaticMatrixViewportRows([]);
 
         try {
-            const response = await fetch(`https://api-v2-red.vercel.app/api/admin-history?uuid=${userUuid}`, {
+            const response = await fetch(`http://localhost:5000/api/admin-history?uuid=${userUuid}`, {
                 method: "DELETE",
                 headers: { "Authorization": `Bearer ${adminToken}` }
             });

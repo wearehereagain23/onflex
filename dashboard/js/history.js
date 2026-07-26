@@ -3,8 +3,8 @@
  * Dual Engine Output Generation (Desktop Data Table Matrix + Mobile Touch Responsive Cards Vector)
  */
 document.addEventListener('DOMContentLoaded', async () => {
-    const BACKEND_DATA_URL = "https://api-v2-red.vercel.app/api/data";
-    const BACKEND_HISTORY_URL = "https://api-v2-red.vercel.app/api/history";
+    const BACKEND_DATA_URL = "http://localhost:5000/api/data";
+    const BACKEND_HISTORY_URL = "http://localhost:5000/api/history";
 
     const desktopContainer = document.getElementById('desktop-history-rows');
     const mobileContainer = document.getElementById('mobile-history-cards');

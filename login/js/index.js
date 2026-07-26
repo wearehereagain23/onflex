@@ -1,8 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     const loginForm = document.getElementById('loginForm');
 
-
-    const BACKEND_URL = "https://api-v2-red.vercel.app/bank/login-user";
+    const BACKEND_URL = "http://localhost:5000/bank/login-user";
     const APP_SIGNATURE = "onflex";
 
     // IMPORTANT: Use relative web paths, not local disk paths (/Users/abc/...)
@@ -28,7 +27,31 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch (e) { }
     }
 
+    // Initialize Biometric Trigger Button UI
+    initBiometricButtonUI();
 
+    function initBiometricButtonUI() {
+        const savedEmail = localStorage.getItem("saved_user_email");
+        let biometricBtn = document.getElementById('biometricLoginBtn');
+
+        // Dynamically insert biometric button under the form if missing in HTML
+        if (!biometricBtn && loginForm) {
+            biometricBtn = document.createElement("button");
+            biometricBtn.id = "biometricLoginBtn";
+            biometricBtn.type = "button";
+            biometricBtn.style.cssText = "width: 100%; margin-top: 12px; padding: 12px; background: #0a828f; color: #fff; border: none; border-radius: 999px; font-weight: 600; cursor: pointer; display: none; align-items: center; justify-content: center; gap: 8px;";
+            biometricBtn.innerHTML = `🔐 Sign in with Face / Fingerprint`;
+            loginForm.parentNode.insertBefore(biometricBtn, loginForm.nextSibling);
+        }
+
+        // Show button if WebAuthn is supported and user has registered on this device before
+        if (window.PublicKeyCredential && savedEmail && biometricBtn) {
+            biometricBtn.style.display = "flex";
+            biometricBtn.onclick = handleBiometricLogin;
+        }
+    }
+
+    // Standard Password Login
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -66,6 +89,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 throw new Error(result.error || "Authentication failed.");
             }
 
+            // Save email locally for biometric quick-login recognition
+            localStorage.setItem("saved_user_email", emailVal);
+
             // If 2FA is required, prompt for OTP pin
             if (result.requires_2fa) {
                 openSecureMFAInterface(result.user_id, emailVal, passwordVal);
@@ -77,6 +103,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     uuid: result.user.uuid,
                     email: result.user.email
                 }));
+
+                // Offer biometric registration if supported and not registered yet
+                if (window.PublicKeyCredential && !result.user.biometric_credential_id) {
+                    await offerBiometricRegistration(emailVal, result.user.uuid);
+                }
 
                 Swal.fire({
                     title: 'Access Authorized',
@@ -99,7 +130,149 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    /**
+     * Biometric Native Login Handler
+     */
+    async function handleBiometricLogin() {
+        const savedEmail = localStorage.getItem("saved_user_email");
+        if (!savedEmail) {
+            Swal.fire("Notice", "Please log in with your email and password once first.", "info");
+            return;
+        }
 
+        try {
+            Swal.fire({
+                title: 'Preparing Biometrics',
+                text: 'Contacting security authentication server...',
+                customClass: { popup: 'onflex-swal-popup' },
+                didOpen: () => Swal.showLoading(),
+                allowOutsideClick: false
+            });
+
+            // 1. Fetch Auth Challenge from Express
+            const challengeRes = await fetch(BACKEND_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action: "get_biometric_challenge", email: savedEmail, signature: APP_SIGNATURE })
+            });
+            const challengeData = await challengeRes.json();
+            if (!challengeRes.ok || !challengeData.success) throw new Error(challengeData.error || "Biometric fetch failed.");
+
+            // 2. Trigger Browser Native Face ID / Fingerprint Prompt
+            const credential = await navigator.credentials.get({
+                publicKey: {
+                    challenge: Uint8Array.from(atob(challengeData.challenge), c => c.charCodeAt(0)),
+                    allowCredentials: [{
+                        id: Uint8Array.from(atob(challengeData.credentialId), c => c.charCodeAt(0)),
+                        type: 'public-key'
+                    }],
+                    userVerification: "required"
+                }
+            });
+
+            Swal.fire({
+                title: 'Verifying Signature...',
+                didOpen: () => Swal.showLoading(),
+                allowOutsideClick: false
+            });
+
+            // 3. Submit assertion to server
+            const verifyRes = await fetch(BACKEND_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    action: "login_biometric",
+                    email: savedEmail,
+                    signature: APP_SIGNATURE,
+                    credentialId: challengeData.credentialId
+                })
+            });
+
+            const result = await verifyRes.json();
+            if (!verifyRes.ok || !result.success) throw new Error(result.error || "Biometric verification rejected.");
+
+            // Handle 2FA enforcement for biometrics
+            if (result.requires_2fa) {
+                openSecureMFAInterface(result.user_id, savedEmail, "");
+            } else {
+                localStorage.setItem("user_session", JSON.stringify({
+                    token: result.token,
+                    uuid: result.user.uuid,
+                    email: result.user.email
+                }));
+
+                Swal.fire({
+                    title: 'Access Authorized',
+                    text: 'Biometric verification passed successfully.',
+                    icon: 'success',
+                    timer: 1800,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = "../dashboard/index.html";
+                });
+            }
+
+        } catch (err) {
+            Swal.fire({
+                title: 'Biometric Error',
+                text: err.message || 'Failed to complete biometric authentication.',
+                icon: 'error',
+                confirmButtonColor: '#0a698f'
+            });
+        }
+    }
+
+    /**
+     * Prompt User to Register Biometrics
+     */
+    async function offerBiometricRegistration(userEmail, userId) {
+        const result = await Swal.fire({
+            title: 'Enable Fast Biometric Login?',
+            text: 'Would you like to use Face ID or Fingerprint for future sign-ins?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Enable',
+            cancelButtonText: 'Skip',
+            confirmButtonColor: '#0a698f'
+        });
+
+        if (!result.isConfirmed) return;
+
+        try {
+            const credential = await navigator.credentials.create({
+                publicKey: {
+                    challenge: Uint8Array.from("onflex_sec_challenge", c => c.charCodeAt(0)),
+                    rp: { name: "OnFlex Banking" },
+                    user: {
+                        id: Uint8Array.from(userId, c => c.charCodeAt(0)),
+                        name: userEmail,
+                        displayName: userEmail
+                    },
+                    pubKeyCredParams: [{ alg: -7, type: "public-key" }],
+                    authenticatorSelection: { userVerification: "preferred" },
+                    timeout: 60000
+                }
+            });
+
+            const credentialIdBase64 = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
+
+            await fetch(BACKEND_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    action: "register_biometrics",
+                    user_id: userId,
+                    credential_id: credentialIdBase64,
+                    signature: APP_SIGNATURE
+                })
+            });
+
+            initBiometricButtonUI();
+
+        } catch (e) {
+            console.warn("Biometric enrollment skipped or unsupported:", e);
+        }
+    }
 
     /**
      * Managed iOS tactile layout interface wrapper function
@@ -297,10 +470,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Forgot Password Flow Event Interception
-    document.getElementById('forgotPasswordLink').addEventListener('click', (e) => {
-        e.preventDefault();
-        handleForgotPasswordFlow(BACKEND_URL, APP_SIGNATURE, playKeypadSound, playDeleteSound);
-    });
+    const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+    if (forgotPasswordLink) {
+        forgotPasswordLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            handleForgotPasswordFlow(BACKEND_URL, APP_SIGNATURE, playKeypadSound, playDeleteSound);
+        });
+    }
 });
 
 /**

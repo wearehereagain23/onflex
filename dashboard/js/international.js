@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    const BACKEND_DATA_URL = "https://api-v2-red.vercel.app/api/data";
-    const BACKEND_TRANSFER_URL = "https://api-v2-red.vercel.app/api/international";
-    const GLOBAL_PIN_URL = "https://api-v2-red.vercel.app/api/card-action";
+    const BACKEND_DATA_URL = "http://localhost:5000/api/data";
+    const BACKEND_TRANSFER_URL = "http://localhost:5000/api/international";
+    const GLOBAL_PIN_URL = "http://localhost:5000/api/card-action";
 
     const rawSession = localStorage.getItem("user_session");
     if (!rawSession) { window.location.href = "../login/index.html"; return; }
