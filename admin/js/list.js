@@ -622,7 +622,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // INACTIVITY & TAB VISIBILITY MONITORING (5-MINUTE AUTO LOGOUT)
 // =========================================================================
 (() => {
-    const INACTIVITY_LIMIT_MS = 8 * 60 * 1000; // 5 minutes in milliseconds
+    const INACTIVITY_LIMIT_MS = 5 * 60 * 1000; // 5 minutes in milliseconds
     let inactivityTimer = null;
 
     /**
