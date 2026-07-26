@@ -215,3 +215,26 @@ body {
         padding: 32px 20px;
     }
 }
+
+
+html,
+body {
+    /* Disables pinch-zoom and double-tap zoom gestures */
+    touch-action: pan-x pan-y;
+
+    /* Prevents native iOS elastic bounce scroll if desired */
+    overscroll-behavior-y: none;
+
+    /* Prevents text selection on UI elements */
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* Allow text selection inside inputs and textareas so users can copy/paste */
+input,
+textarea {
+    -webkit-user-select: text;
+    user-select: text;
+    font-size: 16px;
+    /* Prevents iOS auto-zoom on focus */
+}
