@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }).then(() => {
             localStorage.clear();
             sessionStorage.clear();
-            window.location.replace("./login.html");
+            window.location.replace("../login/index.html");
         });
     };
 

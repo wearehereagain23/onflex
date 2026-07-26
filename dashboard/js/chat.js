@@ -50,12 +50,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const desktopTrigger = document.getElementById("headerChatBtn");
     const mobileTrigger = document.getElementById("mobileChatTrigger");
 
-    // Unified Endpoint Host Resolver
-    const hostOrigin = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-        ? "https://api-v2-red.vercel.app"
-        : window.location.origin;
-
-    const API_ENDPOINT = `${hostOrigin}/api/admin-chat`;
+    // Unified Express Endpoint Host Resolver
+    const BACKEND_URL = "https://api-v2-red.vercel.app";
+    const SIGNATURE = "onflex";
+    const API_ENDPOINT = `${BACKEND_URL}/api/admin-chat`;
 
     let chatPollingInterval = null;
     let localMessagesCache = [];
@@ -189,7 +187,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${currentToken}`
+                    "Authorization": `Bearer ${currentToken}`,
+                    "x-signature": SIGNATURE
                 }
             });
 
@@ -245,12 +244,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${currentToken}`
+                    "Authorization": `Bearer ${currentToken}`,
+                    "x-signature": SIGNATURE
                 },
                 body: JSON.stringify({
                     user_uuid: userUuid,
                     message_body: rawContent || null,
-                    attachment_url: attachmentUrl || null
+                    attachment_url: attachmentUrl || null,
+                    signature: SIGNATURE
                 })
             });
 

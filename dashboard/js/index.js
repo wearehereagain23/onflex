@@ -423,7 +423,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 (() => {
     // ⏱️ CONFIGURE INACTIVE TIMEOUT DURATION HERE (in milliseconds)
-    const INACTIVE_TIMEOUT_MS = 1 * 60 * 1000; // 1 minute (60,000 ms)
+    const INACTIVE_TIMEOUT_MS = 5 * 60 * 1000; // 1 minute (60,000 ms)
 
     let tabInactiveTimer = null;
 

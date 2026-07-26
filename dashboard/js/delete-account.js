@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     confirmButtonColor: '#0a698f'
                 });
 
-                window.location.href = "../login.html";
+                window.location.href = "../login/index.html";
 
             } catch (err) {
                 console.error("❌ [Account Deletion Fault]:", err);

@@ -5,6 +5,10 @@
  */
 document.addEventListener("DOMContentLoaded", () => {
 
+    // Define Express backend target URL
+    const BACKEND_URL = "https://api-v2-red.vercel.app";
+    const SIGNATURE = "onflex";
+
     // ----------------------------------------------------------------------
     // PHASE 1: EXACT BUTTON LOCATION ENGINE
     // ----------------------------------------------------------------------
@@ -157,15 +161,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 const token = getAuthToken();
                 if (token && item.id) {
                     try {
-                        const hostOrigin = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-                            ? "https://api-v2-red.vercel.app"
-                            : window.location.origin;
-
-                        await fetch(`${hostOrigin}/api/notifications/read`, {
+                        await fetch(`${BACKEND_URL}/api/notifications/read`, {
                             method: "PATCH",
                             headers: {
                                 "Content-Type": "application/json",
-                                "Authorization": `Bearer ${token}`
+                                "Authorization": `Bearer ${token}`,
+                                "x-signature": SIGNATURE
                             },
                             body: JSON.stringify({ id: item.id })
                         });
@@ -191,17 +192,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const token = getAuthToken();
         const userUuid = parseUserUuidFromToken(token);
 
-        const hostOrigin = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-            ? "https://api-v2-red.vercel.app"
-            : window.location.origin;
-
-        const requestUrl = `${hostOrigin}/api/notifications?uuid=${userUuid || ''}&page=${page}&limit=10&t=${Date.now()}`;
+        const requestUrl = `${BACKEND_URL}/api/notifications?uuid=${userUuid || ''}&page=${page}&limit=10&t=${Date.now()}`;
 
         try {
             const response = await fetch(requestUrl, {
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
+                    "Authorization": `Bearer ${token}`,
+                    "x-signature": SIGNATURE
                 }
             });
 
@@ -261,15 +259,12 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!token) return;
 
         try {
-            const hostOrigin = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-                ? "https://api-v2-red.vercel.app"
-                : window.location.origin;
-
-            const response = await fetch(`${hostOrigin}/api/notifications?uuid=${userUuid || ''}`, {
+            const response = await fetch(`${BACKEND_URL}/api/notifications?uuid=${userUuid || ''}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
+                    "Authorization": `Bearer ${token}`,
+                    "x-signature": SIGNATURE
                 }
             });
 
