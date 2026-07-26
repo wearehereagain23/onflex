@@ -5,7 +5,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const toggleNotifications = document.getElementById('toggleNotifications');
     if (!toggleNotifications) return;
 
-    const BACKEND_SETTINGS_URL = "https://api-v2-red.vercel.app/api/settings";
+    // Direct production endpoint
+    const BACKEND_SETTINGS_URL = "https://api-v2-red.vercel.app/api/notifications";
     const APP_SIGNATURE = "onflex";
 
     // Hardcoded VAPID Public Key matching the admin implementation
@@ -93,7 +94,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        // Fallback-safe dynamic token retrieval pipeline matching local login payloads
         const rawSession = localStorage.getItem("user_session");
         let userUuid = localStorage.getItem("user_uuid") || localStorage.getItem("uuid");
         let currentToken = localStorage.getItem("user_session_token") || localStorage.getItem("token") || "";
@@ -108,7 +108,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
 
-        // Guard assertion block: Ensure payload parameters exist before executing network connection
         if (!userUuid || !currentToken) {
             Swal.fire({
                 icon: 'error',
@@ -130,7 +129,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     throw new Error("Permission denied. Please enable notifications in your browser.");
                 }
 
-                // Subscribing directly using the hardcoded VAPID public key
                 const subscription = await registration.pushManager.subscribe({
                     userVisibleOnly: true,
                     applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
@@ -168,7 +166,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 };
             }
 
-            // Post preference metadata context updates directly into backend gateway
             const response = await fetch(BACKEND_SETTINGS_URL, {
                 method: "POST",
                 headers: {
@@ -205,7 +202,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Initialize layout state values
     if ('serviceWorker' in navigator && 'PushManager' in window) {
         navigator.serviceWorker.register('/sw.js')
             .then(() => {
