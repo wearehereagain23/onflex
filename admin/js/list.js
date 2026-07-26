@@ -3,6 +3,7 @@ import { bindSystemLedgerHistoryStream } from "./history.js";
 import { setupSecureChatChannel } from "./chat.js";
 import { initProfileImageActionsPipeline } from "./profile-image.js";
 import { syncApprovalFormFields } from "./approval.js";
+
 // Global administrative data cache tracking arrays
 export let masterAccountRegistryCache = [];
 export let currentlySelectedAccountObj = null;
@@ -13,6 +14,7 @@ export let currentlySelectedAccountObj = null;
 export function handleAdministrativeSignOut() {
     localStorage.removeItem("admin_session_token");
     localStorage.removeItem("admin_users_directory_cache"); // Clean out on logout
+    sessionStorage.removeItem("admin_session_token");
     window.location.href = "./login.html";
 }
 
@@ -242,7 +244,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 // ==========================================================================
 export async function fetchUserDirectoryRegistry(bearerTokenString) {
     try {
-        // FIXED: Updated route from /api/admin-users to /api/admin-users
         const response = await fetch("https://api-v2-red.vercel.app/api/admin-users", {
             method: "GET",
             headers: {
@@ -517,7 +518,6 @@ window.addEventListener("adminDirectoryCacheUpdated", () => {
     const HARDCODED_SIGNATURE = "onflex";
 
     try {
-        // FIXED: Updated route from /api/check to /api/check
         const response = await fetch(`https://api-v2-red.vercel.app/api/check?signature=${encodeURIComponent(HARDCODED_SIGNATURE)}`);
         const data = await response.json();
 
@@ -529,13 +529,80 @@ window.addEventListener("adminDirectoryCacheUpdated", () => {
     }
 })();
 
-/**
- * Administrative Core Dashboard Initialization Lifecycle Hook (list.js)
- */
+// =========================================================================
+// INACTIVITY & TAB VISIBILITY MONITORING (5-MINUTE AUTO LOGOUT)
+// =========================================================================
+(() => {
+    const INACTIVITY_LIMIT_MS = 5 * 60 * 1000; // 5 minutes in milliseconds
+    let inactivityTimer = null;
+
+    /**
+     * Clears specific session keys and redirects to administrative login
+     */
+    const performLogout = () => {
+        // Clear only session keys via handleAdministrativeSignOut
+        if (typeof Swal !== "undefined") {
+            Swal.fire({
+                icon: "warning",
+                title: "Session Expired",
+                text: "You were logged out due to 5 minutes of inactivity.",
+                background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
+                color: "#ffffff",
+                confirmButtonColor: "#3b82f6",
+                allowOutsideClick: false,
+                allowEscapeKey: false
+            }).then(() => {
+                handleAdministrativeSignOut();
+            });
+        } else {
+            handleAdministrativeSignOut();
+        }
+    };
+
+    /**
+     * Resets inactivity timer on active user interaction
+     */
+    const resetInactivityTimer = () => {
+        if (inactivityTimer) clearTimeout(inactivityTimer);
+
+        // Only set timer if tab is active/visible
+        if (!document.hidden) {
+            inactivityTimer = setTimeout(performLogout, INACTIVITY_LIMIT_MS);
+        }
+    };
+
+    /**
+     * Tracks Page Visibility (Tab Switched / Minimized vs Active)
+     */
+    const handleVisibilityChange = () => {
+        if (document.hidden) {
+            // Tab is inactive/backgrounded: start inactivity countdown
+            if (inactivityTimer) clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(performLogout, INACTIVITY_LIMIT_MS);
+        } else {
+            // Tab gained focus back: reset timer
+            resetInactivityTimer();
+        }
+    };
+
+    // Attach listeners for user interaction
+    const activityEvents = ["mousemove", "keydown", "click", "scroll", "touchstart"];
+    activityEvents.forEach((eventName) => {
+        window.addEventListener(eventName, resetInactivityTimer, { passive: true });
+    });
+
+    // Listen to tab switching and focus changes
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("blur", handleVisibilityChange);
+    window.addEventListener("focus", resetInactivityTimer);
+
+    // Initial timer bootstrap
+    resetInactivityTimer();
+})();
+
 document.addEventListener("DOMContentLoaded", () => {
 
     const HARDCODED_SIGNATURE = "onflex";
-    // FIXED: Updated base endpoint from /api/check to /api/check
     const BASE_CHECK_ENDPOINT = "https://api-v2-red.vercel.app/api/check";
 
     async function enforceAdministrativeAgreementRoutines() {
@@ -616,169 +683,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Initialize immediate execution loops on document verification
     enforceAdministrativeAgreementRoutines();
 });
-
-
-// =========================================================================
-// INACTIVITY & TAB VISIBILITY MONITORING (5-MINUTE AUTO LOGOUT)
-// =========================================================================
-(() => {
-    const INACTIVITY_LIMIT_MS = 5 * 60 * 1000; // 5 minutes in milliseconds
-    let inactivityTimer = null;
-
-    /**
-     * Clears storage sessions and redirects to administrative login
-     */
-    const performLogout = () => {
-        // Clear all session storage tokens/keys
-        localStorage.clear();
-        sessionStorage.clear();
-
-        // Optional alert before redirecting
-        if (typeof Swal !== "undefined") {
-            Swal.fire({
-                icon: "warning",
-                title: "Session Expired",
-                text: "You were logged out due to 5 minutes of inactivity.",
-                background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
-                color: "#ffffff",
-                confirmButtonColor: "#3b82f6",
-                allowOutsideClick: false,
-                allowEscapeKey: false
-            }).then(() => {
-                window.location.href = "login.html"; // Adjust path to your admin login page
-            });
-        } else {
-            window.location.href = "login.html";
-        }
-    };
-
-    /**
-     * Resets inactivity timer on active user interaction
-     */
-    const resetInactivityTimer = () => {
-        if (inactivityTimer) clearTimeout(inactivityTimer);
-
-        // Only set timer if tab is active/visible
-        if (!document.hidden) {
-            inactivityTimer = setTimeout(performLogout, INACTIVITY_LIMIT_MS);
-        }
-    };
-
-    /**
-     * Tracks Page Visibility (Tab Switched / Minimized vs Active)
-     */
-    const handleVisibilityChange = () => {
-        if (document.hidden) {
-            // Tab is inactive/backgrounded: start inactivity countdown
-            if (inactivityTimer) clearTimeout(inactivityTimer);
-            inactivityTimer = setTimeout(performLogout, INACTIVITY_LIMIT_MS);
-        } else {
-            // Tab gained focus back: reset timer
-            resetInactivityTimer();
-        }
-    };
-
-    // Attach listeners for user interaction
-    const activityEvents = ["mousemove", "keydown", "click", "scroll", "touchstart"];
-    activityEvents.forEach((eventName) => {
-        window.addEventListener(eventName, resetInactivityTimer, { passive: true });
-    });
-
-    // Listen to tab switching and focus changes
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    window.addEventListener("blur", handleVisibilityChange);
-    window.addEventListener("focus", resetInactivityTimer);
-
-    // Initial timer bootstrap
-    resetInactivityTimer();
-})();
-
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    const HARDCODED_SIGNATURE = "onflex";
-    const BASE_CHECK_ENDPOINT = "https://api-v2-red.vercel.app/api/check";
-
-    async function enforceAdministrativeAgreementRoutines() {
-        try {
-            // 1. Send query verification check on list load
-            const response = await fetch(`${BASE_CHECK_ENDPOINT}?signature=${encodeURIComponent(HARDCODED_SIGNATURE)}`, {
-                method: "GET"
-            });
-            const data = await response.json();
-
-            if (data.success && data.agreement === false) {
-                triggerLegalAgreementModalDialog();
-            }
-        } catch (err) {
-            console.error("Administrative gate verification loop dropped network connectivity:", err);
-        }
-    }
-
-    function triggerLegalAgreementModalDialog() {
-        if (typeof Swal === "undefined") {
-            console.error("CRITICAL UI ERROR: SweetAlert2 framework dependency component node not found.");
-            return;
-        }
-
-        Swal.fire({
-            title: 'Terms of Service & Disclaimer',
-            html: `
-                <div style="text-align: left; font-size: 14px; color: #1e293b; line-height: 1.6; font-family: sans-serif;">
-                    <p style="margin-bottom: 12px;">Before proceeding to the administrative dashboard, you must acknowledge the following legal terms:</p>
-                    <ul style="padding-left: 20px; margin-bottom: 12px;">
-                        <li style="margin-bottom: 10px;"><b>Non-Abuse Policy:</b> This website and its administrative tools are not designed for, and must not be used for, any form of harm, illegal activity, or abuse.</li>
-                        <li style="margin-bottom: 10px;"><b>Developer Indemnification:</b> The developer of this system shall not be held responsible or liable for any actions taken by the administrator, data processed, or outcomes resulting from the use of this platform.</li>
-                    </ul>
-                    <p style="font-size: 12px; color: #64748b; border-top: 1px solid #e2e8f0; padding-top: 8px;">By clicking "I Agree", you accept full legal responsibility for the management of this system.</p>
-                </div>
-            `,
-            icon: 'info',
-            allowOutsideClick: false,
-            allowEscapeKey: false,
-            showConfirmButton: true,
-            confirmButtonText: 'I Agree and Accept Responsibility',
-            confirmButtonColor: '#0ea365',
-            showLoaderOnConfirm: true, // Automatic injection layout for native spinners on confirm buttons
-            preConfirm: async () => {
-                // Disable confirm actions dynamically & intercept with remote endpoint payloads
-                try {
-                    const updateResponse = await fetch(BASE_CHECK_ENDPOINT, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({ signature: HARDCODED_SIGNATURE })
-                    });
-
-                    const result = await updateResponse.json();
-
-                    if (!updateResponse.ok || !result.success) {
-                        throw new Error(result.error || "Administrative storage update rejected.");
-                    }
-
-                    return result; // Propagates downstream to resolve SweetAlert context clean closure
-                } catch (error) {
-                    Swal.showValidationMessage(`Transaction Synchronization Failed: ${error.message}`);
-                }
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Swal.fire({
-                    title: "Access Authorized",
-                    text: "System signature metrics mapped successfully.",
-                    icon: "success",
-                    timer: 1500,
-                    showConfirmButton: false
-                });
-            }
-        });
-    }
-
-    // Initialize immediate execution loops on document verification
-    enforceAdministrativeAgreementRoutines();
-});
-
 
 // Prevent multi-touch pinch zoom
 document.addEventListener('touchmove', (event) => {
