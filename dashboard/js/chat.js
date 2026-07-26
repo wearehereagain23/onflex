@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Unified Endpoint Host Resolver
     const hostOrigin = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-        ? "http://localhost:5000"
+        ? "https://api-v2-red.vercel.app"
         : window.location.origin;
 
     const API_ENDPOINT = `${hostOrigin}/api/admin-chat`;

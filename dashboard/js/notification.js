@@ -158,7 +158,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (token && item.id) {
                     try {
                         const hostOrigin = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-                            ? "http://localhost:5000"
+                            ? "https://api-v2-red.vercel.app"
                             : window.location.origin;
 
                         await fetch(`${hostOrigin}/api/notifications/read`, {
@@ -192,7 +192,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const userUuid = parseUserUuidFromToken(token);
 
         const hostOrigin = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-            ? "http://localhost:5000"
+            ? "https://api-v2-red.vercel.app"
             : window.location.origin;
 
         const requestUrl = `${hostOrigin}/api/notifications?uuid=${userUuid || ''}&page=${page}&limit=10&t=${Date.now()}`;
@@ -262,7 +262,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         try {
             const hostOrigin = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-                ? "http://localhost:5000"
+                ? "https://api-v2-red.vercel.app"
                 : window.location.origin;
 
             const response = await fetch(`${hostOrigin}/api/notifications?uuid=${userUuid || ''}`, {
