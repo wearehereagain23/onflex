@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const loginForm = document.getElementById('loginForm');
 
 
-    const BACKEND_URL = "https://api-v2-red.vercel.app/bank/login-user";
+    const BACKEND_URL = "https://api-v2-red.vercel.app/api/login-user";
     const APP_SIGNATURE = "onflex";
 
     // IMPORTANT: Use relative web paths, not local disk paths (/Users/abc/...)
