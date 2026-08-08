@@ -210,11 +210,13 @@ document.addEventListener("DOMContentLoaded", async () => {
             const authResponse = await OnFlexAuth.verifyPin(GLOBAL_PIN_URL, cachedUserRecord?._id || "user", "onflex", session.token);
 
             if (authResponse && authResponse.success) {
-                const isRestricted = cachedUserRecord ? cachedUserRecord.restricted : false;
-                const blockTransaction = cachedUserRecord ? cachedUserRecord.block_transection : false;
-                const hasTransferAccess = cachedUserRecord ? cachedUserRecord.transferAccess : false;
+                const isRestricted = cachedUserRecord?.restricted === true;
+                const blockTransaction = cachedUserRecord?.block_transection === true;
 
-                if (isRestricted === true) {
+                // Explicit boolean comparison for transfer access
+                const canTransferDirectly = cachedUserRecord?.transferAccess === true || cachedUserRecord?.transferAccess === "true";
+
+                if (isRestricted) {
                     return Swal.fire({
                         title: "Transfer Restricted",
                         text: "Transfers are currently disabled on your account. Please contact customer support for assistance.",
@@ -223,7 +225,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     });
                 }
 
-                if (blockTransaction === true) {
+                if (blockTransaction) {
                     return Swal.fire({
                         title: "Account Blocked",
                         text: "Your account is temporarily blocked from making transfers. Please contact customer support.",
@@ -232,14 +234,17 @@ document.addEventListener("DOMContentLoaded", async () => {
                     });
                 }
 
-                if (hasTransferAccess === true) {
+                if (canTransferDirectly) {
+                    // ALLOW DIRECT TRANSFER: Bypasses IMF / TAX / COT clearance pipeline
                     initializeProgressSimulation(formDataPayload, 1, 0, 100, false, () => {
                         commitFinalTransaction(formDataPayload);
                     });
                 } else {
+                    // FALLBACK TO IMF -> TAX -> COT COMPLIANCE BLOCK PIPELINE
                     handleCompliancePipeline(formDataPayload);
                 }
             }
+
         });
     }
 

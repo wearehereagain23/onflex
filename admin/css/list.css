@@ -875,3 +875,24 @@ body {
     border-bottom: 1px solid var(--border-divider-line);
     flex-shrink: 0;
 }
+
+
+/* add bother to inputs */
+
+/* Custom Input Border Enhancements */
+#user-approvals-fields input.form-control,
+#user-approvals-fields select.form-control {
+    background-color: #111b21 !important;
+    border: 1px solid #334155 !important;
+    border-radius: 6px !important;
+    padding: 8px 12px !important;
+    color: var(--text-primary-bright) !important;
+    outline: none !important;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+#user-approvals-fields input.form-control:focus,
+#user-approvals-fields select.form-control:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+}
