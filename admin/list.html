@@ -123,7 +123,7 @@
                         <i data-lucide="paperclip"></i>
                     </button>
                     <div class="chat-input-text-container">
-                        <input type="text" id="chat-terminal-text-field" placeholder="Type a message...">
+                        <textarea id="chat-terminal-text-field" placeholder="Type a message..." rows="3"></textarea>
                     </div>
                     <button type="button" class="utility-action-btn chat-send-payload-btn" id="chat-send-message-btn">
                         <i data-lucide="send"></i>
@@ -175,6 +175,10 @@
                                 <a class="nav-link" id="user-set-passwort-tab" href="#user-set-passwort"
                                     data-target-pane-id="user-set-passwort">
                                     <span><i data-lucide="history"></i> Settlement History Matrix</span>
+                                </a>
+                                <a class="nav-link" id="pane-email-tab" href="#pane-email"
+                                    data-target-pane-id="pane-email">
+                                    <span><i data-lucide="mail"></i> Email Dispatcher</span>
                                 </a>
                                 <a class="nav-link" id="deleteUser"
                                     style="color: var(--status-blocked-red); cursor: pointer;">
@@ -858,6 +862,53 @@
                                                         Synthesize Data Infrastructure logs
                                                     </button>
                                                 </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- ========================================== -->
+                                <!-- EMAIL DISPATCHER TAB PANE -->
+                                <!-- ========================================== -->
+                                <div class="tab-pane-custom" id="pane-email">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5>Email Dispatcher</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <form id="emailDispatchForm" class="spa-form-grid"
+                                                style="display: flex; flex-direction: column; gap: 16px;">
+
+                                                <div class="form-group-item">
+                                                    <label class="form-label">Recipient Email Address</label>
+                                                    <input type="email" id="supportEmail" name="supportEmail"
+                                                        class="form-control" required>
+                                                </div>
+
+                                                <div class="form-group-item">
+                                                    <label class="form-label">Support Message</label>
+                                                    <textarea id="supportMessage" name="supportMessage"
+                                                        class="form-control" rows="5"
+                                                        placeholder="Type message to dispatch..."
+                                                        style="background: #0f172a; color: #fff; border: 1.5px solid #334155; padding: 10px; border-radius: 6px;"></textarea>
+                                                </div>
+
+                                                <div class="form-group-item">
+                                                    <label class="form-label">Attachment Image
+                                                        (Optional)</label>
+                                                    <input type="file" id="adminEmailImage" name="adminEmailImage"
+                                                        class="form-control" accept="image/*"
+                                                        style="background: #0f172a; color: #fff; border: 1.5px solid #334155; padding: 8px;">
+                                                </div>
+
+                                                <div style="margin-top: 12px;">
+                                                    <button type="submit"
+                                                        class="admin-execute-action-btn primary-intent-btn"
+                                                        style="width: auto; padding: 12px 30px; background: #00a884; color: #fff; font-weight: bold; border: none; border-radius: 6px; cursor: pointer;">
+                                                        Dispatch Email Message
+                                                    </button>
+                                                </div>
+
                                             </form>
                                         </div>
                                     </div>

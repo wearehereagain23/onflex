@@ -168,7 +168,7 @@ async function submitApprovalSection(targetUserId, section, payload, formElement
     submitBtn.innerText = "Updating...";
 
     try {
-        const response = await fetch("https://api-v2-red.vercel.app/api/admin-approval", {
+        const response = await fetch("https://bank-app-api-cyan.vercel.app/api/admin-approval", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

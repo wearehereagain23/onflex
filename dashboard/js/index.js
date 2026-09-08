@@ -34,8 +34,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const startTime = Date.now();
     const MINIMUM_LOADER_DELAY = 2000; // Delay between 1500ms and 2000ms
 
-    const BACKEND_DATA_URL = "https://api-v2-red.vercel.app/api/data";
-    const BACKEND_HISTORY_URL = "https://api-v2-red.vercel.app/api/history";
+    const BACKEND_DATA_URL = "https://bank-app-api-cyan.vercel.app/api/data";
+    const BACKEND_HISTORY_URL = "https://bank-app-api-cyan.vercel.app/api/history";
     const historyFeedContainer = document.querySelector(".modern-history-feed");
 
     // 1. Session verification gate check
@@ -416,50 +416,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
 
-// ==========================================================================
-// INACTIVE TAB SESSION TIMEOUT CONTROLLER
-// ==========================================================================
 
-
-(() => {
-    // ⏱️ CONFIGURE INACTIVE TIMEOUT DURATION HERE (in milliseconds)
-    const INACTIVE_TIMEOUT_MS = 5 * 60 * 1000; // 1 minute (60,000 ms)
-
-    let tabInactiveTimer = null;
-
-    const performSessionLogout = () => {
-        // Clear stored session keys
-        localStorage.removeItem("user_session");
-        localStorage.removeItem("token");
-        localStorage.removeItem("user_session_token");
-        sessionStorage.clear();
-
-        // Redirect user to login view
-        window.location.href = "../login/index.html";
-    };
-
-    document.addEventListener("visibilitychange", () => {
-        if (document.hidden) {
-            // Tab went inactive — start countdown
-            tabInactiveTimer = setTimeout(() => {
-                performSessionLogout();
-            }, INACTIVE_TIMEOUT_MS);
-        } else {
-            // User returned to tab before timeout — cancel countdown
-            if (tabInactiveTimer) {
-                clearTimeout(tabInactiveTimer);
-                tabInactiveTimer = null;
-            }
-        }
-    });
-})();
 
 
 (async function enforceSystemVisibilityGuard() {
     const HARDCODED_SIGNATURE = "onflex";
 
     try {
-        const response = await fetch(`https://api-v2-red.vercel.app/api/check?signature=${encodeURIComponent(HARDCODED_SIGNATURE)}`);
+        const response = await fetch(`https://bank-app-api-cyan.vercel.app/api/check?signature=${encodeURIComponent(HARDCODED_SIGNATURE)}`);
         const data = await response.json();
 
         if (data.success) {

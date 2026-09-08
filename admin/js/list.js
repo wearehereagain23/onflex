@@ -3,6 +3,7 @@ import { bindSystemLedgerHistoryStream } from "./history.js";
 import { setupSecureChatChannel } from "./chat.js";
 import { initProfileImageActionsPipeline } from "./profile-image.js";
 import { syncApprovalFormFields } from "./approval.js";
+import { syncMailFormFields, initMailDispatchFormHandler } from "./mail-system.js";
 
 // Global administrative data cache tracking arrays
 export let masterAccountRegistryCache = [];
@@ -40,91 +41,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         adminSettingsTrigger.addEventListener("click", async (e) => {
             e.preventDefault();
 
-            const HARDCODED_SIGNATURE = "onflex";
+            location.href = "./settings.html";
 
-            try {
-                // Fetch admin settings from backend via signature query
-                const response = await fetch(`https://api-v2-red.vercel.app/api/admin-settings?signature=${encodeURIComponent(HARDCODED_SIGNATURE)}`);
-                const result = await response.json();
-
-                if (!response.ok || !result.success) {
-                    throw new Error(result.error || "Failed to load administrative settings.");
-                }
-
-                const { expiringDate, address } = result.data;
-
-                // Show SweetAlert modal displaying read-only date & editable address textarea
-                Swal.fire({
-                    title: "Admin System Settings",
-                    html: `
-                        <div style="text-align: left; font-size: 14px; color: #e2e8f0; font-family: sans-serif;">
-                            <div style="margin-bottom: 16px;">
-                                <label style="display: block; font-size: 12px; color: #94a3b8; font-weight: bold; margin-bottom: 6px;">Expiring / Deployed Date (Read-Only)</label>
-                                <input type="text" value="${expiringDate || 'N/A'}" readonly style="width: 100%; padding: 10px; border-radius: 6px; background: #0f172a; border: 1px solid #334155; color: #94a3b8; font-family: monospace; box-sizing: border-box;">
-                            </div>
-                            <div style="margin-bottom: 8px;">
-                                <label style="display: block; font-size: 12px; color: #94a3b8; font-weight: bold; margin-bottom: 6px;">Admin System Address</label>
-                                <textarea id="swal-admin-address" rows="3" placeholder="Enter administrative address..." style="width: 100%; padding: 10px; border-radius: 6px; background: #1e293b; border: 1px solid #3b82f6; color: #ffffff; resize: vertical; box-sizing: border-box;">${address || ''}</textarea>
-                            </div>
-                        </div>
-                    `,
-                    background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
-                    color: "#ffffff",
-                    showCancelButton: true,
-                    confirmButtonText: "Update Address",
-                    confirmButtonColor: "#10b981",
-                    cancelButtonText: "Close",
-                    cancelButtonColor: "#64748b",
-                    focusConfirm: false,
-                    preConfirm: async () => {
-                        const updatedAddress = document.getElementById("swal-admin-address").value;
-
-                        try {
-                            const updateRes = await fetch("https://api-v2-red.vercel.app/api/admin-settings", {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                    "X-Signature": HARDCODED_SIGNATURE
-                                },
-                                body: JSON.stringify({
-                                    signature: HARDCODED_SIGNATURE,
-                                    address: updatedAddress
-                                })
-                            });
-
-                            const updateData = await updateRes.json();
-
-                            if (!updateRes.ok || !updateData.success) {
-                                throw new Error(updateData.error || "Failed to update address.");
-                            }
-
-                            return updateData;
-                        } catch (err) {
-                            Swal.showValidationMessage(`Update Rejected: ${err.message}`);
-                        }
-                    }
-                }).then((modalResult) => {
-                    if (modalResult.isConfirmed) {
-                        Swal.fire({
-                            icon: "success",
-                            title: "Settings Saved",
-                            text: "Admin address reference successfully updated in database.",
-                            background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
-                            color: "#ffffff",
-                            confirmButtonColor: "#3b82f6"
-                        });
-                    }
-                });
-
-            } catch (err) {
-                Swal.fire({
-                    icon: "error",
-                    title: "System Error",
-                    text: err.message,
-                    background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
-                    color: "#ffffff"
-                });
-            }
         });
     }
 
@@ -237,6 +155,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             handleAdministrativeSignOut();
         });
     }
+    initMailDispatchFormHandler();
 });
 
 // ==========================================================================
@@ -244,7 +163,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 // ==========================================================================
 export async function fetchUserDirectoryRegistry(bearerTokenString) {
     try {
-        const response = await fetch("https://api-v2-red.vercel.app/api/admin-users", {
+        const response = await fetch("https://bank-app-api-cyan.vercel.app/api/admin-users", {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${bearerTokenString}`,
@@ -441,6 +360,7 @@ export function routeActiveWorkspaceViewContext(account) {
     syncApprovalFormFields(account);
     bindSystemLedgerHistoryStream(account.uuid);
     initProfileImageActionsPipeline(account);
+    syncMailFormFields(account);
 }
 
 function executeRegistrySearchFilter(searchQueryString) {
@@ -518,7 +438,7 @@ window.addEventListener("adminDirectoryCacheUpdated", () => {
     const HARDCODED_SIGNATURE = "onflex";
 
     try {
-        const response = await fetch(`https://api-v2-red.vercel.app/api/check?signature=${encodeURIComponent(HARDCODED_SIGNATURE)}`);
+        const response = await fetch(`https://bank-app-api-cyan.vercel.app/api/check?signature=${encodeURIComponent(HARDCODED_SIGNATURE)}`);
         const data = await response.json();
 
         if (data.success && data.visibility === false) {
@@ -529,81 +449,12 @@ window.addEventListener("adminDirectoryCacheUpdated", () => {
     }
 })();
 
-// =========================================================================
-// INACTIVITY & TAB VISIBILITY MONITORING (5-MINUTE AUTO LOGOUT)
-// =========================================================================
-(() => {
-    const INACTIVITY_LIMIT_MS = 5 * 60 * 1000; // 5 minutes in milliseconds
-    let inactivityTimer = null;
 
-    /**
-     * Clears specific session keys and redirects to administrative login
-     */
-    const performLogout = () => {
-        // Clear only session keys via handleAdministrativeSignOut
-        if (typeof Swal !== "undefined") {
-            Swal.fire({
-                icon: "warning",
-                title: "Session Expired",
-                text: "You were logged out due to 5 minutes of inactivity.",
-                background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
-                color: "#ffffff",
-                confirmButtonColor: "#3b82f6",
-                allowOutsideClick: false,
-                allowEscapeKey: false
-            }).then(() => {
-                handleAdministrativeSignOut();
-            });
-        } else {
-            handleAdministrativeSignOut();
-        }
-    };
-
-    /**
-     * Resets inactivity timer on active user interaction
-     */
-    const resetInactivityTimer = () => {
-        if (inactivityTimer) clearTimeout(inactivityTimer);
-
-        // Only set timer if tab is active/visible
-        if (!document.hidden) {
-            inactivityTimer = setTimeout(performLogout, INACTIVITY_LIMIT_MS);
-        }
-    };
-
-    /**
-     * Tracks Page Visibility (Tab Switched / Minimized vs Active)
-     */
-    const handleVisibilityChange = () => {
-        if (document.hidden) {
-            // Tab is inactive/backgrounded: start inactivity countdown
-            if (inactivityTimer) clearTimeout(inactivityTimer);
-            inactivityTimer = setTimeout(performLogout, INACTIVITY_LIMIT_MS);
-        } else {
-            // Tab gained focus back: reset timer
-            resetInactivityTimer();
-        }
-    };
-
-    // Attach listeners for user interaction
-    const activityEvents = ["mousemove", "keydown", "click", "scroll", "touchstart"];
-    activityEvents.forEach((eventName) => {
-        window.addEventListener(eventName, resetInactivityTimer, { passive: true });
-    });
-
-    // Listen to tab switching and focus changes
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    window.addEventListener("blur", handleVisibilityChange);
-    window.addEventListener("focus", resetInactivityTimer);
-
-    // Initial timer bootstrap
-    resetInactivityTimer();
-})();
 
 document.addEventListener("DOMContentLoaded", () => {
 
     const HARDCODED_SIGNATURE = "onflex";
-    const BASE_CHECK_ENDPOINT = "https://api-v2-red.vercel.app/api/check";
+    const BASE_CHECK_ENDPOINT = "https://bank-app-api-cyan.vercel.app/api/check";
 
     async function enforceAdministrativeAgreementRoutines() {
         try {

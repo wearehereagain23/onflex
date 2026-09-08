@@ -4,8 +4,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     const actionDeleteAccount = document.getElementById('actionDeleteAccount');
 
-    const BACKEND_DELETE_URL = "https://api-v2-red.vercel.app/api/user-delete";
-    const BACKEND_DATA_URL = "https://api-v2-red.vercel.app/api/data";
+    const BACKEND_DELETE_URL = "https://bank-app-api-cyan.vercel.app/api/user-delete";
+    const BACKEND_DATA_URL = "https://bank-app-api-cyan.vercel.app/api/data";
 
     // Helper: Safely resolve authentication token from browser storage
     const getAuthToken = () => {

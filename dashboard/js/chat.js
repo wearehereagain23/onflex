@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         </label>
                         <input type="file" id="chatImageFile" accept="image/*" style="display: none;">
                         
-                        <input type="text" id="chatTextInput" class="chat-text-input" placeholder="Message content...">
+                        <textarea id="chatTextInput" class="chat-text-input" placeholder="Message content..." rows="1" style="resize: none; overflow-y: auto; max-height: 100px; font-family: inherit;"></textarea>
                         
                         <div id="chatSendBtn" class="chat-action-icon" aria-label="Send Query">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const mobileTrigger = document.getElementById("mobileChatTrigger");
 
     // Unified Express Endpoint Host Resolver
-    const BACKEND_URL = "https://api-v2-red.vercel.app";
+    const BACKEND_URL = "https://bank-app-api-cyan.vercel.app";
     const SIGNATURE = "onflex";
     const API_ENDPOINT = `${BACKEND_URL}/api/admin-chat`;
 
@@ -126,6 +126,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const bubble = document.createElement("div");
         bubble.className = `msg-bubble ${isUserOwner ? 'msg-user-bubble' : 'msg-support-bubble'}`;
+        // Preserve returns/line breaks and paragraphs inside the chat bubble
+        bubble.style.whiteSpace = "pre-wrap";
+        bubble.style.wordBreak = "break-word";
 
         if (imagePayload) {
             const previewImg = document.createElement("img");
@@ -162,7 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const renderDatabaseChatHistory = (messages) => {
         chatBody.innerHTML = `
             <div class="msg-wrapper msg-support-wrap">
-                <div class="msg-bubble msg-support-bubble">Welcome to OnFlex Live Assistance! Type your text query below or attach an image file directly. How can we serve your portfolio updates?</div>
+                <div class="msg-bubble msg-support-bubble" style="white-space: pre-wrap; word-break: break-word;">Welcome to OnFlex Live Assistance! Type your text query below or attach an image file directly. How can we serve your portfolio updates?</div>
             </div>
         `;
 
@@ -234,6 +237,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const userUuid = parseUserUuidFromToken(currentToken);
 
         textInput.value = "";
+        textInput.style.height = "auto"; // Reset textarea height after sending
         fileInput.value = "";
 
         // Optimistic UI Append with single tick (isSavedToDb = false)
@@ -269,8 +273,18 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     sendBtn.addEventListener("click", processTextMessageSend);
-    textInput.addEventListener("keypress", (event) => {
-        if (event.key === "Enter") processTextMessageSend();
+
+    // Auto-expand textarea on typing & handle Enter / Shift+Enter keypress
+    textInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" && !event.shiftKey) {
+            event.preventDefault();
+            processTextMessageSend();
+        }
+    });
+
+    textInput.addEventListener("input", () => {
+        textInput.style.height = "auto";
+        textInput.style.height = `${Math.min(textInput.scrollHeight, 100)}px`;
     });
 
     fileInput.addEventListener("change", () => {

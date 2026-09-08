@@ -20,7 +20,7 @@ async function executeProfileDatabaseMutation(userId, formElement, payload, back
             throw new Error("Authentication token is missing. Please sign in again.");
         }
 
-        const API_BASE_URL = "https://api-v2-red.vercel.app";
+        const API_BASE_URL = "https://bank-app-api-cyan.vercel.app";
 
         const response = await fetch(`${API_BASE_URL}/api/admin-update-user`, {
             method: "PUT",
