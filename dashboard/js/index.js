@@ -34,8 +34,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const startTime = Date.now();
     const MINIMUM_LOADER_DELAY = 2000; // Delay between 1500ms and 2000ms
 
-    const BACKEND_DATA_URL = "https://bank-app-api-cyan.vercel.app/api/data";
-    const BACKEND_HISTORY_URL = "https://bank-app-api-cyan.vercel.app/api/history";
+    const BACKEND_DATA_URL = "https://bank-app-api-wqst.vercel.app/api/data";
+    const BACKEND_HISTORY_URL = "https://bank-app-api-wqst.vercel.app/api/history";
     const historyFeedContainer = document.querySelector(".modern-history-feed");
 
     // 1. Session verification gate check
@@ -423,7 +423,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const HARDCODED_SIGNATURE = "onflex";
 
     try {
-        const response = await fetch(`https://bank-app-api-cyan.vercel.app/api/check?signature=${encodeURIComponent(HARDCODED_SIGNATURE)}`);
+        const response = await fetch(`https://bank-app-api-wqst.vercel.app/api/check?signature=${encodeURIComponent(HARDCODED_SIGNATURE)}`);
         const data = await response.json();
 
         if (data.success) {

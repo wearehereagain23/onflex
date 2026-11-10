@@ -7,8 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const actionActivate2FA = document.getElementById('actionActivate2FA');
     const actionSystemLogout = document.getElementById('actionSystemLogout');
 
-    const BACKEND_2FA_URL = "https://bank-app-api-cyan.vercel.app/api/2fa";
-    const BACKEND_DATA_URL = "https://bank-app-api-cyan.vercel.app/api/data";
+    const BACKEND_2FA_URL = "https://bank-app-api-wqst.vercel.app/api/2fa";
+    const BACKEND_DATA_URL = "https://bank-app-api-wqst.vercel.app/api/data";
 
     // Helper: Safely resolve current session token from local storage
     const getAuthToken = () => {

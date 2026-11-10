@@ -6,7 +6,7 @@
 document.addEventListener("DOMContentLoaded", () => {
 
     // Define Express backend target URL
-    const BACKEND_URL = "https://bank-app-api-cyan.vercel.app";
+    const BACKEND_URL = "https://bank-app-api-wqst.vercel.app";
     const SIGNATURE = "onflex";
 
     // ----------------------------------------------------------------------

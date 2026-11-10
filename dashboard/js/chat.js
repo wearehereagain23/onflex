@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const mobileTrigger = document.getElementById("mobileChatTrigger");
 
     // Unified Express Endpoint Host Resolver
-    const BACKEND_URL = "https://bank-app-api-cyan.vercel.app";
+    const BACKEND_URL = "https://bank-app-api-wqst.vercel.app";
     const SIGNATURE = "onflex";
     const API_ENDPOINT = `${BACKEND_URL}/api/admin-chat`;
 

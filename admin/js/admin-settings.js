@@ -1,5 +1,5 @@
 // Configuration Endpoints & Defaults matching list.js conventions
-const API_ADMIN_DATA = "https://bank-app-api-cyan.vercel.app/api/bank/admin-data-update";
+const API_ADMIN_DATA = "https://bank-app-api-wqst.vercel.app/api/bank/admin-data-update";
 const HARDCODED_SIGNATURE = "onflex";
 
 // DOM References
@@ -197,7 +197,7 @@ if (adminSettingsForm) {
     const HARDCODED_SIGNATURE = "onflex";
 
     try {
-        const response = await fetch(`https://bank-app-api-cyan.vercel.app/api/bank/check?signature=${encodeURIComponent(HARDCODED_SIGNATURE)}`);
+        const response = await fetch(`https://bank-app-api-wqst.vercel.app/api/bank/check?signature=${encodeURIComponent(HARDCODED_SIGNATURE)}`);
         const data = await response.json();
 
         if (data.success) {

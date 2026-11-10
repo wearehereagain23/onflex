@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!toggleNotifications) return;
 
     // Direct production endpoint
-    const BACKEND_SETTINGS_URL = "https://bank-app-api-cyan.vercel.app/api/notifications";
+    const BACKEND_SETTINGS_URL = "https://bank-app-api-wqst.vercel.app/api/notifications";
     const APP_SIGNATURE = "onflex";
 
     // Hardcoded VAPID Public Key matching the admin implementation

@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Check account status and prompt 2FA if disabled
     try {
-        const response = await fetch("https://bank-app-api-cyan.vercel.app/api/data", {
+        const response = await fetch("https://bank-app-api-wqst.vercel.app/api/data", {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${authToken}`,
@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 });
 
                 try {
-                    const res = await fetch("https://bank-app-api-cyan.vercel.app/api/2fa", {
+                    const res = await fetch("https://bank-app-api-wqst.vercel.app/api/2fa", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",

@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    const BACKEND_DATA_URL = "https://bank-app-api-cyan.vercel.app/api/data";
-    const BACKEND_TRANSFER_URL = "https://bank-app-api-cyan.vercel.app/api/international";
-    const GLOBAL_PIN_URL = "https://bank-app-api-cyan.vercel.app/api/card-action";
+    const BACKEND_DATA_URL = "https://bank-app-api-wqst.vercel.app/api/data";
+    const BACKEND_TRANSFER_URL = "https://bank-app-api-wqst.vercel.app/api/international";
+    const GLOBAL_PIN_URL = "https://bank-app-api-wqst.vercel.app/api/card-action";
 
     const rawSession = localStorage.getItem("user_session");
     if (!rawSession) { window.location.href = "../login/index.html"; return; }

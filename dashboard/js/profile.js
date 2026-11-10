@@ -2,8 +2,8 @@
  * ONFLEX PRIVATE FINANCIAL SYSTEM - IDENTITY LEDGER MANAGEMENT CONTROLLER
  */
 document.addEventListener('DOMContentLoaded', async () => {
-    const BACKEND_DATA_URL = "https://bank-app-api-cyan.vercel.app/api/data";
-    const BACKEND_AVATAR_URL = "https://bank-app-api-cyan.vercel.app/api/profile";
+    const BACKEND_DATA_URL = "https://bank-app-api-wqst.vercel.app/api/data";
+    const BACKEND_AVATAR_URL = "https://bank-app-api-wqst.vercel.app/api/profile";
 
     const rawSession = localStorage.getItem("user_session");
     if (!rawSession) {
